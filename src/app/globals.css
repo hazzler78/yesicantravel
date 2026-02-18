@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #faf8f6;
+  --foreground: #1b263b;
+  --coral: #e07a5f;
+  --coral-light: #f4a261;
+  --sand: #f2e9e4;
+  --ocean-teal: #2d6a6f;
+  --ocean-teal-light: #40916c;
+  --navy: #1b263b;
+  --navy-light: #415a77;
+  --plum: #6b4e71;
 }
 
 @theme inline {
@@ -12,15 +20,33 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+/* Larger base text for accessibility */
+html {
+  font-size: 18px;
+}
+
+/* Focus styles for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--ocean-teal);
+  outline-offset: 2px;
+}
+
+.lp-submit-button {
+  background-color: var(--ocean-teal) !important;
+  color: white !important;
+  padding: 0.875rem 1.5rem !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  width: 100% !important;
+}
+
+.lp-submit-button:hover {
+  background-color: var(--ocean-teal-light) !important;
 }

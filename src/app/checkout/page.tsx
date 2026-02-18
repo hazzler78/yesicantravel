@@ -231,6 +231,34 @@ function CheckoutContent() {
     );
   }
 
+  // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required for full support)
+  useEffect(() => {
+    const matches = (s: string) =>
+      s.includes("loaderror") ||
+      s.includes("expressCheckout") ||
+      s.includes("payment Element");
+    const onRejection = (e: PromiseRejectionEvent) => {
+      const msg =
+        e.reason?.message ??
+        (typeof e.reason === "string" ? e.reason : JSON.stringify(e.reason ?? ""));
+      if (typeof msg === "string" && matches(msg)) {
+        e.preventDefault();
+      }
+    };
+    const onError = (e: ErrorEvent) => {
+      if (e.message && matches(e.message)) {
+        e.preventDefault();
+        return true;
+      }
+    };
+    window.addEventListener("unhandledrejection", onRejection);
+    window.addEventListener("error", onError);
+    return () => {
+      window.removeEventListener("unhandledrejection", onRejection);
+      window.removeEventListener("error", onError);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
       <Script src="https://payment-wrapper.liteapi.travel/dist/liteAPIPayment.js?v=a1" strategy="afterInteractive" />
@@ -288,6 +316,13 @@ function CheckoutContent() {
             <h1 className="text-2xl font-bold text-[var(--navy)]">Payment</h1>
             <p className="rounded-lg bg-[var(--ocean-teal)]/10 p-4 text-base text-[var(--navy)]">
               Sandbox: use test card <strong>4242 4242 4242 4242</strong>, any 3 digits for CVV, any future expiration date.
+              {typeof window !== "undefined" &&
+                window.location?.protocol === "http:" &&
+                window.location?.hostname === "localhost" && (
+                  <span className="mt-2 block text-sm text-[var(--navy-light)]">
+                    Payment may not load on HTTP localhost. Deploy to Vercel (HTTPS) for full payment flow.
+                  </span>
+                )}
             </p>
             <div id="payment-form" className="min-h-[200px]" />
             {prebookData && (

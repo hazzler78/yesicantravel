@@ -231,18 +231,25 @@ function CheckoutContent() {
     );
   }
 
-  // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required for full support)
+  // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
   useEffect(() => {
+    const getMsg = (r: unknown) => {
+      if (!r) return "";
+      if (typeof r === "string") return r;
+      const o = r as Record<string, unknown>;
+      return (
+        String(o.message ?? o.msg ?? "") ||
+        String(o.error?.message ?? o.error ?? "") ||
+        JSON.stringify(r)
+      );
+    };
     const matches = (s: string) =>
-      s.includes("loaderror") ||
-      s.includes("expressCheckout") ||
-      s.includes("payment Element");
+      /loaderror|expressCheckout|payment Element/i.test(s);
     const onRejection = (e: PromiseRejectionEvent) => {
-      const msg =
-        e.reason?.message ??
-        (typeof e.reason === "string" ? e.reason : JSON.stringify(e.reason ?? ""));
-      if (typeof msg === "string" && matches(msg)) {
+      const msg = getMsg(e.reason);
+      if (matches(msg)) {
         e.preventDefault();
+        e.stopPropagation();
       }
     };
     const onError = (e: ErrorEvent) => {
@@ -251,11 +258,19 @@ function CheckoutContent() {
         return true;
       }
     };
-    window.addEventListener("unhandledrejection", onRejection);
-    window.addEventListener("error", onError);
+    // Filter Stripe SDK noise from console
+    const origError = console.error;
+    console.error = (...args: unknown[]) => {
+      const str = args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
+      if (matches(str) || /Stripe\.js.*legacy|options\.wallets.*paypal/i.test(str)) return;
+      origError.apply(console, args);
+    };
+    window.addEventListener("unhandledrejection", onRejection, true);
+    window.addEventListener("error", onError, true);
     return () => {
-      window.removeEventListener("unhandledrejection", onRejection);
-      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection, true);
+      window.removeEventListener("error", onError, true);
+      console.error = origError;
     };
   }, []);
 

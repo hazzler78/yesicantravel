@@ -237,9 +237,10 @@ function CheckoutContent() {
       if (!r) return "";
       if (typeof r === "string") return r;
       const o = r as Record<string, unknown>;
+      const err = o.error as { message?: string } | undefined;
       return (
         String(o.message ?? o.msg ?? "") ||
-        String(o.error?.message ?? o.error ?? "") ||
+        String(err?.message ?? o.error ?? "") ||
         JSON.stringify(r)
       );
     };

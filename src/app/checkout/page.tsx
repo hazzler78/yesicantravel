@@ -60,9 +60,11 @@ function CheckoutContent() {
   const transactionId = searchParams.get("transactionId");
 
   const [step, setStep] = useState<"form" | "payment" | "booking" | "done" | "error">("form");
+  const [paymentMethod, setPaymentMethod] = useState<"account" | "card">("account");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [prebookData, setPrebookData] = useState<{
     prebookId: string;
     transactionId: string;
@@ -70,6 +72,21 @@ function CheckoutContent() {
   } | null>(null);
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [paymentLoadFailed, setPaymentLoadFailed] = useState(false);
+
+  // Detect when payment form fails to load (Stripe 400 on HTTP/localhost)
+  useEffect(() => {
+    if (step !== "payment" || !prebookData) return;
+    setPaymentLoadFailed(false);
+    const timer = setTimeout(() => {
+      const el = document.getElementById("payment-form");
+      const hasStripeForm = el?.querySelector("iframe, [data-stripe], [role='group']");
+      if (el && !hasStripeForm) {
+        setPaymentLoadFailed(true);
+      }
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, [step, prebookData]);
 
   // Return from payment: we have prebookId + transactionId in URL
   useEffect(() => {
@@ -91,7 +108,7 @@ function CheckoutContent() {
     }
   }, [prebookId, transactionId, step]);
 
-  // Execute book when we have everything
+  // Execute book when we have everything (return from User Payment redirect)
   useEffect(() => {
     if (step !== "booking" || !prebookId || !transactionId) return;
     const stored = sessionStorage.getItem(STORAGE_KEY);
@@ -110,6 +127,7 @@ function CheckoutContent() {
               firstName: guest.firstName,
               lastName: guest.lastName,
               email: guest.email,
+              ...(guest.phone && { phone: guest.phone }),
             },
             guests: Array.from({ length: Number(adults) || 1 }, (_, i) => ({
               occupancyNumber: i + 1,
@@ -144,31 +162,59 @@ function CheckoutContent() {
       return;
     }
 
-    setStep("payment");
+    const guestPayload = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      ...(phone.trim() && { phone: phone.trim() }),
+    };
+
     try {
-      const res = await fetch("/api/prebook", {
+      const usePaymentSdk = paymentMethod === "card";
+      const prebookRes = await fetch("/api/prebook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId }),
+        body: JSON.stringify({ offerId, usePaymentSdk }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Prebook failed");
+      const prebookJson = await prebookRes.json();
+      if (!prebookRes.ok) throw new Error(prebookJson.error ?? "Prebook failed");
 
-      const data = json.data;
-      const pid = data.prebookId;
-      const tid = data.transactionId;
-      const sk = data.secretKey;
+      const pid = prebookJson.data.prebookId;
 
+      if (paymentMethod === "account") {
+        setStep("booking");
+        const bookRes = await fetch("/api/book", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prebookId: pid,
+            paymentMethod: "ACC_CREDIT_CARD",
+            holder: { ...guestPayload, phone: guestPayload.phone || "0000000000" },
+            guests: Array.from({ length: Number(adults) || 1 }, (_, i) => ({
+              occupancyNumber: i + 1,
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              email: email.trim(),
+            })),
+          }),
+        });
+        const bookJson = await bookRes.json();
+        if (!bookRes.ok) throw new Error(bookJson.error ?? "Booking failed");
+        const data = bookJson.data;
+        setBooking(data);
+        sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
+        setStep("done");
+        return;
+      }
+
+      const tid = prebookJson.data.transactionId;
+      const sk = prebookJson.data.secretKey;
       setPrebookData({ prebookId: pid, transactionId: tid, secretKey: sk });
-
-      sessionStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ firstName, lastName, email })
-      );
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ ...guestPayload, phone: phone.trim() }));
+      setStep("payment");
 
       const base = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
       const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&adults=${adults}&prebookId=${pid}&transactionId=${tid}`;
-
       (window as unknown as { liteAPIConfig?: unknown }).liteAPIConfig = {
         publicKey: "sandbox",
         secretKey: sk,
@@ -287,6 +333,38 @@ function CheckoutContent() {
           <form onSubmit={handleGuestSubmit} className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
             <h1 className="text-2xl font-bold text-[var(--navy)]">Your details</h1>
             <p className="text-[var(--navy-light)]">We&apos;ll use this to confirm your booking.</p>
+
+            <div>
+              <span className="mb-2 block text-base font-medium text-[var(--navy)]">Payment</span>
+              <div className="flex gap-4">
+                <label className="flex cursor-pointer items-center gap-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === "account"}
+                    onChange={() => setPaymentMethod("account")}
+                    className="h-4 w-4 accent-[var(--ocean-teal)]"
+                  />
+                  <span>Charge to account</span>
+                </label>
+                <label className="flex cursor-pointer items-center gap-2">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === "card"}
+                    onChange={() => setPaymentMethod("card")}
+                    className="h-4 w-4 accent-[var(--ocean-teal)]"
+                  />
+                  <span>Pay with card at checkout</span>
+                </label>
+              </div>
+              {paymentMethod === "account" && (
+                <p className="mt-2 text-sm text-[var(--navy-light)]">
+                  In sandbox, no real charge. Easiest option for testing.
+                </p>
+              )}
+            </div>
+
             <div>
               <label htmlFor="firstName" className="mb-2 block text-base font-medium text-[var(--navy)]">First name</label>
               <input
@@ -320,6 +398,17 @@ function CheckoutContent() {
                 required
               />
             </div>
+            <div>
+              <label htmlFor="phone" className="mb-2 block text-base font-medium text-[var(--navy)]">Phone (optional)</label>
+              <input
+                id="phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="e.g. +46 70 123 45 67"
+                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+              />
+            </div>
             <button
               type="submit"
               className="w-full rounded-lg bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white hover:bg-[var(--ocean-teal-light)]"
@@ -341,6 +430,25 @@ function CheckoutContent() {
                 )}
             </p>
             <div id="payment-form" className="min-h-[200px]" />
+            {paymentLoadFailed && (
+              <div className="mt-4 rounded-lg border border-[var(--coral)]/50 bg-[var(--coral)]/10 p-4 text-[var(--navy)]">
+                <p className="font-medium">Payment form didn&apos;t load.</p>
+                <p className="mt-1 text-sm text-[var(--navy-light)]">
+                  The payment provider returned an error. Please try again in a moment. If it persists,
+                  LiteAPI may need to verify your domain (yesicantravel.com) for their Stripe integration.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentLoadFailed(false);
+                    setStep("form");
+                  }}
+                  className="mt-3 rounded-lg bg-[var(--ocean-teal)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--ocean-teal-light)]"
+                >
+                  Back to details
+                </button>
+              </div>
+            )}
             {prebookData && (
               <PaymentFormInit
                 secretKey={prebookData.secretKey}

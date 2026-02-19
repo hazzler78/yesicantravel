@@ -51,21 +51,25 @@ export async function searchRates(params: {
   return res.json();
 }
 
-export async function prebook(offerId: string) {
+export async function prebook(offerId: string, usePaymentSdk = true) {
   const res = await fetch(`${BOOK_BASE}/rates/prebook`, {
     method: "POST",
     headers: defaultHeaders,
-    body: JSON.stringify({ usePaymentSdk: true, offerId }),
+    body: JSON.stringify({ usePaymentSdk, offerId }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error?.message ?? `Prebook failed: ${res.status}`);
   return data;
 }
 
+export type BookPayment =
+  | { method: "TRANSACTION_ID"; transactionId: string }
+  | { method: "ACC_CREDIT_CARD" };
+
 export async function book(params: {
   prebookId: string;
-  transactionId: string;
-  holder: { firstName: string; lastName: string; email: string };
+  payment: BookPayment;
+  holder: { firstName: string; lastName: string; email: string; phone?: string };
   guests: Array<{ occupancyNumber: number; firstName: string; lastName: string; email: string }>;
 }) {
   const res = await fetch(`${BOOK_BASE}/rates/book`, {
@@ -74,7 +78,10 @@ export async function book(params: {
     body: JSON.stringify({
       prebookId: params.prebookId,
       holder: params.holder,
-      payment: { method: "TRANSACTION_ID", transactionId: params.transactionId },
+      payment:
+        params.payment.method === "TRANSACTION_ID"
+          ? { method: "TRANSACTION_ID", transactionId: params.payment.transactionId }
+          : { method: "ACC_CREDIT_CARD" },
       guests: params.guests,
     }),
   });

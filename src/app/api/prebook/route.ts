@@ -3,14 +3,15 @@ import { prebook } from "@/lib/liteapi";
 
 export async function POST(request: NextRequest) {
   try {
-    const { offerId } = await request.json();
+    const body = await request.json();
+    const { offerId, usePaymentSdk = true } = body;
     if (!offerId) {
       return NextResponse.json(
         { error: "offerId is required" },
         { status: 400 }
       );
     }
-    const data = await prebook(offerId);
+    const data = await prebook(offerId, usePaymentSdk);
     return NextResponse.json(data);
   } catch (e) {
     return NextResponse.json(

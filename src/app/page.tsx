@@ -102,13 +102,13 @@ export default function Home() {
         <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 py-12 md:py-16">
           <div className="mx-auto w-full max-w-3xl">
             <div className="mb-10">
-              <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md md:text-[var(--ocean-teal)] md:drop-shadow-none">
+              <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md">
                 Safer Stays
               </p>
-              <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl md:text-[var(--navy)] md:drop-shadow-none">
+              <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl">
                 You&apos;re capable. We&apos;ve got your back.
               </h1>
-              <p className="text-lg text-white/95 drop-shadow-sm md:text-[var(--navy-light)] md:drop-shadow-none">
+              <p className="text-lg text-white/95 drop-shadow-sm">
                 Safety-first stays for women travelling solo in Western &amp; Central Europe. Find reassurance and stay in control.
               </p>
             </div>

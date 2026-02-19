@@ -9,6 +9,7 @@ const STORAGE_KEY = "liteapi_checkout_guest";
 
 function PaymentFormInit({
   secretKey,
+  publicKey,
   prebookId,
   transactionId,
   offerId,
@@ -18,6 +19,7 @@ function PaymentFormInit({
   adults,
 }: {
   secretKey: string;
+  publicKey: "sandbox" | "live";
   prebookId: string;
   transactionId: string;
   offerId: string;
@@ -37,7 +39,7 @@ function PaymentFormInit({
         ? `${window.location.origin}${window.location.pathname}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&adults=${adults}&prebookId=${prebookId}&transactionId=${transactionId}`
         : "";
     const payment = new w.LiteAPIPayment({
-      publicKey: "sandbox",
+      publicKey,
       secretKey,
       returnUrl,
       targetElement: "#payment-form",
@@ -45,7 +47,7 @@ function PaymentFormInit({
       options: { business: { name: "Safer Stays" } },
     });
     payment.handlePayment();
-  }, [secretKey, prebookId, transactionId, offerId, hotelId, checkin, checkout, adults]);
+  }, [secretKey, publicKey, prebookId, transactionId, offerId, hotelId, checkin, checkout, adults]);
   return null;
 }
 
@@ -60,7 +62,11 @@ function CheckoutContent() {
   const transactionId = searchParams.get("transactionId");
 
   const [step, setStep] = useState<"form" | "payment" | "booking" | "done" | "error">("form");
-  const [paymentMethod, setPaymentMethod] = useState<"account" | "card">("account");
+  const [paymentConfig, setPaymentConfig] = useState<{
+    accountPaymentEnabled: boolean;
+    paymentEnv: "sandbox" | "live";
+  } | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"account" | "card">("card");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -73,6 +79,19 @@ function CheckoutContent() {
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paymentLoadFailed, setPaymentLoadFailed] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/config")
+      .then((r) => r.json())
+      .then((c) => {
+        setPaymentConfig({
+          accountPaymentEnabled: c.accountPaymentEnabled ?? false,
+          paymentEnv: c.paymentEnv ?? "sandbox",
+        });
+        if (c.accountPaymentEnabled) setPaymentMethod("account");
+      })
+      .catch(() => setPaymentConfig({ accountPaymentEnabled: false, paymentEnv: "sandbox" }));
+  }, []);
 
   // Detect when payment form fails to load (Stripe 400 on HTTP/localhost)
   useEffect(() => {
@@ -216,7 +235,7 @@ function CheckoutContent() {
       const base = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
       const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&adults=${adults}&prebookId=${pid}&transactionId=${tid}`;
       (window as unknown as { liteAPIConfig?: unknown }).liteAPIConfig = {
-        publicKey: "sandbox",
+        publicKey: paymentConfig?.paymentEnv ?? "sandbox",
         secretKey: sk,
         returnUrl,
         targetElement: "#payment-form",
@@ -334,36 +353,38 @@ function CheckoutContent() {
             <h1 className="text-2xl font-bold text-[var(--navy)]">Your details</h1>
             <p className="text-[var(--navy-light)]">We&apos;ll use this to confirm your booking.</p>
 
-            <div>
-              <span className="mb-2 block text-base font-medium text-[var(--navy)]">Payment</span>
-              <div className="flex gap-4">
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    checked={paymentMethod === "account"}
-                    onChange={() => setPaymentMethod("account")}
-                    className="h-4 w-4 accent-[var(--ocean-teal)]"
-                  />
-                  <span>Charge to account</span>
-                </label>
-                <label className="flex cursor-pointer items-center gap-2">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    checked={paymentMethod === "card"}
-                    onChange={() => setPaymentMethod("card")}
-                    className="h-4 w-4 accent-[var(--ocean-teal)]"
-                  />
-                  <span>Pay with card at checkout</span>
-                </label>
+            {paymentConfig?.accountPaymentEnabled && (
+              <div>
+                <span className="mb-2 block text-base font-medium text-[var(--navy)]">Payment</span>
+                <div className="flex gap-4">
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={paymentMethod === "account"}
+                      onChange={() => setPaymentMethod("account")}
+                      className="h-4 w-4 accent-[var(--ocean-teal)]"
+                    />
+                    <span>Charge to account</span>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={paymentMethod === "card"}
+                      onChange={() => setPaymentMethod("card")}
+                      className="h-4 w-4 accent-[var(--ocean-teal)]"
+                    />
+                    <span>Pay with card at checkout</span>
+                  </label>
+                </div>
+                {paymentMethod === "account" && (
+                  <p className="mt-2 text-sm text-[var(--navy-light)]">
+                    In sandbox, no real charge. Easiest option for testing.
+                  </p>
+                )}
               </div>
-              {paymentMethod === "account" && (
-                <p className="mt-2 text-sm text-[var(--navy-light)]">
-                  In sandbox, no real charge. Easiest option for testing.
-                </p>
-              )}
-            </div>
+            )}
 
             <div>
               <label htmlFor="firstName" className="mb-2 block text-base font-medium text-[var(--navy)]">First name</label>
@@ -411,9 +432,12 @@ function CheckoutContent() {
             </div>
             <button
               type="submit"
-              className="w-full rounded-lg bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white hover:bg-[var(--ocean-teal-light)]"
+              disabled={paymentMethod === "card" && paymentConfig === null}
+              className="w-full rounded-lg bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white hover:bg-[var(--ocean-teal-light)] disabled:opacity-50"
             >
-              Continue to payment
+              {paymentMethod === "card" && paymentConfig === null
+                ? "Loading..."
+                : "Continue to payment"}
             </button>
           </form>
         ) : (
@@ -452,6 +476,7 @@ function CheckoutContent() {
             {prebookData && (
               <PaymentFormInit
                 secretKey={prebookData.secretKey}
+                publicKey={paymentConfig?.paymentEnv ?? "sandbox"}
                 prebookId={prebookData.prebookId}
                 transactionId={prebookData.transactionId}
                 offerId={offerId!}

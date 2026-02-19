@@ -79,20 +79,41 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-      <div className="mx-auto max-w-3xl px-6 py-16">
-        <div className="mb-10">
-          <p className="mb-2 text-sm font-medium uppercase tracking-wider text-[var(--ocean-teal)]">
-            Safer Stays
-          </p>
-          <h1 className="mb-3 text-4xl font-bold tracking-tight text-[var(--navy)] md:text-5xl">
-            You&apos;re capable. We&apos;ve got your back.
-          </h1>
-          <p className="text-lg text-[var(--navy-light)]">
-            Safety-first stays for women travelling solo in Western &amp; Central Europe. Find reassurance and stay in control.
-          </p>
+      {/* Hero: image as background with text and form overlaid */}
+      <header className="relative min-h-screen w-full overflow-hidden">
+        {/* Image layer */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 aspect-[9/16] w-full md:aspect-auto md:h-full">
+            <img
+              src="/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"
+              alt=""
+              role="presentation"
+              className="h-full w-full object-cover object-center"
+              fetchPriority="high"
+            />
+          </div>
         </div>
+        {/* Gradient scrim for readability */}
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-[var(--navy)]/40 via-[var(--navy)]/10 to-[var(--navy)]/50"
+          aria-hidden
+        />
+        {/* Content overlay */}
+        <div className="relative z-10 flex min-h-screen flex-col justify-center px-6 py-12 md:py-16">
+          <div className="mx-auto w-full max-w-3xl">
+            <div className="mb-10">
+              <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md md:text-[var(--ocean-teal)] md:drop-shadow-none">
+                Safer Stays
+              </p>
+              <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl md:text-[var(--navy)] md:drop-shadow-none">
+                You&apos;re capable. We&apos;ve got your back.
+              </h1>
+              <p className="text-lg text-white/95 drop-shadow-sm md:text-[var(--navy-light)] md:drop-shadow-none">
+                Safety-first stays for women travelling solo in Western &amp; Central Europe. Find reassurance and stay in control.
+              </p>
+            </div>
 
-        <div className="rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
+            <div className="rounded-2xl border border-[var(--navy)]/10 bg-white/95 p-6 shadow-lg backdrop-blur-sm">
           <div className="mb-6 flex gap-2">
             <button
               type="button"
@@ -228,8 +249,10 @@ export default function Home() {
           >
             {loading ? "Searching..." : "Find safer stays"}
           </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
     </div>
   );
 }

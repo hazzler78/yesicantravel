@@ -378,7 +378,7 @@ function CheckoutContent() {
                     <span>Pay with card at checkout</span>
                   </label>
                 </div>
-                {paymentMethod === "account" && (
+                {paymentMethod === "account" && paymentConfig?.paymentEnv === "sandbox" && (
                   <p className="mt-2 text-sm text-[var(--navy-light)]">
                     In sandbox, no real charge. Easiest option for testing.
                   </p>
@@ -443,16 +443,18 @@ function CheckoutContent() {
         ) : (
           <div className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
             <h1 className="text-2xl font-bold text-[var(--navy)]">Payment</h1>
-            <p className="rounded-lg bg-[var(--ocean-teal)]/10 p-4 text-base text-[var(--navy)]">
-              Sandbox: use test card <strong>4242 4242 4242 4242</strong>, any 3 digits for CVV, any future expiration date.
-              {typeof window !== "undefined" &&
-                window.location?.protocol === "http:" &&
-                window.location?.hostname === "localhost" && (
-                  <span className="mt-2 block text-sm text-[var(--navy-light)]">
-                    Payment may not load on HTTP localhost. Deploy to Vercel (HTTPS) for full payment flow.
-                  </span>
-                )}
-            </p>
+            {paymentConfig?.paymentEnv === "sandbox" && (
+              <p className="rounded-lg bg-[var(--ocean-teal)]/10 p-4 text-base text-[var(--navy)]">
+                Sandbox: use test card <strong>4242 4242 4242 4242</strong>, any 3 digits for CVV, any future expiration date.
+                {typeof window !== "undefined" &&
+                  window.location?.protocol === "http:" &&
+                  window.location?.hostname === "localhost" && (
+                    <span className="mt-2 block text-sm text-[var(--navy-light)]">
+                      Payment may not load on HTTP localhost. Deploy to Vercel (HTTPS) for full payment flow.
+                    </span>
+                  )}
+              </p>
+            )}
             <div id="payment-form" className="min-h-[200px]" />
             {paymentLoadFailed && (
               <div className="mt-4 rounded-lg border border-[var(--coral)]/50 bg-[var(--coral)]/10 p-4 text-[var(--navy)]">

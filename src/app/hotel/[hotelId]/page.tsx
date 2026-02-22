@@ -41,6 +41,7 @@ function HotelContent() {
   const [roomGroups, setRoomGroups] = useState<RoomGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasFreeCancellation, setHasFreeCancellation] = useState(false);
 
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
@@ -82,8 +83,12 @@ function HotelContent() {
         const rateData = data.find((d: { hotelId: string }) => d.hotelId === hotelId);
         const roomTypes = rateData?.roomTypes ?? [];
         const allRates: Rate[] = [];
+        let freeCancellation = false;
         for (const rt of roomTypes) {
           for (const r of rt.rates ?? []) {
+            if (r.cancellationPolicies?.refundableTag === "RFN") {
+              freeCancellation = true;
+            }
             allRates.push({
               ...r,
               offerId: rt.offerId ?? r.offerId,
@@ -116,6 +121,7 @@ function HotelContent() {
           });
         });
         setRoomGroups(groups);
+        setHasFreeCancellation(freeCancellation);
       } catch (e) {
         setError((e as Error).message);
       } finally {
@@ -184,9 +190,21 @@ function HotelContent() {
           <div className="p-6">
             <h1 className="text-2xl font-bold text-[var(--navy)]">{hotel.name}</h1>
             {hotel.address && <p className="mt-1 text-[var(--navy-light)]">{hotel.address}</p>}
-            {hotel.starRating != null && (
-              <p className="mt-1 text-[var(--ocean-teal)]">★ {hotel.starRating} stars</p>
-            )}
+            <div className="mt-3 flex flex-wrap gap-2">
+              {hotel.starRating != null && (
+                <span className="inline-flex items-center rounded-full bg-[var(--ocean-teal)]/10 px-3 py-1 text-xs font-medium text-[var(--ocean-teal)]">
+                  ★ {hotel.starRating} overall rating
+                </span>
+              )}
+              {hasFreeCancellation && (
+                <span className="inline-flex items-center rounded-full bg-[var(--sand)] px-3 py-1 text-xs font-medium text-[var(--navy)]">
+                  Free cancellation options available
+                </span>
+              )}
+              <span className="inline-flex items-center rounded-full bg-[var(--navy)]/5 px-3 py-1 text-xs font-medium text-[var(--navy-light)]">
+                Secure booking via trusted provider
+              </span>
+            </div>
           </div>
         </div>
 

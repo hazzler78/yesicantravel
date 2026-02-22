@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import Script from "next/script";
 
 interface HotelBasic {
   id: string;
@@ -12,11 +13,20 @@ interface HotelBasic {
   rating?: number;
 }
 
+interface HotelListItem extends HotelBasic {
+  price?: number;
+  currency?: string;
+  hasFreeCancellation?: boolean;
+}
+
 function ResultsContent() {
   const searchParams = useSearchParams();
-  const [hotels, setHotels] = useState<Array<HotelBasic & { price?: number; currency?: string }>>([]);
+  const [hotels, setHotels] = useState<HotelListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [minRating, setMinRating] = useState<number | null>(4);
+  const [maxPrice, setMaxPrice] = useState<number | null>(null);
+  const [onlyFreeCancellation, setOnlyFreeCancellation] = useState(false);
 
   useEffect(() => {
     const placeId = searchParams.get("placeId");
@@ -49,17 +59,28 @@ function ResultsContent() {
         const json = await res.json();
         if (!res.ok) throw new Error(json.error ?? "Search failed");
 
-        const data = (json.data ?? []) as Array<{ hotelId: string; roomTypes?: Array<{ rates?: Array<{ retailRate?: { total?: Array<{ amount: number; currency?: string }> } }> }> }>;
+        const data = (json.data ?? []) as Array<{
+          hotelId: string;
+          roomTypes?: Array<{
+            rates?: Array<{
+              retailRate?: { total?: Array<{ amount: number; currency?: string }> };
+              cancellationPolicies?: { refundableTag: string };
+            }>;
+          }>;
+        }>;
         const hotelsFromApi = (json.hotels ?? []) as HotelBasic[];
 
         if (aiSearch && hotelsFromApi.length > 0) {
-          const merged = hotelsFromApi.map((h: HotelBasic) => {
-            const rateData = data.find((d: { hotelId: string }) => d.hotelId === h.id);
-            const rate = rateData?.roomTypes?.[0]?.rates?.[0];
+          const merged = hotelsFromApi.map((h) => {
+            const rateData = data.find((d) => d.hotelId === h.id);
+            const allRates = rateData?.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
+            const firstRate = allRates[0];
+            const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
             return {
               ...h,
-              price: rate?.retailRate?.total?.[0]?.amount,
-              currency: rate?.retailRate?.total?.[0]?.currency ?? "USD",
+              price: firstRate?.retailRate?.total?.[0]?.amount,
+              currency: firstRate?.retailRate?.total?.[0]?.currency ?? "USD",
+              hasFreeCancellation: freeCancellation,
             };
           });
           setHotels(merged);
@@ -72,12 +93,18 @@ function ResultsContent() {
               return j.data;
             })
           );
-          const rateByHotel: Record<string, { amount: number; currency?: string }> = {};
+          const rateByHotel: Record<string, { amount: number; currency?: string; hasFreeCancellation: boolean }> = {};
           for (const d of data) {
-            const rate = d.roomTypes?.[0]?.rates?.[0];
-            const total = rate?.retailRate?.total?.[0];
+            const allRates = d.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
+            const firstRate = allRates[0];
+            const total = firstRate?.retailRate?.total?.[0];
+            const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
             if (total && !rateByHotel[d.hotelId]) {
-              rateByHotel[d.hotelId] = { amount: total.amount, currency: total.currency ?? "USD" };
+              rateByHotel[d.hotelId] = {
+                amount: total.amount,
+                currency: total.currency ?? "USD",
+                hasFreeCancellation: freeCancellation,
+              };
             }
           }
           const merged = details.filter(Boolean).map((h) => ({
@@ -88,6 +115,7 @@ function ResultsContent() {
             rating: h.starRating,
             price: rateByHotel[h.id]?.amount,
             currency: rateByHotel[h.id]?.currency ?? "USD",
+            hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
           }));
           setHotels(merged);
         }
@@ -103,6 +131,54 @@ function ResultsContent() {
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
   const adults = searchParams.get("adults") ?? "2";
+
+  const filteredAndSortedHotels = useMemo(() => {
+    const filtered = hotels.filter((h) => {
+      if (minRating != null && (h.rating ?? 0) < minRating) return false;
+      if (maxPrice != null && (h.price ?? Number.MAX_SAFE_INTEGER) > maxPrice) return false;
+      if (onlyFreeCancellation && !h.hasFreeCancellation) return false;
+      return true;
+    });
+    // Proxy for "safest first": higher-rated stays first when available
+    return [...filtered].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
+  }, [hotels, minRating, maxPrice, onlyFreeCancellation]);
+
+  const placeId = searchParams.get("placeId");
+
+  useEffect(() => {
+    if (!placeId) return;
+    const domain = process.env.NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN ?? "whitelabel.nuitee.link";
+
+    let cancelled = false;
+    const interval = setInterval(() => {
+      if (cancelled) return;
+      const w = window as unknown as {
+        LiteAPI?: {
+          init: (opts: { domain: string }) => void;
+          Map: { create: (opts: { selector: string; placeId: string; primaryColor?: string }) => void };
+        };
+        __yictLiteApiMapInit?: boolean;
+      };
+      if (!w.LiteAPI) return;
+      clearInterval(interval);
+      if (!w.__yictLiteApiMapInit) {
+        w.LiteAPI!.init({ domain });
+        w.__yictLiteApiMapInit = true;
+      }
+      w.LiteAPI!.Map.create({
+        selector: "#yict-map",
+        placeId,
+        primaryColor: "#0f766e",
+      });
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [placeId]);
+
+  const hasMapData = filteredAndSortedHotels.some((h) => typeof h.lat === "number" && typeof h.lng === "number");
 
   if (loading) {
     return (
@@ -123,12 +199,95 @@ function ResultsContent() {
 
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-      <div className="mx-auto max-w-4xl px-6 py-10">
-        <Link href="/" className="mb-6 inline-block text-[var(--ocean-teal)] font-medium hover:underline">← Back to search</Link>
-        <h1 className="mb-2 text-2xl font-bold text-[var(--navy)]">Safer stays for your trip</h1>
-        <p className="mb-6 text-[var(--navy-light)]">Select a stay to view rooms and book.</p>
-        <div className="space-y-6">
-          {hotels.map((h) => (
+      <div className="mx-auto max-w-6xl px-6 py-10">
+        <Link href="/" className="mb-6 inline-block text-[var(--ocean-teal)] font-medium hover:underline">
+          ← Back to search
+        </Link>
+        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+          <div>
+            <h1 className="mb-1 text-2xl font-bold text-[var(--navy)]">Safer stays for your trip</h1>
+            <p className="text-[var(--navy-light)]">Filter by safety, budget, and rating to stay in control.</p>
+          </div>
+          <p className="text-sm text-[var(--navy-light)]">
+            Showing <span className="font-semibold text-[var(--navy)]">{filteredAndSortedHotels.length}</span>{" "}
+            {filteredAndSortedHotels.length === 1 ? "place" : "places"}
+          </p>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,260px)_minmax(0,1.4fr)]">
+          <aside className="h-fit rounded-xl border border-[var(--navy)]/10 bg-white p-5 shadow-sm">
+            <h2 className="mb-3 text-base font-semibold text-[var(--navy)]">Safety & comfort filters</h2>
+            <div className="space-y-4 text-sm">
+              <div>
+                <p className="mb-1 text-[var(--navy)] font-medium">Minimum rating</p>
+                <div className="flex flex-wrap gap-2">
+                  {[null, 3, 4, 4.5].map((value) => (
+                    <button
+                      key={String(value)}
+                      type="button"
+                      onClick={() => setMinRating(value)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium border ${
+                        minRating === value
+                          ? "border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/10 text-[var(--ocean-teal)]"
+                          : "border-[var(--navy)]/15 text-[var(--navy-light)] hover:border-[var(--ocean-teal)]/40"
+                      }`}
+                    >
+                      {value === null ? "Any" : `★ ${value}+`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="mb-1 text-[var(--navy)] font-medium">Budget (per stay)</p>
+                <div className="flex flex-wrap gap-2">
+                  {[null, 150, 250, 400].map((value) => (
+                    <button
+                      key={String(value)}
+                      type="button"
+                      onClick={() => setMaxPrice(value)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium border ${
+                        maxPrice === value
+                          ? "border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/10 text-[var(--ocean-teal)]"
+                          : "border-[var(--navy)]/15 text-[var(--navy-light)] hover:border-[var(--ocean-teal)]/40"
+                      }`}
+                    >
+                      {value === null ? "Any" : `Up to ${value}`}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 border-t border-[var(--navy)]/10 pt-3">
+                <label className="flex cursor-pointer items-start gap-2">
+                  <input
+                    type="checkbox"
+                    checked={onlyFreeCancellation}
+                    onChange={(e) => setOnlyFreeCancellation(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-[var(--navy)]/30 text-[var(--ocean-teal)] focus:ring-[var(--ocean-teal)]/40"
+                  />
+                  <span>
+                    <span className="block text-[var(--navy)] font-medium">Free cancellation only</span>
+                    <span className="block text-[var(--navy-light)]">
+                      Prioritise flexibility in case your plans change.
+                    </span>
+                  </span>
+                </label>
+                <p className="mt-1 text-xs text-[var(--navy-light)]">
+                  Future versions will let you filter by women-only options, neighbourhood safety and lighting.
+                </p>
+              </div>
+            </div>
+          </aside>
+
+          <div className="space-y-6">
+            <Script src="https://components.liteapi.travel/v1.0/sdk.umd.js" strategy="afterInteractive" />
+            <div
+              id="yict-map"
+              className="h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)]"
+              aria-label="Map of safer stays in this area"
+            />
+            {filteredAndSortedHotels.map((h) => (
             <Link
               key={h.id}
               href={`/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""}${searchParams.get("aiSearch") ? `&aiSearch=${encodeURIComponent(searchParams.get("aiSearch")!)}` : ""}`}
@@ -150,20 +309,30 @@ function ResultsContent() {
                       <p className="mt-1 text-[var(--ocean-teal)]">★ {h.rating}</p>
                     )}
                   </div>
-                  {h.price != null && (
-                    <p className="mt-2 text-lg font-semibold text-[var(--ocean-teal)]">
-                      {h.currency} {h.price.toFixed(2)}
-                      <span className="text-base font-normal text-[var(--navy-light)]"> / total stay</span>
-                    </p>
-                  )}
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {h.price != null && (
+                      <p className="text-lg font-semibold text-[var(--ocean-teal)]">
+                        {h.currency} {h.price.toFixed(2)}
+                        <span className="text-base font-normal text-[var(--navy-light)]"> / total stay</span>
+                      </p>
+                    )}
+                    {h.hasFreeCancellation && (
+                      <span className="inline-flex items-center rounded-full bg-[var(--ocean-teal)]/10 px-3 py-1 text-xs font-medium text-[var(--ocean-teal)]">
+                        Free cancellation
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </Link>
-          ))}
+            ))}
+            {filteredAndSortedHotels.length === 0 && (
+              <p className="text-[var(--navy-light)]">
+                No stays match these filters. Try relaxing your rating, budget, or cancellation preferences.
+              </p>
+            )}
+          </div>
         </div>
-        {hotels.length === 0 && (
-          <p className="text-[var(--navy-light)]">No stays found. Try different dates or destination.</p>
-        )}
       </div>
     </div>
   );

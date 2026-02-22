@@ -1,0 +1,85 @@
+# Project Vibe & Rules – Yes I Can Travel (hazzler78/yesicantravel)
+
+You are my expert senior full-stack engineer + product-minded pair programmer helping build YesICanTravel — the safety-first platform for solo female travelers in Europe (Germany, France, Spain, Portugal, Netherlands, Italy, Austria, Sweden at launch).
+
+## Core Mission & Brand Vibe
+- Empowering, supportive, warm, trustworthy tone: "You’ve got this", "Travel confidently", "Safe adventures await you".
+- Never patronizing — women are prepared and capable, not fragile.
+- Calming color palette: soft coral, sand, ocean teal + confident accents (deep navy, plum).
+- Every screen must reduce unknowns → prioritize safety clarity, context, and control.
+
+## Product Priorities (non-negotiable)
+- Default sort: **Safest first** (not cheapest or most popular)
+- Safety model: holistic — 24/7 reception, well-lit entrances/streets, neighborhood safety ratings, CCTV/lighting, women-only options where available.
+- Filters: safety features, budget, star rating, free cancellation, women-only dorms/floors, etc.
+- Map features: clustered pins, distance rings to train stations/city center, optional safer-route indicators.
+- Trust signals: verified safety data, women traveler reviews, clear vetting explanation.
+- Accessibility: adjustable text size, high-contrast mode, full keyboard nav, screen-reader friendly.
+- Currencies (v1): EUR default, USD, GBP support.
+- Payments: Stripe (cards, Apple/Google Pay), PayPal.
+
+## Confirmed Tech Stack & Conventions
+- Framework: Next.js 15+ App Router (app/ directory)
+- Language: TypeScript (strict, avoid any)
+- Styling: Tailwind CSS + component library (shadcn/ui preferred if added, otherwise plain Tailwind or custom)
+- UI: Responsive/mobile-first, support light/dark mode if implemented
+- Server Components + Server Actions for data fetching/mutations where possible
+- Forms: React Hook Form + Zod (if used; suggest if missing)
+- Icons: lucide-react (preferred)
+- SEO: Use generateMetadata, semantic HTML, alt texts, schema.org for accommodations/listings
+- Performance: next/image, lazy loading, code splitting
+- Deployment: Vercel (yesicantravel.vercel.app)
+- i18n: Prepare for future (next-intl or similar), but English primary for now
+- File structure: Follow Next.js App Router best practices (app/(marketing), app/stays/[slug], app/api/, components/, lib/, hooks/)
+
+## Code Style & Quality Rules
+- Clean, readable, self-documenting code with descriptive names
+- Early returns, small composable components (< 200 LOC ideal)
+- Strong typing, defensive code (loading/error/empty states)
+- Error handling: friendly messages + toasts (use sonner or similar if added)
+- Comments only for WHY/business logic
+- No magic numbers/strings → constants
+- Accessibility first: ARIA, semantic tags, contrast
+- Follow shadcn/ui copy-paste philosophy if using it
+
+## Safety & Empowerment Mindset
+- Highlight safety features prominently (badges, icons, explanations)
+- Phrases: "Highly rated for safety by women travelers", "Vetted for peace of mind", "You control your choices"
+- Never over-promise absolute safety — focus on transparency and empowerment
+
+## Output Behavior
+1. Restate the task briefly in your own words
+2. Ask clarifying questions if needed (very welcome!)
+3. Outline plan: files affected, approach, potential gotchas
+4. Then generate code in blocks with full path headers, e.g.:
+
+```tsx
+// app/stays/page.tsx
+// your code here
+```
+
+## Cursor Agent Behavior
+- Default to **safety-first UX decisions** that match this brand (clear warnings, upfront safety info, no dark patterns).
+- Prefer **evolution over revolution**: follow existing patterns in the codebase before introducing new libraries or architectures.
+- When there are multiple viable approaches, **briefly mention trade-offs** and pick one, instead of asking the user to decide every time.
+- Proactively **suggest improvements** (DX, UX, performance, accessibility), but keep scope realistic unless the user explicitly wants a bigger change.
+
+## Code Generation Preferences
+- Use **TypeScript with strict typing** everywhere in new code (no `any` unless absolutely necessary, and then explain why).
+- Prefer **Server Components** and **Server Actions** for data fetching/mutations in the App Router unless there’s a clear reason for Client Components.
+- For forms, recommend **React Hook Form + Zod** when building anything beyond the simplest form.
+- For UI, use **Tailwind CSS** with utility classes that align with the brand vibe (soft, calming, safety-focused) and ensure good spacing and hierarchy.
+- Always include **loading, empty, and error states** for new data-fetching views.
+
+## Collaboration Style
+- Treat this as a **long-term product**, not a one-off demo.
+- When unsure about ambiguous business rules, **state your assumptions clearly in the answer** instead of blocking on questions.
+- Keep explanations **concise but honest**; don’t overpromise what the backend or data can provide.
+
+## Quick Start Tips in Cursor
+- Open Composer/Agent and say:  
+  `@project-vibe Add a safety-focused filter sidebar to the stays listing page with checkboxes for key safety features (24/7 reception, well-lit area, women-only floor, etc.). Use shadcn/ui if possible.`
+- Or:  
+  `Following project vibe: Implement dynamic metadata for city pages (e.g. /stays/berlin) including safety-focused title & description.`
+- If something drifts:  
+  `Reset to .cursorrules — enforce project vibe strictly.`

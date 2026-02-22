@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useCallback, useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
@@ -79,6 +79,17 @@ function CheckoutContent() {
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paymentLoadFailed, setPaymentLoadFailed] = useState(false);
+
+  const saveCustomerForSuggestions = useCallback(
+    (payload: { email: string; firstName: string; lastName: string; phone?: string; hotelId?: string; checkin?: string; checkout?: string }) => {
+      fetch("/api/customer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    },
+    []
+  );
 
   useEffect(() => {
     fetch("/api/config")
@@ -163,12 +174,21 @@ function CheckoutContent() {
         sessionStorage.removeItem(STORAGE_KEY);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
+        saveCustomerForSuggestions({
+          email: guest.email,
+          firstName: guest.firstName,
+          lastName: guest.lastName,
+          phone: guest.phone,
+          hotelId: hotelId ?? undefined,
+          checkin: checkin ?? undefined,
+          checkout: checkout ?? undefined,
+        });
       } catch (e) {
         setError((e as Error).message);
         setStep("error");
       }
     })();
-  }, [step, prebookId, transactionId, adults]);
+  }, [step, prebookId, transactionId, adults, hotelId, checkin, checkout, saveCustomerForSuggestions]);
 
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -223,6 +243,15 @@ function CheckoutContent() {
         setBooking(data);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
+        saveCustomerForSuggestions({
+          email: guestPayload.email,
+          firstName: guestPayload.firstName,
+          lastName: guestPayload.lastName,
+          phone: guestPayload.phone,
+          hotelId: hotelId ?? undefined,
+          checkin: checkin ?? undefined,
+          checkout: checkout ?? undefined,
+        });
         return;
       }
 

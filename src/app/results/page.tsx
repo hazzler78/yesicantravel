@@ -17,6 +17,8 @@ interface HotelListItem extends HotelBasic {
   price?: number;
   currency?: string;
   hasFreeCancellation?: boolean;
+  lat?: number;
+  lng?: number;
 }
 
 function ResultsContent() {

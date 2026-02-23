@@ -30,6 +30,7 @@ function ResultsContent() {
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [onlyFreeCancellation, setOnlyFreeCancellation] = useState(false);
   const [mapSdkReady, setMapSdkReady] = useState(false);
+  const [mapLoadFailed, setMapLoadFailed] = useState(false);
 
   useEffect(() => {
     const placeId = searchParams.get("placeId");
@@ -148,7 +149,26 @@ function ResultsContent() {
 
   const placeId = searchParams.get("placeId");
 
-  // Init and render map only after the LiteAPI SDK script has loaded (Script onLoad sets mapSdkReady).
+  // If Script onLoad doesn't fire (e.g. cached script), poll for LiteAPI for a short time.
+  useEffect(() => {
+    if (!placeId || mapSdkReady || mapLoadFailed) return;
+    const w = window as unknown as { LiteAPI?: { Map?: unknown } };
+    const deadline = Date.now() + 10000;
+    const id = setInterval(() => {
+      if (w.LiteAPI?.Map) {
+        setMapSdkReady(true);
+        clearInterval(id);
+        return;
+      }
+      if (Date.now() > deadline) {
+        setMapLoadFailed(true);
+        clearInterval(id);
+      }
+    }, 300);
+    return () => clearInterval(id);
+  }, [placeId, mapSdkReady, mapLoadFailed]);
+
+  // Init and render map only after the LiteAPI SDK script has loaded (Script onLoad or poll sets mapSdkReady).
   useEffect(() => {
     if (!placeId || !mapSdkReady) return;
     const w = window as unknown as {
@@ -287,6 +307,7 @@ function ResultsContent() {
               src="https://components.liteapi.travel/v1.0/sdk.umd.js"
               strategy="afterInteractive"
               onLoad={() => setMapSdkReady(true)}
+              onError={() => setMapLoadFailed(true)}
             />
             <div
               id="yict-map"
@@ -296,6 +317,10 @@ function ResultsContent() {
               {!placeId ? (
                 <p className="text-center text-[var(--navy-light)] px-4">
                   Map available when you search by destination.
+                </p>
+              ) : mapLoadFailed ? (
+                <p className="text-center text-[var(--navy-light)] px-4">
+                  Map couldn&apos;t load. You can still browse the list below.
                 </p>
               ) : !mapSdkReady ? (
                 <p className="text-center text-[var(--navy-light)]">Loading map…</p>

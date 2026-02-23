@@ -101,6 +101,9 @@ To avoid sending visitors to a broken booking flow, run these checks first.
    - If you use both “Pay with card” and “Charge to account”, test both paths once.  
    - After deploy, hit `/api/health` from a simple uptime/monitoring check so you get alerted if the API key or LiteAPI becomes invalid.
 
+**Map on results page**  
+The results page map uses LiteAPI’s map widget and only runs when you search **by destination** (not by vibe). If the map stays blank, set `NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN` in Vercel to your LiteAPI whitelabel domain (e.g. from your LiteAPI dashboard; default is `whitelabel.nuitee.link`).
+
 ---
 
 ## Roadmap Notes (for collaborators)

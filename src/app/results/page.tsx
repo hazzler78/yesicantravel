@@ -29,6 +29,7 @@ function ResultsContent() {
   const [minRating, setMinRating] = useState<number | null>(4);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [onlyFreeCancellation, setOnlyFreeCancellation] = useState(false);
+  const [mapSdkReady, setMapSdkReady] = useState(false);
 
   useEffect(() => {
     const placeId = searchParams.get("placeId");
@@ -147,38 +148,37 @@ function ResultsContent() {
 
   const placeId = searchParams.get("placeId");
 
+  // Init and render map only after the LiteAPI SDK script has loaded (Script onLoad sets mapSdkReady).
   useEffect(() => {
-    if (!placeId) return;
-    const domain = process.env.NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN ?? "whitelabel.nuitee.link";
-
-    let cancelled = false;
-    const interval = setInterval(() => {
-      if (cancelled) return;
-      const w = window as unknown as {
-        LiteAPI?: {
-          init: (opts: { domain: string }) => void;
-          Map: { create: (opts: { selector: string; placeId: string; primaryColor?: string }) => void };
-        };
-        __yictLiteApiMapInit?: boolean;
+    if (!placeId || !mapSdkReady) return;
+    const w = window as unknown as {
+      LiteAPI?: {
+        init: (opts: { domain: string }) => void;
+        Map: { create: (opts: { selector: string; placeId: string; primaryColor?: string }) => void };
       };
-      if (!w.LiteAPI) return;
-      clearInterval(interval);
-      if (!w.__yictLiteApiMapInit) {
-        w.LiteAPI!.init({ domain });
-        w.__yictLiteApiMapInit = true;
-      }
-      w.LiteAPI!.Map.create({
-        selector: "#yict-map",
-        placeId,
-        primaryColor: "#0f766e",
-      });
-    }, 200);
-
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
+      __yictLiteApiMapInit?: boolean;
     };
-  }, [placeId]);
+    if (!w.LiteAPI?.Map?.create) return;
+
+    const domain = process.env.NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN ?? "whitelabel.nuitee.link";
+    if (!w.__yictLiteApiMapInit) {
+      w.LiteAPI.init({ domain });
+      w.__yictLiteApiMapInit = true;
+    }
+
+    // Defer so the #yict-map container is in the DOM and laid out.
+    const t = setTimeout(() => {
+      const el = document.getElementById("yict-map");
+      if (el) {
+        w.LiteAPI!.Map!.create({
+          selector: "#yict-map",
+          placeId,
+          primaryColor: "#0f766e",
+        });
+      }
+    }, 100);
+    return () => clearTimeout(t);
+  }, [placeId, mapSdkReady]);
 
   const hasMapData = filteredAndSortedHotels.some((h) => typeof h.lat === "number" && typeof h.lng === "number");
 
@@ -283,12 +283,24 @@ function ResultsContent() {
           </aside>
 
           <div className="space-y-6">
-            <Script src="https://components.liteapi.travel/v1.0/sdk.umd.js" strategy="afterInteractive" />
+            <Script
+              src="https://components.liteapi.travel/v1.0/sdk.umd.js"
+              strategy="afterInteractive"
+              onLoad={() => setMapSdkReady(true)}
+            />
             <div
               id="yict-map"
-              className="h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)]"
+              className="h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)] flex items-center justify-center"
               aria-label="Map of safer stays in this area"
-            />
+            >
+              {!placeId ? (
+                <p className="text-center text-[var(--navy-light)] px-4">
+                  Map available when you search by destination.
+                </p>
+              ) : !mapSdkReady ? (
+                <p className="text-center text-[var(--navy-light)]">Loading map…</p>
+              ) : null}
+            </div>
             {filteredAndSortedHotels.map((h) => (
             <Link
               key={h.id}

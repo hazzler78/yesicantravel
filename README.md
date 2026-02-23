@@ -85,7 +85,7 @@ To avoid sending visitors to a broken booking flow, run these checks first.
 
 1. **Health endpoint**  
    Open or request:  
-   `https://your-domain.com/api/health`  
+   `https://www.yesicantravel.com/api/health`  
    You should get **200** and `"ok": true` with `checks.apiKey` and `checks.liteApiReachable` true.  
    If you get 503 or `ok: false`, fix the reported checks (e.g. set `LITEAPI_KEY` in your deployment env) before promoting the site.
 

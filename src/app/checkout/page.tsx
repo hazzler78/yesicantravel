@@ -190,6 +190,50 @@ function CheckoutContent() {
     })();
   }, [step, prebookId, transactionId, adults, hotelId, checkin, checkout, saveCustomerForSuggestions]);
 
+  // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
+  // Must run unconditionally (before any early return) to avoid React "fewer hooks" error.
+  useEffect(() => {
+    const getMsg = (r: unknown) => {
+      if (!r) return "";
+      if (typeof r === "string") return r;
+      const o = r as Record<string, unknown>;
+      const err = o.error as { message?: string } | undefined;
+      return (
+        String(o.message ?? o.msg ?? "") ||
+        String(err?.message ?? o.error ?? "") ||
+        JSON.stringify(r)
+      );
+    };
+    const matches = (s: string) =>
+      /loaderror|expressCheckout|payment Element/i.test(s);
+    const onRejection = (e: PromiseRejectionEvent) => {
+      const msg = getMsg(e.reason);
+      if (matches(msg)) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+    const onError = (e: ErrorEvent) => {
+      if (e.message && matches(e.message)) {
+        e.preventDefault();
+        return true;
+      }
+    };
+    const origError = console.error;
+    console.error = (...args: unknown[]) => {
+      const str = args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
+      if (matches(str) || /Stripe\.js.*legacy|options\.wallets.*paypal/i.test(str)) return;
+      origError.apply(console, args);
+    };
+    window.addEventListener("unhandledrejection", onRejection, true);
+    window.addEventListener("error", onError, true);
+    return () => {
+      window.removeEventListener("unhandledrejection", onRejection, true);
+      window.removeEventListener("error", onError, true);
+      console.error = origError;
+    };
+  }, []);
+
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName.trim() || !lastName.trim() || !email.trim()) {
@@ -324,50 +368,6 @@ function CheckoutContent() {
       </div>
     );
   }
-
-  // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
-  useEffect(() => {
-    const getMsg = (r: unknown) => {
-      if (!r) return "";
-      if (typeof r === "string") return r;
-      const o = r as Record<string, unknown>;
-      const err = o.error as { message?: string } | undefined;
-      return (
-        String(o.message ?? o.msg ?? "") ||
-        String(err?.message ?? o.error ?? "") ||
-        JSON.stringify(r)
-      );
-    };
-    const matches = (s: string) =>
-      /loaderror|expressCheckout|payment Element/i.test(s);
-    const onRejection = (e: PromiseRejectionEvent) => {
-      const msg = getMsg(e.reason);
-      if (matches(msg)) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-    const onError = (e: ErrorEvent) => {
-      if (e.message && matches(e.message)) {
-        e.preventDefault();
-        return true;
-      }
-    };
-    // Filter Stripe SDK noise from console
-    const origError = console.error;
-    console.error = (...args: unknown[]) => {
-      const str = args.map((a) => (typeof a === "string" ? a : JSON.stringify(a))).join(" ");
-      if (matches(str) || /Stripe\.js.*legacy|options\.wallets.*paypal/i.test(str)) return;
-      origError.apply(console, args);
-    };
-    window.addEventListener("unhandledrejection", onRejection, true);
-    window.addEventListener("error", onError, true);
-    return () => {
-      window.removeEventListener("unhandledrejection", onRejection, true);
-      window.removeEventListener("error", onError, true);
-      console.error = origError;
-    };
-  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">

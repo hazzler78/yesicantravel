@@ -17,6 +17,16 @@ export async function searchPlaces(query: string) {
   return res.json();
 }
 
+/** Place details (coordinates, viewport) for map display. Server-side only to avoid CORS with whitelabel. */
+export async function getPlaceDetails(placeId: string) {
+  const res = await fetch(
+    `${API_BASE}/data/places/${encodeURIComponent(placeId)}?language=en`,
+    { headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" } }
+  );
+  if (!res.ok) throw new Error(`Place details failed: ${res.status}`);
+  return res.json();
+}
+
 export async function searchRates(params: {
   placeId?: string;
   hotelIds?: string[];

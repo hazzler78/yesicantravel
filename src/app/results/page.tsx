@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import Script from "next/script";
 
 interface HotelBasic {
   id: string;
@@ -29,8 +28,11 @@ function ResultsContent() {
   const [minRating, setMinRating] = useState<number | null>(4);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [onlyFreeCancellation, setOnlyFreeCancellation] = useState(false);
-  const [mapSdkReady, setMapSdkReady] = useState(false);
-  const [mapLoadFailed, setMapLoadFailed] = useState(false);
+  const [placeDetails, setPlaceDetails] = useState<{
+    location: { latitude: number; longitude: number };
+    viewport?: { high: { latitude: number; longitude: number }; low: { latitude: number; longitude: number } };
+  } | null>(null);
+  const [placeDetailsError, setPlaceDetailsError] = useState(false);
 
   useEffect(() => {
     const placeId = searchParams.get("placeId");
@@ -149,56 +151,31 @@ function ResultsContent() {
 
   const placeId = searchParams.get("placeId");
 
-  // If Script onLoad doesn't fire (e.g. cached script), poll for LiteAPI for a short time.
+  // Fetch place details server-side (avoids CORS with LiteAPI whitelabel) for map.
   useEffect(() => {
-    if (!placeId || mapSdkReady || mapLoadFailed) return;
-    const w = window as unknown as { LiteAPI?: { Map?: unknown } };
-    const deadline = Date.now() + 10000;
-    const id = setInterval(() => {
-      if (w.LiteAPI?.Map) {
-        setMapSdkReady(true);
-        clearInterval(id);
-        return;
-      }
-      if (Date.now() > deadline) {
-        setMapLoadFailed(true);
-        clearInterval(id);
-      }
-    }, 300);
-    return () => clearInterval(id);
-  }, [placeId, mapSdkReady, mapLoadFailed]);
-
-  // Init and render map only after the LiteAPI SDK script has loaded (Script onLoad or poll sets mapSdkReady).
-  useEffect(() => {
-    if (!placeId || !mapSdkReady) return;
-    const w = window as unknown as {
-      LiteAPI?: {
-        init: (opts: { domain: string }) => void;
-        Map: { create: (opts: { selector: string; placeId: string; primaryColor?: string }) => void };
-      };
-      __yictLiteApiMapInit?: boolean;
-    };
-    if (!w.LiteAPI?.Map?.create) return;
-
-    const domain = process.env.NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN ?? "whitelabel.nuitee.link";
-    if (!w.__yictLiteApiMapInit) {
-      w.LiteAPI.init({ domain });
-      w.__yictLiteApiMapInit = true;
+    if (!placeId?.trim()) {
+      setPlaceDetails(null);
+      setPlaceDetailsError(false);
+      return;
     }
-
-    // Defer so the #yict-map container is in the DOM and laid out.
-    const t = setTimeout(() => {
-      const el = document.getElementById("yict-map");
-      if (el) {
-        w.LiteAPI!.Map!.create({
-          selector: "#yict-map",
-          placeId,
-          primaryColor: "#0f766e",
-        });
-      }
-    }, 100);
-    return () => clearTimeout(t);
-  }, [placeId, mapSdkReady]);
+    setPlaceDetails(null);
+    setPlaceDetailsError(false);
+    fetch(`/api/places/details?placeId=${encodeURIComponent(placeId)}`)
+      .then((r) => r.json())
+      .then((json) => {
+        const data = json.data ?? json;
+        const loc = data?.location;
+        if (loc && typeof loc.latitude === "number" && typeof loc.longitude === "number") {
+          setPlaceDetails({
+            location: { latitude: loc.latitude, longitude: loc.longitude },
+            viewport: data.viewport,
+          });
+        } else {
+          setPlaceDetailsError(true);
+        }
+      })
+      .catch(() => setPlaceDetailsError(true));
+  }, [placeId]);
 
   const hasMapData = filteredAndSortedHotels.some((h) => typeof h.lat === "number" && typeof h.lng === "number");
 
@@ -303,12 +280,6 @@ function ResultsContent() {
           </aside>
 
           <div className="space-y-6">
-            <Script
-              src="https://components.liteapi.travel/v1.0/sdk.umd.js"
-              strategy="afterInteractive"
-              onLoad={() => setMapSdkReady(true)}
-              onError={() => setMapLoadFailed(true)}
-            />
             <div
               id="yict-map"
               className="h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)] flex items-center justify-center"
@@ -318,13 +289,33 @@ function ResultsContent() {
                 <p className="text-center text-[var(--navy-light)] px-4">
                   Map available when you search by destination.
                 </p>
-              ) : mapLoadFailed ? (
+              ) : placeDetailsError ? (
                 <p className="text-center text-[var(--navy-light)] px-4">
                   Map couldn&apos;t load. You can still browse the list below.
                 </p>
-              ) : !mapSdkReady ? (
+              ) : !placeDetails ? (
                 <p className="text-center text-[var(--navy-light)]">Loading map…</p>
-              ) : null}
+              ) : (() => {
+                const { location, viewport } = placeDetails;
+                const lat = location.latitude;
+                const lon = location.longitude;
+                const pad = 0.02;
+                const minLon = viewport?.low?.longitude ?? lon - pad;
+                const minLat = viewport?.low?.latitude ?? lat - pad;
+                const maxLon = viewport?.high?.longitude ?? lon + pad;
+                const maxLat = viewport?.high?.latitude ?? lat + pad;
+                const bbox = `${minLon},${minLat},${maxLon},${maxLat}`;
+                const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat},${lon}`;
+                return (
+                  <iframe
+                    title="Map of destination"
+                    src={osmUrl}
+                    className="h-full w-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                );
+              })()}
             </div>
             {filteredAndSortedHotels.map((h) => (
             <Link

@@ -14,7 +14,7 @@ export const maxDuration = 10;
  * You can call this from a browser, curl, or a simple uptime check.
  */
 export async function GET() {
-  const checks: Record<string, boolean | string> = {};
+  const checks: Record<string, boolean | string | number> = {};
   let ok = true;
 
   const apiKey = process.env.LITEAPI_KEY ?? "";

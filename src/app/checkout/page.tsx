@@ -159,12 +159,17 @@ function CheckoutContent() {
               email: guest.email,
               ...(guest.phone && { phone: guest.phone }),
             },
-            guests: Array.from({ length: Number(adults) || 1 }, (_, i) => ({
-              occupancyNumber: i + 1,
-              firstName: guest.firstName,
-              lastName: guest.lastName,
-              email: guest.email,
-            })),
+            // LiteAPI expects one primary guest per room (occupancyNumber = room index),
+            // and this app currently books a single room with `adults` occupants.
+            // So we send exactly one guest with occupancyNumber 1.
+            guests: [
+              {
+                occupancyNumber: 1,
+                firstName: guest.firstName,
+                lastName: guest.lastName,
+                email: guest.email,
+              },
+            ],
           }),
         });
         const json = await res.json();
@@ -273,12 +278,15 @@ function CheckoutContent() {
             prebookId: pid,
             paymentMethod: "ACC_CREDIT_CARD",
             holder: { ...guestPayload, phone: guestPayload.phone || "0000000000" },
-            guests: Array.from({ length: Number(adults) || 1 }, (_, i) => ({
-              occupancyNumber: i + 1,
-              firstName: firstName.trim(),
-              lastName: lastName.trim(),
-              email: email.trim(),
-            })),
+            // Single-room booking: one primary guest with occupancyNumber 1.
+            guests: [
+              {
+                occupancyNumber: 1,
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+                email: email.trim(),
+              },
+            ],
           }),
         });
         const bookJson = await bookRes.json();

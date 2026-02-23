@@ -98,3 +98,21 @@ export async function getHotel(hotelId: string) {
   if (!res.ok) throw new Error(`Hotel fetch failed: ${res.status}`);
   return res.json();
 }
+
+/** Hotel reviews with optional AI sentiment (pros/cons, category ratings). */
+export async function getHotelReviews(
+  hotelId: string,
+  opts?: { getSentiment?: boolean; limit?: number; timeout?: number }
+) {
+  const params = new URLSearchParams({
+    hotelId,
+    timeout: String(opts?.timeout ?? 4),
+  });
+  if (opts?.getSentiment === true) params.set("getSentiment", "true");
+  if (opts?.limit != null) params.set("limit", String(opts.limit));
+  const res = await fetch(`${API_BASE}/data/reviews?${params}`, {
+    headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Hotel reviews fetch failed: ${res.status}`);
+  return res.json();
+}

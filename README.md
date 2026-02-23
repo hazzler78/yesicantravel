@@ -1,4 +1,4 @@
-## Lite API – Safer Stays for Women Travellers
+## Yes I Can Travel – Safer Stays for Women Travellers
 
 A safety‑first booking experience designed for women travelling solo in Western & Central Europe.  
 The product prioritises **reassurance, clarity, and control** so women feel that:
@@ -103,6 +103,22 @@ To avoid sending visitors to a broken booking flow, run these checks first.
 
 **Map on results page**  
 The results page map uses LiteAPI’s map widget and only runs when you search **by destination** (not by vibe). If the map stays blank, set `NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN` in Vercel to your LiteAPI whitelabel domain (e.g. from your LiteAPI dashboard; default is `whitelabel.nuitee.link`).
+
+---
+
+## Brand & Social (Yes I Can Travel)
+
+- **Brand promise**: “Travel can be safe, empowering, and realistic for women travelling solo in Europe.”
+- **Tone**: Empowering, calm, practical; avoid fear‑based or sensational messaging about safety.
+- **Visuals**: Soft, warm colours (coral, sand, ocean teal) with a confident accent (deep navy / plum); real‑feeling travel imagery over stocky “perfect” shots.
+- **Primary audience**: Women planning their first or early solo trips in Western & Central Europe.
+
+When creating or updating **Facebook / Instagram**:
+- Use the name `Yes I Can Travel` and keep the profile photo, colours, and messaging aligned with this README.
+- Prioritise content that helps women **feel prepared and in control** (checklists, local tips, itineraries) over generic inspirational quotes.
+- Avoid over‑promising on safety; be clear about what the product can and cannot guarantee.
+
+Coordinate any big marketing pushes (ads, influencers, campaigns) with the **“Before you drive traffic – booking readiness”** checklist above so visitors land on a working, trustworthy booking flow.
 
 ---
 

@@ -79,6 +79,30 @@ Main entry for the marketing / booking experience is `app/page.tsx` (and related
 
 ---
 
+## Before you drive traffic – booking readiness
+
+To avoid sending visitors to a broken booking flow, run these checks first.
+
+1. **Health endpoint**  
+   Open or request:  
+   `https://your-domain.com/api/health`  
+   You should get **200** and `"ok": true` with `checks.apiKey` and `checks.liteApiReachable` true.  
+   If you get 503 or `ok: false`, fix the reported checks (e.g. set `LITEAPI_KEY` in your deployment env) before promoting the site.
+
+2. **One full test booking (sandbox)**  
+   - Use **sandbox** (`LITEAPI_KEY` starting with `sand`) so no real charge is made.  
+   - Do a full path: **Search** → pick a **hotel** → **Select & book** → fill guest details → pay (sandbox test card `4242 4242 4242 4242` if paying by card, or “Charge to account” if available).  
+   - Confirm you reach the **“You’re all set!”** screen with a booking ID and that **View booking details** (confirmation page) works.
+
+3. **HTTPS for payment**  
+   Card payment (Stripe via LiteAPI) requires **HTTPS**. It will not load on `http://localhost`. For real traffic, the site must be served over HTTPS (e.g. Vercel/production).
+
+4. **Optional**  
+   - If you use both “Pay with card” and “Charge to account”, test both paths once.  
+   - After deploy, hit `/api/health` from a simple uptime/monitoring check so you get alerted if the API key or LiteAPI becomes invalid.
+
+---
+
 ## Roadmap Notes (for collaborators)
 
 - Expand safety data coverage beyond initial countries once the EU experience is solid.

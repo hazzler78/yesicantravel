@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.yesicantravel.com"),
   icons: {
-    icon: "/logo.jpg",
+    icon: "/logo.png",
   },
   title: {
     default: "Yes I Can Travel – Safe solo travel stays for women in Europe",

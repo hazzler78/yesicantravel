@@ -161,7 +161,10 @@ function ResultsContent() {
     setPlaceDetails(null);
     setPlaceDetailsError(false);
     fetch(`/api/places/details?placeId=${encodeURIComponent(placeId)}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) return r.json().then((j) => Promise.reject(new Error(j?.error ?? `Place details failed: ${r.status}`)));
+        return r.json();
+      })
       .then((json) => {
         const data = json.data ?? json;
         const loc = data?.location;
@@ -305,15 +308,26 @@ function ResultsContent() {
                 const maxLon = viewport?.high?.longitude ?? lon + pad;
                 const maxLat = viewport?.high?.latitude ?? lat + pad;
                 const bbox = `${minLon},${minLat},${maxLon},${maxLat}`;
-                const osmUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat},${lon}`;
+                const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat},${lon}`;
+                const osmViewUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`;
                 return (
-                  <iframe
-                    title="Map of destination"
-                    src={osmUrl}
-                    className="h-full w-full border-0"
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
+                  <div className="relative h-full w-full">
+                    <iframe
+                      title="Map of destination"
+                      src={osmEmbedUrl}
+                      className="h-full w-full border-0"
+                      loading="lazy"
+                      referrerPolicy="no-referrer-when-downgrade"
+                    />
+                    <a
+                      href={osmViewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-2 right-2 rounded bg-white/90 px-2 py-1 text-xs font-medium text-[var(--navy)] shadow hover:bg-white"
+                    >
+                      Open map in new tab
+                    </a>
+                  </div>
                 );
               })()}
             </div>

@@ -21,6 +21,7 @@ interface HotelMarker {
   rating?: number;
   price?: number;
   currency?: string;
+  href?: string;
 }
 
 interface ResultsMapProps {
@@ -76,7 +77,18 @@ export default function ResultsMap({ placeDetails, hotels, className = "" }: Res
           <Marker key={h.id} position={[h.lat, h.lng]} title={h.name}>
             <Popup>
               <div className="min-w-[140px]">
-                <p className="font-semibold text-[var(--navy)]">{h.name}</p>
+                <p className="font-semibold text-[var(--navy)]">
+                  {h.href ? (
+                    <a
+                      href={h.href}
+                      className="text-[var(--ocean-teal)] hover:underline"
+                    >
+                      {h.name}
+                    </a>
+                  ) : (
+                    h.name
+                  )}
+                </p>
                 {h.address && <p className="text-sm text-[var(--navy-light)]">{h.address}</p>}
                 {h.rating != null && <p className="text-[var(--ocean-teal)]">★ {h.rating}</p>}
                 {h.price != null && (

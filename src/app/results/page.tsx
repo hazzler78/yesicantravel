@@ -309,10 +309,31 @@ function ResultsContent() {
               ) : (
                 <ResultsMap
                   placeDetails={placeDetails}
-                  hotels={filteredAndSortedHotels.filter(
-                    (h): h is HotelListItem & { lat: number; lng: number } =>
-                      typeof h.lat === "number" && typeof h.lng === "number"
-                  )}
+                  hotels={filteredAndSortedHotels
+                    .filter(
+                      (h): h is HotelListItem & { lat: number; lng: number } =>
+                        typeof h.lat === "number" && typeof h.lng === "number"
+                    )
+                    .map((h) => {
+                      const href = `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
+                        searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""
+                      }${
+                        searchParams.get("aiSearch")
+                          ? `&aiSearch=${encodeURIComponent(searchParams.get("aiSearch")!)}`
+                          : ""
+                      }`;
+                      return {
+                        id: h.id,
+                        name: h.name,
+                        lat: h.lat!,
+                        lng: h.lng!,
+                        address: h.address,
+                        rating: h.rating,
+                        price: h.price,
+                        currency: h.currency,
+                        href,
+                      };
+                    })}
                   className="h-full w-full"
                 />
               )}

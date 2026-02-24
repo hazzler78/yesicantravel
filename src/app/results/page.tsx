@@ -1,8 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState, Suspense } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+
+const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
+  ssr: false,
+  loading: () => <p className="text-center text-[var(--navy-light)]">Loading map…</p>,
+});
 
 interface HotelBasic {
   id: string;
@@ -96,7 +102,7 @@ function ResultsContent() {
             ids.slice(0, 20).map(async (id) => {
               const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(id)}`);
               const j = await r.json();
-              return j.data;
+              return j.data ?? j;
             })
           );
           const rateByHotel: Record<string, { amount: number; currency?: string; hasFreeCancellation: boolean }> = {};
@@ -122,6 +128,8 @@ function ResultsContent() {
             price: rateByHotel[h.id]?.amount,
             currency: rateByHotel[h.id]?.currency ?? "USD",
             hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
+            lat: h.location?.latitude,
+            lng: h.location?.longitude,
           }));
           setHotels(merged);
         }
@@ -298,38 +306,16 @@ function ResultsContent() {
                 </p>
               ) : !placeDetails ? (
                 <p className="text-center text-[var(--navy-light)]">Loading map…</p>
-              ) : (() => {
-                const { location, viewport } = placeDetails;
-                const lat = location.latitude;
-                const lon = location.longitude;
-                const pad = 0.02;
-                const minLon = viewport?.low?.longitude ?? lon - pad;
-                const minLat = viewport?.low?.latitude ?? lat - pad;
-                const maxLon = viewport?.high?.longitude ?? lon + pad;
-                const maxLat = viewport?.high?.latitude ?? lat + pad;
-                const bbox = `${minLon},${minLat},${maxLon},${maxLat}`;
-                const osmEmbedUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat},${lon}`;
-                const osmViewUrl = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`;
-                return (
-                  <div className="relative h-full w-full">
-                    <iframe
-                      title="Map of destination"
-                      src={osmEmbedUrl}
-                      className="h-full w-full border-0"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
-                    <a
-                      href={osmViewUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute bottom-2 right-2 rounded bg-white/90 px-2 py-1 text-xs font-medium text-[var(--navy)] shadow hover:bg-white"
-                    >
-                      Open map in new tab
-                    </a>
-                  </div>
-                );
-              })()}
+              ) : (
+                <ResultsMap
+                  placeDetails={placeDetails}
+                  hotels={filteredAndSortedHotels.filter(
+                    (h): h is HotelListItem & { lat: number; lng: number } =>
+                      typeof h.lat === "number" && typeof h.lng === "number"
+                  )}
+                  className="h-full w-full"
+                />
+              )}
             </div>
             {filteredAndSortedHotels.map((h) => (
             <Link

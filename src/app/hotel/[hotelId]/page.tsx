@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
 
 interface Rate {
   name: string;
@@ -132,6 +133,18 @@ function HotelContent() {
   }, [hotelId, checkin, checkout, adults]);
 
   const handleBook = (offerId: string) => {
+    const total = roomGroups
+      .flatMap((g) => g.rates)
+      .find((r) => r.offerId === offerId)?.retailRate?.total?.[0];
+    track("select_room", {
+      hotelId,
+      offerId,
+      amount: total?.amount,
+      currency: total?.currency,
+      checkin,
+      checkout,
+      adults,
+    });
     const q = new URLSearchParams({
       offerId,
       hotelId,

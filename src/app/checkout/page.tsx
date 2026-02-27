@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState, useRef, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 
@@ -104,6 +105,18 @@ function CheckoutContent() {
       .catch(() => setPaymentConfig({ accountPaymentEnabled: false, paymentEnv: "sandbox" }));
   }, []);
 
+  useEffect(() => {
+    if (offerId && hotelId && checkin && checkout && step === "form") {
+      track("checkout_view", {
+        hotelId,
+        offerId,
+        checkin,
+        checkout,
+        adults,
+      });
+    }
+  }, [offerId, hotelId, checkin, checkout, adults, step]);
+
   // Detect when payment form fails to load (Stripe 400 on HTTP/localhost)
   useEffect(() => {
     if (step !== "payment" || !prebookData) return;
@@ -179,6 +192,14 @@ function CheckoutContent() {
         sessionStorage.removeItem(STORAGE_KEY);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
+        track("booking_complete", {
+          bookingId: (data as { bookingId?: string }).bookingId,
+          hotelId,
+          checkin,
+          checkout,
+          adults,
+          paymentMethod: "card",
+        });
         saveCustomerForSuggestions({
           email: guest.email,
           firstName: guest.firstName,
@@ -257,6 +278,13 @@ function CheckoutContent() {
       ...(phone.trim() && { phone: phone.trim() }),
     };
 
+    track("checkout_details_submit", {
+      hotelId,
+      offerId,
+      hasPhone: Boolean(phone.trim()),
+      paymentMethod,
+    });
+
     try {
       const usePaymentSdk = paymentMethod === "card";
       const prebookRes = await fetch("/api/prebook", {
@@ -295,6 +323,14 @@ function CheckoutContent() {
         setBooking(data);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
+        track("booking_complete", {
+          bookingId: (data as { bookingId?: string }).bookingId,
+          hotelId,
+          checkin,
+          checkout,
+          adults,
+          paymentMethod: "account",
+        });
         saveCustomerForSuggestions({
           email: guestPayload.email,
           firstName: guestPayload.firstName,

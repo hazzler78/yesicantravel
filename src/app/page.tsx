@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { track } from "@vercel/analytics";
 
 function TrustSection() {
   return (
@@ -117,6 +118,11 @@ export default function Home() {
       alert("Please enter a search description (e.g. romantic getaway in Paris).");
       return;
     }
+    track("search_submit", {
+      mode: searchMode,
+      hasPlaceId: Boolean(placeId),
+      hasVibeQuery: Boolean(vibeQuery.trim()),
+    });
     setLoading(true);
     const params = new URLSearchParams({
       checkin,

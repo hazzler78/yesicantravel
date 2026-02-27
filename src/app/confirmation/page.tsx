@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
 
 interface Booking {
   bookingId?: string;
@@ -49,6 +50,12 @@ function ConfirmationContent() {
       }
     } else {
       setBooking({ bookingId });
+    }
+  }, [bookingId]);
+
+  useEffect(() => {
+    if (bookingId) {
+      track("booking_confirmation_view", { bookingId });
     }
   }, [bookingId]);
 

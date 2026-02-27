@@ -2,6 +2,64 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+function TrustSection() {
+  return (
+    <section className="bg-[var(--sand)] py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="mb-12 flex flex-wrap justify-center gap-6 md:gap-10">
+          <div className="flex items-center gap-3 text-[var(--navy)] text-base md:text-lg font-medium">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[var(--coral)] shadow-sm">
+              ✓
+            </span>
+            <span>Stays reviewed and rated by women travellers</span>
+          </div>
+          <div className="flex items-center gap-3 text-[var(--navy)] text-base md:text-lg font-medium">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[var(--coral)] shadow-sm">
+              ☾
+            </span>
+            <span>Focus on well-lit areas, safe access and neighbourhood tips</span>
+          </div>
+          <div className="flex items-center gap-3 text-[var(--navy)] text-base md:text-lg font-medium">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-[var(--coral)] shadow-sm">
+              ★
+            </span>
+            <span>Handpicked places with strong guest ratings</span>
+          </div>
+        </div>
+
+        <div className="grid gap-8 md:grid-cols-3 md:gap-10">
+          <div className="rounded-3xl border border-[var(--sand)] bg-[var(--background)] p-7 shadow-lg shadow-[var(--navy)]/5 transition-shadow hover:shadow-xl">
+            <h2 className="mb-3 text-2xl font-semibold text-[var(--navy)]">Safety-first filters</h2>
+            <p className="text-[var(--navy-light)]">
+              Filter for 24/7 staffed reception, women-friendly reviews, well-lit streets and safer neighbourhoods—so you&apos;re not guessing in a new city.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-[var(--sand)] bg-[var(--background)] p-7 shadow-lg shadow-[var(--navy)]/5 transition-shadow hover:shadow-xl">
+            <h2 className="mb-3 text-2xl font-semibold text-[var(--navy)]">Solo-friendly stays</h2>
+            <p className="text-[var(--navy-light)]">
+              From cosy single rooms to calm hotels near public transport, we highlight options that work especially well when you&apos;re travelling on your own.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-[var(--sand)] bg-[var(--background)] p-7 shadow-lg shadow-[var(--navy)]/5 transition-shadow hover:shadow-xl">
+            <h2 className="mb-3 text-2xl font-semibold text-[var(--navy)]">Support when you need it</h2>
+            <p className="text-[var(--navy-light)]">
+              Get practical guidance from our assistant about areas, routes and what to expect—so you can feel prepared before you even check in.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <p className="mx-auto max-w-3xl text-xl italic text-[var(--navy)]">
+            &quot;I booked my first solo trip through Yes I Can Travel and felt calm from search to check-out. It&apos;s the first time a booking site really spoke to my safety.&quot;
+          </p>
+          <p className="mt-4 text-[var(--navy-light)]">– Sofia, 29, travelling alone in Spain</p>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   const router = useRouter();
@@ -83,13 +141,15 @@ export default function Home() {
       <header className="relative min-h-screen w-full overflow-hidden">
         {/* Image layer */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 aspect-[9/16] w-full md:aspect-auto md:h-full">
-            <img
+          <div className="relative h-full w-full">
+            <Image
               src="/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"
               alt=""
               role="presentation"
-              className="h-full w-full object-cover object-center"
-              fetchPriority="high"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
             />
           </div>
         </div>
@@ -103,13 +163,13 @@ export default function Home() {
           <div className="mx-auto w-full max-w-3xl">
             <div className="mb-10">
               <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md">
-                Safer Stays
+                Safer solo stays in Europe
               </p>
               <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl">
-                You&apos;re capable. We&apos;ve got your back.
+                Safer places to stay, picked for women travelling solo.
               </h1>
               <p className="text-lg text-white/95 drop-shadow-sm">
-                Safety-first stays for women travelling solo in Western &amp; Central Europe. Find reassurance and stay in control.
+                Safety-first stays across Western &amp; Central Europe, so you can feel prepared, supported, and in control on every trip.
               </p>
             </div>
 
@@ -245,14 +305,17 @@ export default function Home() {
             type="button"
             onClick={handleSearch}
             disabled={loading}
-            className="w-full rounded-lg bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white transition-colors hover:bg-[var(--ocean-teal-light)] disabled:opacity-60"
+            className="w-full rounded-lg bg-[var(--coral)] px-6 py-4 text-lg font-semibold text-white transition-colors hover:bg-[var(--coral-light)] disabled:opacity-60"
           >
-            {loading ? "Searching..." : "Find safer stays"}
+            {loading ? "Searching..." : "Find your safer stay"}
           </button>
             </div>
           </div>
         </div>
       </header>
+      <main>
+        <TrustSection />
+      </main>
     </div>
   );
 }

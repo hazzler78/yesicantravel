@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "../../lib/metaPixel";
+import { fbqTrack } from "@/lib/metaPixel";
 
 interface Rate {
   name: string;

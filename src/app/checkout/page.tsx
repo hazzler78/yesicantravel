@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "../../lib/metaPixel";
+import { fbqTrack } from "@/lib/metaPixel";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 

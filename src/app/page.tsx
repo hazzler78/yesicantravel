@@ -4,7 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "../lib/metaPixel";
+import { fbqTrack } from "@/lib/metaPixel";
 
 function TrustSection() {
   return (

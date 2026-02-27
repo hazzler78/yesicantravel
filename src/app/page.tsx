@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { track } from "@vercel/analytics";
+import { fbqTrack } from "../lib/metaPixel";
 
 function TrustSection() {
   return (
@@ -122,6 +123,11 @@ export default function Home() {
       mode: searchMode,
       hasPlaceId: Boolean(placeId),
       hasVibeQuery: Boolean(vibeQuery.trim()),
+    });
+    fbqTrack("Search", {
+      search_mode: searchMode,
+      destination_set: Boolean(placeId),
+      has_vibe_query: Boolean(vibeQuery.trim()),
     });
     setLoading(true);
     const params = new URLSearchParams({

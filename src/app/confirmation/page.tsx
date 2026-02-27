@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { fbqTrack } from "../../lib/metaPixel";
 
 interface Booking {
   bookingId?: string;
@@ -58,6 +59,17 @@ function ConfirmationContent() {
       track("booking_confirmation_view", { bookingId });
     }
   }, [bookingId]);
+
+  useEffect(() => {
+    if (booking && booking.price != null) {
+      fbqTrack("Purchase", {
+        value: booking.price,
+        currency: booking.currency ?? "USD",
+        content_ids: booking.hotel?.hotelId ? [booking.hotel.hotelId] : undefined,
+        content_type: "product",
+      });
+    }
+  }, [booking]);
 
   if (!bookingId) {
     return (

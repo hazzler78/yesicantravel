@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { fbqTrack } from "../../lib/metaPixel";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 
@@ -110,6 +111,15 @@ function CheckoutContent() {
       track("checkout_view", {
         hotelId,
         offerId,
+        checkin,
+        checkout,
+        adults,
+      });
+      fbqTrack("InitiateCheckout", {
+        content_ids: [hotelId],
+        content_type: "product",
+        value: undefined,
+        currency: undefined,
         checkin,
         checkout,
         adults,
@@ -283,6 +293,12 @@ function CheckoutContent() {
       offerId,
       hasPhone: Boolean(phone.trim()),
       paymentMethod,
+    });
+    fbqTrack("AddPaymentInfo", {
+      content_ids: [hotelId],
+      content_type: "product",
+      has_phone: Boolean(phone.trim()),
+      payment_method: paymentMethod,
     });
 
     try {

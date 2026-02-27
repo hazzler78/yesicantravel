@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { fbqTrack } from "../../lib/metaPixel";
 
 interface Rate {
   name: string;
@@ -140,6 +141,15 @@ function HotelContent() {
       hotelId,
       offerId,
       amount: total?.amount,
+      currency: total?.currency,
+      checkin,
+      checkout,
+      adults,
+    });
+    fbqTrack("InitiateCheckout", {
+      content_ids: [hotelId],
+      content_type: "product",
+      value: total?.amount,
       currency: total?.currency,
       checkin,
       checkout,

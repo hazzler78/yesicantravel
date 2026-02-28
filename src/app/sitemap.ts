@@ -1,9 +1,17 @@
 import type { MetadataRoute } from "next";
+import { getAllDestinationSlugs } from "@/data/destinations";
 
 const BASE_URL = "https://www.yesicantravel.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+
+  const destinations = getAllDestinationSlugs().map((slug) => ({
+    url: `${BASE_URL}/destinations/${slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   return [
     {
@@ -18,6 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    ...destinations,
     {
       url: `${BASE_URL}/confirmation`,
       lastModified: now,

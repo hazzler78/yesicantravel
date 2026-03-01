@@ -1,6 +1,6 @@
 ## Yes I Can Travel – Safer Stays for Women Travellers
 
-A safety‑first booking experience designed for women travelling solo in Western & Central Europe.  
+A safety‑first booking experience designed for women travelling solo—worldwide.  
 The product prioritises **reassurance, clarity, and control** so women feel that:
 - **Someone capable has their back**, and
 - **They themselves are capable and in control** of every decision.
@@ -11,8 +11,8 @@ Brand vibe: **empowering with a calming undertone** – soft, warm colours (cora
 
 ## Product Focus
 
-- **Regions (launch)**: Germany, France, Spain, Portugal, Netherlands, Italy, Austria, Sweden.  
-- **Audience**: Women planning their first or early solo trips, mainly within Europe.
+- **Coverage**: Worldwide (strong presence in Europe, e.g. Germany, France, Spain, Portugal, Netherlands, Italy, Austria, Sweden—and beyond).  
+- **Audience**: Women planning their first or early solo trips, anywhere in the world.
 - **Default sort**: **Safest first** (safety & comfort > price by default).
 - **Map experience**:
   - Clustered pins in dense city areas
@@ -77,6 +77,31 @@ Then open `http://localhost:3000` in your browser.
 
 Main entry for the marketing / booking experience is `app/page.tsx` (and related routes under `app/`).
 
+### Event destination pages (add more anytime)
+
+Event-driven landing pages live at **`/destinations/[slug]`** (e.g. `/destinations/milan`). Data is in **`src/data/destinations.ts`**.
+
+**To add a new destination:** add one object to the `destinations` array with these fields:
+
+| Field | Purpose |
+|-------|--------|
+| `slug` | URL segment, lowercase, hyphenated (e.g. `milan`, `key-west`) |
+| `city` | Display name (e.g. `Milan`, `Key West`) |
+| `country` | Display name (e.g. `Italy`, `Florida`) |
+| `headline` | Main H1 text before the date (e.g. `Witness Paralympic History`) |
+| `subheadline` | Short paragraph under the hero; mention event and pre-filled dates |
+| `eventDateRange` | Bold date range (e.g. `March 6–15, 2026`) – shown in H1, “Why now?” and CTA |
+| `eventShortName` | Short event label for badge/CTA (e.g. `Paralympic Winter Games`, `Spring Break`) |
+| `whyDemand` | “Why now?” body copy |
+| `events` | One-line event summary (e.g. `Paralympic Winter Games, 6–15 March 2026`) |
+| `metaTitle` | SEO title (include city, event and year) |
+| `metaDescription` | SEO description (~150 chars, safety + event) |
+| `aiSearch` | Vibe query for results (e.g. `central safe hotel Milan near venues well-lit`) |
+| `checkin` | ISO date for pre-filled search (e.g. `2026-03-06`) |
+| `checkout` | ISO date for pre-filled search (e.g. `2026-03-16`) |
+
+The sitemap includes all destinations automatically. Keep the **empowering, safety-first** tone; no fear-based copy.
+
 ---
 
 ## Before you drive traffic – booking readiness
@@ -108,10 +133,10 @@ The results page map uses LiteAPI’s map widget and only runs when you search *
 
 ## Brand & Social (Yes I Can Travel)
 
-- **Brand promise**: “Travel can be safe, empowering, and realistic for women travelling solo in Europe.”
+- **Brand promise**: “Travel can be safe, empowering, and realistic for women travelling solo—worldwide.”
 - **Tone**: Empowering, calm, practical; avoid fear‑based or sensational messaging about safety.
 - **Visuals**: Soft, warm colours (coral, sand, ocean teal) with a confident accent (deep navy / plum); real‑feeling travel imagery over stocky “perfect” shots.
-- **Primary audience**: Women planning their first or early solo trips in Western & Central Europe.
+- **Primary audience**: Women planning their first or early solo trips, globally.
 
 When creating or updating **Facebook / Instagram**:
 - Use the name `Yes I Can Travel` and keep the profile photo, colours, and messaging aligned with this README.
@@ -129,3 +154,17 @@ Coordinate any big marketing pushes (ads, influencers, campaigns) with the **“
 - Add deeper safety reviews and community tips focused on women solo travellers.
 
 If you’re working on UI, copy, or growth experiments (Facebook / Instagram), keep changes aligned with the **empowering, calm, safety‑led** brand described above.
+
+---
+
+## Atlas – AI-assistent för hemsidan
+
+**Atlas** är den AI som hjälper till med Yes I Can Travel-hemsidan. Ställ frågor tydligt och specifikt, t.ex. *"Atlas, hur fungerar chatbotens API?"* eller *"Atlas, uppdatera copy på landningssidan."*
+
+**Du kan fråga Atlas om:**
+- **Tekniska detaljer** – kod, Next.js, API:er (LiteAPI, chat/xAI), deployment, miljövariabler.
+- **Innehåll och copy** – texter, formuleringar, README, beskrivningar.
+- **Design och UX** – layout, färger, tillgänglighet, flöden.
+- **Ändringar på hemsidan** – nya funktioner, buggfixar, refaktorering.
+
+**Statistik (trafik, konvertering):** Atlas har inte direkt åtkomst till live-analys (t.ex. Vercel Analytics eller Google Analytics). För siffror som konverteringsgrad eller besökare – kolla i er analytics-panel eller klistra in siffrorna i chatten; då kan Atlas hjälpa till att tolka eller planera utifrån dem.

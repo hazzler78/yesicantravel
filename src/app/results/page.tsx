@@ -80,19 +80,56 @@ function ResultsContent() {
             }>;
           }>;
         }>;
-        const hotelsFromApi = (json.hotels ?? []) as HotelBasic[];
+        const hotelsFromApi = (json.hotels ?? []) as (HotelBasic & {
+          location?: { latitude?: number; longitude?: number };
+          rating?: number; // guest review rating, when present
+        })[];
 
         if (aiSearch && hotelsFromApi.length > 0) {
+          // For vibe/AI search, enrich basic hotel data with full details (including coordinates)
+          const details = await Promise.all(
+            hotelsFromApi.slice(0, 20).map(async (h) => {
+              try {
+                const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(h.id)}`);
+                const j = await r.json();
+                return j.data ?? j;
+              } catch {
+                return null;
+              }
+            })
+          );
+          const byHotelId: Record<
+            string,
+            { address?: string; rating?: number; lat?: number; lng?: number }
+          > = {};
+          for (const d of details) {
+            if (!d?.id) continue;
+            const loc = d.location;
+            byHotelId[d.id] = {
+              address: d.address,
+              // Prefer guest review rating; fall back to star rating.
+              rating: typeof d.rating === "number" ? d.rating : d.starRating,
+              lat: typeof loc?.latitude === "number" ? loc.latitude : undefined,
+              lng: typeof loc?.longitude === "number" ? loc.longitude : undefined,
+            };
+          }
+
           const merged = hotelsFromApi.map((h) => {
             const rateData = data.find((d) => d.hotelId === h.id);
             const allRates = rateData?.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
             const firstRate = allRates[0];
             const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
+            const extra = byHotelId[h.id] ?? {};
             return {
               ...h,
+              address: extra.address ?? h.address,
+              // Again, prefer review rating from details, then any rating on the list item.
+              rating: extra.rating ?? h.rating,
               price: firstRate?.retailRate?.total?.[0]?.amount,
               currency: firstRate?.retailRate?.total?.[0]?.currency ?? "USD",
               hasFreeCancellation: freeCancellation,
+              lat: extra.lat,
+              lng: extra.lng,
             };
           });
           setHotels(merged);
@@ -124,7 +161,8 @@ function ResultsContent() {
             name: h.name,
             main_photo: h.main_photo ?? h.hotelImages?.[0]?.url,
             address: h.address,
-            rating: h.starRating,
+            // Prefer guest review rating if available; fall back to star rating.
+            rating: typeof h.rating === "number" ? h.rating : h.starRating,
             price: rateByHotel[h.id]?.amount,
             currency: rateByHotel[h.id]?.currency ?? "USD",
             hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
@@ -159,7 +197,7 @@ function ResultsContent() {
 
   const placeId = searchParams.get("placeId");
 
-  // Fetch place details server-side (avoids CORS with LiteAPI whitelabel) for map.
+  // Fetch place details server-side (avoids CORS with LiteAPI whitelabel) for map when searching by destination.
   useEffect(() => {
     if (!placeId?.trim()) {
       setPlaceDetails(null);
@@ -187,8 +225,35 @@ function ResultsContent() {
       })
       .catch(() => setPlaceDetailsError(true));
   }, [placeId]);
+  const hotelsWithCoords = useMemo(
+    () =>
+      filteredAndSortedHotels.filter(
+        (h): h is HotelListItem & { lat: number; lng: number } =>
+          typeof h.lat === "number" && typeof h.lng === "number"
+      ),
+    [filteredAndSortedHotels]
+  );
 
-  const hasMapData = filteredAndSortedHotels.some((h) => typeof h.lat === "number" && typeof h.lng === "number");
+  const derivedPlaceFromHotels = useMemo(() => {
+    if (hotelsWithCoords.length === 0) return null;
+    const lats = hotelsWithCoords.map((h) => h.lat);
+    const lngs = hotelsWithCoords.map((h) => h.lng);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+    return {
+      location: { latitude: centerLat, longitude: centerLng },
+      viewport: {
+        high: { latitude: maxLat, longitude: maxLng },
+        low: { latitude: minLat, longitude: minLng },
+      },
+    };
+  }, [hotelsWithCoords]);
+
+  const effectivePlaceForMap = placeDetails ?? derivedPlaceFromHotels;
 
   if (loading) {
     return (
@@ -296,24 +361,20 @@ function ResultsContent() {
               className="h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)] flex items-center justify-center"
               aria-label="Map of safer stays in this area"
             >
-              {!placeId ? (
+              {!effectivePlaceForMap && !placeId ? (
                 <p className="text-center text-[var(--navy-light)] px-4">
-                  Map available when you search by destination.
+                  Map will appear when stays include location data or when you search by destination.
                 </p>
-              ) : placeDetailsError ? (
+              ) : placeDetailsError && !derivedPlaceFromHotels ? (
                 <p className="text-center text-[var(--navy-light)] px-4">
                   Map couldn&apos;t load. You can still browse the list below.
                 </p>
-              ) : !placeDetails ? (
+              ) : !effectivePlaceForMap ? (
                 <p className="text-center text-[var(--navy-light)]">Loading map…</p>
               ) : (
                 <ResultsMap
-                  placeDetails={placeDetails}
-                  hotels={filteredAndSortedHotels
-                    .filter(
-                      (h): h is HotelListItem & { lat: number; lng: number } =>
-                        typeof h.lat === "number" && typeof h.lng === "number"
-                    )
+                  placeDetails={effectivePlaceForMap}
+                  hotels={hotelsWithCoords
                     .map((h) => {
                       const href = `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
                         searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""

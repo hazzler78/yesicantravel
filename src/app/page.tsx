@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { fbqTrack } from "@/lib/metaPixel";
+import { getEventsForHomepage } from "@/data/events";
 
 /** Simple inline icons for hero trust badges (no extra deps). */
 function Icon24_7() {
@@ -81,6 +82,41 @@ function TrustSection() {
             &quot;I booked my first solo trip through Yes I Can Travel and felt calm from search to check-out. It&apos;s the first time a booking site really spoke to my safety.&quot;
           </p>
           <p className="mt-4 text-[var(--navy-light)]">– Sofia, 29, travelling alone in Spain</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function TrendingEventsSection() {
+  const trendingEvents = getEventsForHomepage(8);
+  return (
+    <section id="trending-events" className="bg-[var(--navy)] py-16 md:py-20">
+      <div className="mx-auto max-w-6xl px-6">
+        <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-wider text-[var(--ocean-teal)]">
+          Peak dates
+        </h2>
+        <p className="mb-10 text-center text-2xl font-bold text-white md:text-3xl">
+          Trending events – safer stays pre-filled
+        </p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {trendingEvents.map((e) => (
+            <Link
+              key={e.slug}
+              href={`/events/${e.slug}`}
+              className="group flex flex-col rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-[var(--ocean-teal)]/50 hover:bg-white/10"
+            >
+              <span className="text-lg font-semibold text-white group-hover:text-[var(--ocean-teal-light)]">
+                {e.eventShortName}
+              </span>
+              <span className="mt-1 text-white/80">
+                {e.city}, {e.country}
+              </span>
+              <span className="mt-2 text-sm font-medium text-[var(--ocean-teal)]">
+                {e.dateRange}
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
@@ -389,10 +425,10 @@ export default function Home() {
             {loading ? "Searching..." : "Find Safer Stays for Women"}
           </button>
             <Link
-              href="/destinations/milan"
+              href="#trending-events"
               className="mt-4 flex w-full items-center justify-center rounded-lg border-2 border-white/80 bg-white/10 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
             >
-              See Popular Cities
+              See trending events
             </Link>
             </div>
           </div>
@@ -400,6 +436,7 @@ export default function Home() {
       </header>
       <main>
         <TrustSection />
+        <TrendingEventsSection />
       </main>
     </div>
   );

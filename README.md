@@ -77,11 +77,30 @@ Then open `http://localhost:3000` in your browser.
 
 Main entry for the marketing / booking experience is `app/page.tsx` (and related routes under `app/`).
 
-### Event destination pages (add more anytime)
+### Scalable event pages (recommended)
 
-Event-driven landing pages live at **`/destinations/[slug]`** (e.g. `/destinations/milan`). Data is in **`src/data/destinations.ts`**.
+**Event-driven landing pages** at **`/events/[slug]`** (e.g. `/events/milan-paralympics-2026`) are generated from **`src/data/events.ts`**. One template renders all events; no per-page copy. Sitemap and homepage “Trending events” block update automatically when you add entries.
 
-**To add a new destination:** add one object to the `destinations` array with these fields:
+**To add a new event:** add one object to the `events` array in `events.ts`:
+
+| Field | Purpose |
+|-------|--------|
+| `id` | Unique ID (e.g. `paralympics-milan-2026`) |
+| `slug` | URL segment (e.g. `milan-paralympics-2026`) |
+| `city`, `country` | Display location |
+| `eventName`, `eventShortName` | Full name + short label for badges/CTAs |
+| `startDate`, `endDate` | ISO `YYYY-MM-DD` (dateRange is generated) |
+| `category` | `sports` \| `festival` \| `season` \| `other` |
+| `aiSearchTemplate` | Vibe query for results page |
+| `venueNotes` | Optional; `whyNow` | Optional “Why now?” body copy |
+
+Copy is template-driven: H1 = `{eventName} – {dateRange} in {city}`, CTA = “Find Safer Stays in {city} – {dateRange}”, etc. Future: Google Sheet or PredictHQ for bulk import.
+
+### Legacy destination pages
+
+**`/destinations/[slug]`** (e.g. `/destinations/milan`) still uses **`src/data/destinations.ts`** with full manual copy per entry. Prefer adding new events in **`events.ts`** for scalability.
+
+**To add a new destination (legacy):** add one object to the `destinations` array with these fields:
 
 | Field | Purpose |
 |-------|--------|

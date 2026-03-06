@@ -171,15 +171,15 @@ export default function Home() {
   const handleSearch = async () => {
     setFormError(null);
     if (!checkin || !checkout) {
-      setFormError("Välj in- och utcheckningsdatum för att söka.");
+      setFormError("Please select both check-in and check-out dates before searching.");
       return;
     }
     if (searchMode === "destination" && !placeId) {
-      setFormError("Välj en destination från förslagen (t.ex. Paris, Berlin) eller byt till \"Search by vibe\".");
+      setFormError('Please choose a destination from the suggestions (e.g. Paris, Berlin) or switch to "Search by vibe".');
       return;
     }
     if (searchMode === "vibe" && !vibeQuery.trim()) {
-      setFormError("Beskriv din idéella vistelse (t.ex. centralt, välbelyst område).");
+      setFormError("Describe your ideal stay (e.g. central, well-lit area).");
       return;
     }
     track("search_submit", {

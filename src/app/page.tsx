@@ -23,14 +23,6 @@ function IconReviewed() {
     </svg>
   );
 }
-function IconShield() {
-  return (
-    <svg className="h-6 w-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-  );
-}
-
 function TrustSection() {
   return (
     <section className="bg-[var(--sand)] py-16 md:py-24">
@@ -246,8 +238,8 @@ export default function Home() {
             />
           </Link>
         </div>
-        {/* Content overlay: on mobile use top padding so content starts below logo; on desktop center */}
-        <div className="relative z-10 flex min-h-screen flex-col px-6 pt-20 pb-10 md:justify-center md:pt-6 md:py-16">
+        {/* Content overlay: on mobile py-8 so CTA visible without scroll; on desktop center */}
+        <div className="relative z-10 flex min-h-screen flex-col px-6 py-8 md:justify-center md:py-16">
           <div className="mx-auto w-full max-w-3xl">
             <div className="mb-6 md:mb-8">
               <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md">
@@ -256,30 +248,27 @@ export default function Home() {
               <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl">
                 Safer places to stay, picked for women travelling solo.
               </h1>
-              <p className="mb-6 text-lg text-white/95 drop-shadow-sm md:mb-8">
+              <p className="mb-4 text-lg text-white/95 drop-shadow-sm md:mb-6">
                 Safety-first stays across the world—so you can feel prepared, supported, and in control on every trip.
               </p>
-              {/* Trust badges above the fold */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-white/95 drop-shadow-sm sm:gap-6 md:justify-start">
-                <span className="flex items-center gap-2 text-sm font-medium md:text-base">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white">
-                    <Icon24_7 />
-                  </span>
-                  24/7 reception
-                </span>
-                <span className="flex items-center gap-2 text-sm font-medium md:text-base">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white">
+              {/* Trust badges: 2 strong signals, small circles, centered, mobile wrap */}
+              <div className="flex flex-wrap items-center justify-center gap-6 text-white/95 drop-shadow-sm">
+                <span className="flex items-center gap-2 text-sm font-medium">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 text-white shadow-md">
                     <IconReviewed />
                   </span>
-                  Reviewed by women travellers
+                  Reviewed &amp; rated by women travellers
                 </span>
-                <span className="flex items-center gap-2 text-sm font-medium md:text-base">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white">
-                    <IconShield />
+                <span className="flex items-center gap-2 text-sm font-medium">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 text-white shadow-md">
+                    <Icon24_7 />
                   </span>
-                  Safer neighbourhoods &amp; well-lit areas
+                  24/7 staffed reception
                 </span>
               </div>
+              <p className="mt-4 text-center text-sm italic text-white/90 md:mt-5">
+                &quot;First time I felt truly safe planning my solo trip.&quot; – Sofia, 29, Spain
+              </p>
             </div>
 
             <div className="rounded-2xl border border-[var(--navy)]/10 bg-white/95 p-6 shadow-lg backdrop-blur-sm">
@@ -422,11 +411,20 @@ export default function Home() {
             disabled={loading}
             className="w-full rounded-lg bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-lg shadow-[var(--navy)]/20 transition-colors hover:bg-[var(--coral-light)] hover:shadow-xl disabled:opacity-60"
           >
-            {loading ? "Searching..." : "Find Safer Stays for Women"}
+            {loading ? "Searching..." : "Find Your Safe Solo Stay Now"}
           </button>
+          <p className="mt-2 text-center text-sm text-gray-300">
+            Filter by safety features – start in seconds
+          </p>
+          <Link
+            href="/popular-cities"
+            className="mt-4 flex w-full items-center justify-center rounded-lg border-2 border-white bg-white/10 px-6 py-3.5 text-xl font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+          >
+            Not sure where to go? See Popular Safe Cities
+          </Link>
             <Link
               href="#trending-events"
-              className="mt-4 flex w-full items-center justify-center rounded-lg border-2 border-white/80 bg-white/10 px-6 py-3 text-base font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+              className="mt-3 flex w-full items-center justify-center rounded-lg border border-white/60 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/95 transition-colors hover:bg-white/10"
             >
               See trending events
             </Link>

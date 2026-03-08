@@ -18,6 +18,8 @@ export interface Event {
   venueNotes?: string;
   /** Optional: 1–2 sentences for "Why now?" body. Falls back to generic if missing. */
   whyNow?: string;
+  /** Optional: override for hero/CTA (e.g. "April 10–12 & 17–19, 2026" when two weekends). */
+  displayDateRange?: string;
 }
 
 const MONTHS = [
@@ -101,30 +103,19 @@ export const events: Event[] = [
     whyNow: "Ultra Miami + spring-break and Miami Open period. High demand.",
   },
   {
-    id: "coachella-2026-weekend1",
-    slug: "coachella-2026-weekend-1",
-    city: "Indio / Palm Springs",
-    country: "California",
-    eventName: "Coachella Weekend 1",
+    id: "coachella-2026",
+    slug: "coachella-2026",
+    city: "Indio",
+    country: "USA",
+    eventName: "Coachella Valley Music and Arts Festival",
     eventShortName: "Coachella",
     startDate: "2026-04-10",
     endDate: "2026-04-12",
+    displayDateRange: "April 10–12 & 17–19, 2026",
     category: "festival",
-    aiSearchTemplate: "safe hotel near Coachella Indio Palm Springs well-lit",
-    whyNow: "Passes sold out; hotel packages sell fast. Book early.",
-  },
-  {
-    id: "coachella-2026-weekend2",
-    slug: "coachella-2026-weekend-2",
-    city: "Indio / Palm Springs",
-    country: "California",
-    eventName: "Coachella Weekend 2",
-    eventShortName: "Coachella",
-    startDate: "2026-04-17",
-    endDate: "2026-04-19",
-    category: "festival",
-    aiSearchTemplate: "safe hotel near Coachella Indio Palm Springs well-lit",
-    whyNow: "Passes sold out; hotel packages sell fast. Book early.",
+    aiSearchTemplate: "safe hotels near Empire Polo Club Coachella Indio",
+    venueNotes: "Empire Polo Club, Indio – shuttles to Palm Springs/La Quinta",
+    whyNow: "Passes sold out – safe stays near venue fill fast! Pre-filled for both weekends.",
   },
   {
     id: "masters-augusta-2026",
@@ -136,8 +127,9 @@ export const events: Event[] = [
     startDate: "2026-04-06",
     endDate: "2026-04-12",
     category: "sports",
-    aiSearchTemplate: "hotels near Augusta National Masters 2026 well-lit safe",
-    whyNow: "One of the most sought-after sports events. Rooms fill early.",
+    aiSearchTemplate: "safe hotels near Augusta National Masters golf well-lit",
+    venueNotes: "Augusta National Golf Club, Augusta, GA",
+    whyNow: "Golf fans book early; one of the most sought-after sports events. Safe stays near the course fill fast.",
   },
   {
     id: "treefort-music-fest-boise-2026",
@@ -350,7 +342,7 @@ export const events: Event[] = [
     endDate: "2026-08-15",
     category: "festival",
     aiSearchTemplate: "safe hotels Oslo Norway near Oya Festival fjord well-lit",
-    whyNow: "Boutique yet big indie festival in a beautiful fjord setting; very safe and walkable.",
+    whyNow: "Boutique indie festival in a beautiful fjord setting; extremely safe and walkable, easy to meet people.",
   },
   {
     id: "rock-en-seine-paris-2026",
@@ -364,7 +356,7 @@ export const events: Event[] = [
     category: "festival",
     aiSearchTemplate: "safe hotels Paris near Parc de Saint-Cloud Rock en Seine well-lit",
     venueNotes: "Parc de Saint-Cloud, Paris",
-    whyNow: "Major outdoor festival with strong pop, rock and indie acts in a chic Parisian parkside setting.",
+    whyNow: "Major outdoor festival with strong pop, rock and indie acts; chic Parisian vibe mixed with nature.",
   },
   {
     id: "nos-alive-lisbon-2026",
@@ -377,7 +369,7 @@ export const events: Event[] = [
     endDate: "2026-07-11",
     category: "festival",
     aiSearchTemplate: "safe coastal hotels Lisbon Portugal near NOS Alive well-lit",
-    whyNow: "Big mainstream and indie acts with ocean views; very sunny, social and relaxed.",
+    whyNow: "Mainstream and indie acts with ocean views; relaxed, safe and very popular with solo and group travellers.",
   },
   {
     id: "we-love-green-paris-2026",
@@ -391,7 +383,7 @@ export const events: Event[] = [
     category: "festival",
     aiSearchTemplate: "safe hotels Paris near Bois de Vincennes We Love Green well-lit",
     venueNotes: "Bois de Vincennes, Paris",
-    whyNow: "Eco-conscious music and food festival in a green park; very popular with creative, conscious crowds.",
+    whyNow: "Eco-conscious music and food festival in a green park; very female-skewed, calming and empowering vibe.",
   },
   {
     id: "roskilde-festival-2026",
@@ -405,7 +397,7 @@ export const events: Event[] = [
     category: "festival",
     aiSearchTemplate: "safe hotels Roskilde and Copenhagen near Roskilde Festival well-lit",
     venueNotes: "Roskilde, Denmark (short train from Copenhagen)",
-    whyNow: "One of Europe’s biggest festivals with strong lineups and an activist side; huge but safe with city and camping stay options.",
+    whyNow: "One of Europe’s biggest festivals with strong lineups and an activist side; mega but safe, with city and camping options.",
   },
   {
     id: "lollapalooza-berlin-2026",
@@ -419,7 +411,22 @@ export const events: Event[] = [
     category: "festival",
     aiSearchTemplate: "safe central hotels Berlin near Lollapalooza Treptower Park well-lit",
     venueNotes: "Treptower Park, Berlin",
-    whyNow: "US-style big lineup in a historic park with a very international, female-positive crowd.",
+    whyNow: "US-style big lineup in Berlin; close to home for many in Germany, with empowering female acts and an international crowd.",
+  },
+  {
+    id: "tomorrowland-2026",
+    slug: "tomorrowland-2026",
+    city: "Boom",
+    country: "Belgium",
+    eventName: "Tomorrowland",
+    eventShortName: "Tomorrowland",
+    startDate: "2026-07-17",
+    endDate: "2026-07-19",
+    displayDateRange: "July 17–19 & 24–26, 2026",
+    category: "festival",
+    aiSearchTemplate: "safe hotels near Tomorrowland Boom Belgium well-lit",
+    venueNotes: "Boom, Belgium – EDM mega-festival, 400k+ visitors across two weekends",
+    whyNow: "EDM mega-festival with 400k+ visitors; two weekends. Safe stays near Boom fill fast – book early.",
   },
 ];
 
@@ -428,7 +435,7 @@ export function getEventBySlug(slug: string): (Event & { dateRange: string }) | 
   if (!event) return undefined;
   return {
     ...event,
-    dateRange: formatEventDateRange(event.startDate, event.endDate),
+    dateRange: event.displayDateRange ?? formatEventDateRange(event.startDate, event.endDate),
   };
 }
 
@@ -440,7 +447,7 @@ export function getAllEventSlugs(): string[] {
 export function getEventsForHomepage(limit = 8): (Event & { dateRange: string })[] {
   return events.slice(0, limit).map((e) => ({
     ...e,
-    dateRange: formatEventDateRange(e.startDate, e.endDate),
+    dateRange: e.displayDateRange ?? formatEventDateRange(e.startDate, e.endDate),
   }));
 }
 

@@ -7,6 +7,19 @@ import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { fbqTrack } from "@/lib/metaPixel";
 import { getEventsForHomepage } from "@/data/events";
+import { popularCities } from "@/data/popularCities";
+
+/** Default check-in 14 days from now, checkout +2 nights – for trending city links */
+function getDefaultSearchParams() {
+  const checkin = new Date();
+  checkin.setDate(checkin.getDate() + 14);
+  const checkout = new Date(checkin);
+  checkout.setDate(checkout.getDate() + 2);
+  return {
+    checkin: checkin.toISOString().slice(0, 10),
+    checkout: checkout.toISOString().slice(0, 10),
+  };
+}
 
 /** Simple inline icons for hero trust badges (no extra deps). */
 function Icon24_7() {
@@ -353,8 +366,8 @@ export default function Home() {
             </div>
           )}
 
-          <div className="mb-6 grid gap-4 sm:grid-cols-3">
-            <div>
+          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="min-w-0">
               <label htmlFor="checkin" className="mb-2 block text-base font-medium text-[var(--navy)]">
                 Check-in
               </label>
@@ -365,10 +378,10 @@ export default function Home() {
                 onChange={(e) => { setCheckin(e.target.value); setFormError(null); }}
                 min={minCheckin}
                 aria-label="Check-in date"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 [overflow:hidden] [text-overflow:ellipsis] max-sm:text-base"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label htmlFor="checkout" className="mb-2 block text-base font-medium text-[var(--navy)]">
                 Check-out
               </label>
@@ -379,10 +392,10 @@ export default function Home() {
                 onChange={(e) => { setCheckout(e.target.value); setFormError(null); }}
                 min={minCheckout}
                 aria-label="Check-out date"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 [overflow:hidden] [text-overflow:ellipsis] max-sm:text-base"
               />
             </div>
-            <div>
+            <div className="min-w-0">
               <label htmlFor="guests" className="mb-2 block text-base font-medium text-[var(--navy)]">
                 Travellers
               </label>
@@ -391,7 +404,7 @@ export default function Home() {
                 value={guests}
                 onChange={(e) => setGuests(Number(e.target.value))}
                 aria-label="Number of guests"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
               >
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <option key={n} value={n}>{n} {n === 1 ? "traveller" : "travellers"}</option>
@@ -409,11 +422,11 @@ export default function Home() {
             type="button"
             onClick={handleSearch}
             disabled={loading}
-            className="min-h-[48px] w-full rounded-lg border-2 border-white/30 bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-2xl transition-colors hover:bg-[var(--coral-light)] hover:shadow-2xl disabled:opacity-60 [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
+            className="min-h-[48px] w-full rounded-lg border-2 border-white bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-2xl transition-colors hover:bg-[var(--coral-light)] hover:shadow-2xl disabled:opacity-60 [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
           >
             {loading ? "Searching..." : "Find Your Safe Solo Stay Now"}
           </button>
-          <p className="mt-2 text-center text-sm text-[var(--navy-light)]">
+          <p className="mt-2 text-center text-sm font-medium text-[var(--navy)]">
             Filter by safety features – start in seconds
           </p>
           <Link
@@ -429,6 +442,47 @@ export default function Home() {
               See trending events
             </Link>
             </div>
+
+            {/* Trending Safe Destinations – mjuk ingång under formuläret */}
+            <section className="mt-8 md:mt-10" aria-labelledby="trending-destinations-heading">
+              <h2 id="trending-destinations-heading" className="mb-4 text-center text-lg font-semibold text-white drop-shadow-md md:text-xl">
+                Trending Safe Destinations
+              </h2>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {(() => {
+                  const { checkin: dCheckin, checkout: dCheckout } = getDefaultSearchParams();
+                  return popularCities.map((city) => {
+                    const href = `/results?${new URLSearchParams({ aiSearch: city.aiSearch, checkin: dCheckin, checkout: dCheckout, adults: "1" })}`;
+                    return (
+                      <Link
+                        key={city.slug}
+                        href={href}
+                        className="group flex items-center gap-3 rounded-xl border border-white/20 bg-white/10 p-3 backdrop-blur-sm transition-colors hover:bg-white/20"
+                      >
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-[var(--navy)]/30">
+                          <Image
+                            src="/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"
+                            alt=""
+                            fill
+                            className="object-cover opacity-70"
+                            sizes="48px"
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <span className="block font-semibold text-white drop-shadow-sm">
+                            {city.city}
+                          </span>
+                          <span className="text-xs text-white/90">
+                            Safe stays from €89/night
+                          </span>
+                        </div>
+                        <span className="shrink-0 text-[var(--ocean-teal)] group-hover:text-[var(--ocean-teal-light)]" aria-hidden>→</span>
+                      </Link>
+                    );
+                  });
+                })()}
+              </div>
+            </section>
           </div>
         </div>
       </header>

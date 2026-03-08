@@ -6,6 +6,7 @@ import {
   getAllEventSlugs,
   getCheckoutDate,
 } from "@/data/events";
+import { searchPlaces } from "@/lib/liteapi";
 import EventPriceBadge from "@/components/EventPriceBadge";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -56,12 +57,29 @@ export default async function EventPage({ params }: Props) {
   if (!event) notFound();
 
   const checkout = getCheckoutDate(event.endDate);
-  const searchUrl = `/results?${new URLSearchParams({
-    aiSearch: event.aiSearchTemplate,
-    checkin: event.startDate,
-    checkout,
-    adults: "1",
-  })}`;
+  let placeId: string | undefined;
+  if (event.placeQuery) {
+    try {
+      const placeRes = await searchPlaces(event.placeQuery);
+      const first = (placeRes as { data?: Array<{ placeId?: string }> })?.data?.[0];
+      placeId = first?.placeId;
+    } catch {
+      // fall back to aiSearch below
+    }
+  }
+  const searchUrl = placeId
+    ? `/results?${new URLSearchParams({
+        placeId,
+        checkin: event.startDate,
+        checkout,
+        adults: "1",
+      })}`
+    : `/results?${new URLSearchParams({
+        aiSearch: event.aiSearchTemplate,
+        checkin: event.startDate,
+        checkout,
+        adults: "1",
+      })}`;
 
   const whyNowBody =
     event.whyNow ??

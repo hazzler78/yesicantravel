@@ -20,6 +20,8 @@ export interface Event {
   whyNow?: string;
   /** Optional: override for hero/CTA (e.g. "April 10–12 & 17–19, 2026" when two weekends). */
   displayDateRange?: string;
+  /** Optional: use destination search instead of aiSearch (e.g. "Brussels, Belgium") when aiSearch returns no hotels. */
+  placeQuery?: string;
 }
 
 const MONTHS = [
@@ -424,9 +426,10 @@ export const events: Event[] = [
     endDate: "2026-07-19",
     displayDateRange: "July 17–19 & 24–26, 2026",
     category: "festival",
-    aiSearchTemplate: "safe hotels near Tomorrowland Boom Belgium well-lit",
-    venueNotes: "Boom, Belgium – EDM mega-festival, 400k+ visitors across two weekends",
-    whyNow: "EDM mega-festival with 400k+ visitors; two weekends. Safe stays near Boom fill fast – book early.",
+    aiSearchTemplate: "safe hotels Brussels Belgium well-lit central",
+    placeQuery: "Brussels, Belgium",
+    venueNotes: "Boom, Belgium (stay in Brussels or Antwerp – shuttles to festival)",
+    whyNow: "EDM mega-festival with 400k+ visitors; two weekends. Most visitors stay in Brussels or Antwerp – safe stays there fill fast.",
   },
 ];
 

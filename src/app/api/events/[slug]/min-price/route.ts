@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { searchRates } from "@/lib/liteapi";
+import { searchRates, searchPlaces } from "@/lib/liteapi";
 import { getEventBySlug, getCheckoutDate } from "@/data/events";
 
 /**
  * GET /api/events/[slug]/min-price
- * Returns lowest rate for the event's dates (aiSearch + startDate/checkout).
+ * Returns lowest rate for the event's dates (placeId or aiSearch + startDate/checkout).
  * Used by event pages for "From X €/night" urgency. Cached by client; consider
  * adding response cache (e.g. revalidate 3600) if you want server-side caching.
  */
@@ -20,8 +20,19 @@ export async function GET(
     }
 
     const checkout = getCheckoutDate(event.endDate);
+    let placeId: string | undefined;
+    if (event.placeQuery) {
+      try {
+        const placeRes = await searchPlaces(event.placeQuery);
+        const first = (placeRes as { data?: Array<{ placeId?: string }> })?.data?.[0];
+        placeId = first?.placeId;
+      } catch {
+        // fall back to aiSearch below
+      }
+    }
+
     const data = await searchRates({
-      aiSearch: event.aiSearchTemplate,
+      ...(placeId ? { placeId } : { aiSearch: event.aiSearchTemplate }),
       checkin: event.startDate,
       checkout,
       adults: 1,

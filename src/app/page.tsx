@@ -220,13 +220,13 @@ export default function Home() {
             />
           </div>
         </div>
-        {/* Gradient scrim for readability */}
+        {/* Gradient scrim for readability – stronger top (60%) so grey text reads well */}
         <div
-          className="absolute inset-0 bg-gradient-to-b from-[var(--navy)]/40 via-[var(--navy)]/10 to-[var(--navy)]/50"
+          className="absolute inset-0 bg-gradient-to-b from-[var(--navy)]/60 via-[var(--navy)]/25 to-[var(--navy)]/50"
           aria-hidden
         />
-        {/* Logo top-left */}
-        <div className="absolute left-4 top-4 z-20 md:left-6 md:top-6">
+        {/* Logo top-left – left-6 top-6 so content can start below with pt-24 */}
+        <div className="absolute left-6 top-6 z-20">
           <Link href="/" className="block" aria-label="Yes I Can Travel – startsida">
             <Image
               src="/logo.png"
@@ -238,9 +238,9 @@ export default function Home() {
             />
           </Link>
         </div>
-        {/* Content overlay: on mobile py-8 so CTA visible without scroll; on desktop center */}
-        <div className="relative z-10 flex min-h-screen flex-col px-6 py-8 md:justify-center md:py-16">
-          <div className="mx-auto w-full max-w-3xl">
+        {/* Content overlay: pt-24 so headline never under logo; mobile py-8, desktop center */}
+        <div className="relative z-10 flex min-h-screen flex-col px-6 pt-24 pb-8 md:justify-center md:pt-16 md:pb-16">
+          <div className="mx-auto w-full max-w-3xl md:pl-0">
             <div className="mb-6 md:mb-8">
               <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md">
                 Safer solo stays worldwide
@@ -248,11 +248,11 @@ export default function Home() {
               <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl">
                 Safer places to stay, picked for women travelling solo.
               </h1>
-              <p className="mb-4 text-lg text-white/95 drop-shadow-sm md:mb-6">
+              <p className="mb-4 text-lg text-white drop-shadow-lg md:mb-6">
                 Safety-first stays across the world—so you can feel prepared, supported, and in control on every trip.
               </p>
               {/* Trust badges: 2 strong signals, small circles, centered, mobile wrap */}
-              <div className="flex flex-wrap items-center justify-center gap-6 text-white/95 drop-shadow-sm">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-white drop-shadow-md">
                 <span className="flex items-center gap-2 text-sm font-medium">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/20 text-white shadow-md">
                     <IconReviewed />
@@ -266,7 +266,7 @@ export default function Home() {
                   24/7 staffed reception
                 </span>
               </div>
-              <p className="mt-4 text-center text-sm italic text-white/90 md:mt-5">
+              <p className="mt-4 text-center text-sm italic text-white drop-shadow-md md:mt-5">
                 &quot;First time I felt truly safe planning my solo trip.&quot; – Sofia, 29, Spain
               </p>
             </div>
@@ -315,7 +315,7 @@ export default function Home() {
                 onFocus={() => places.length > 0 && setShowPlaces(true)}
                 placeholder="e.g. Paris, Berlin, Barcelona, Amsterdam..."
                 aria-label="Destination"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy)]/75 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
               />
               {showPlaces && places.length > 0 && (
                 <ul className="absolute left-0 right-0 top-full z-10 mt-1 max-h-56 overflow-auto rounded-lg border border-[var(--navy)]/10 bg-white shadow-lg" role="listbox">
@@ -348,7 +348,7 @@ export default function Home() {
                 onChange={(e) => { setVibeQuery(e.target.value); setFormError(null); }}
                 placeholder="e.g. central, well-lit area, quiet neighbourhood..."
                 aria-label="Describe your ideal stay"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy)]/75 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
               />
             </div>
           )}
@@ -409,11 +409,11 @@ export default function Home() {
             type="button"
             onClick={handleSearch}
             disabled={loading}
-            className="w-full rounded-lg bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-lg shadow-[var(--navy)]/20 transition-colors hover:bg-[var(--coral-light)] hover:shadow-xl disabled:opacity-60"
+            className="min-h-[48px] w-full rounded-lg border-2 border-white/30 bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-2xl transition-colors hover:bg-[var(--coral-light)] hover:shadow-2xl disabled:opacity-60 [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
           >
             {loading ? "Searching..." : "Find Your Safe Solo Stay Now"}
           </button>
-          <p className="mt-2 text-center text-sm text-gray-300">
+          <p className="mt-2 text-center text-sm text-[var(--navy-light)]">
             Filter by safety features – start in seconds
           </p>
           <Link
@@ -436,6 +436,15 @@ export default function Home() {
         <TrustSection />
         <TrendingEventsSection />
       </main>
+
+      {/* Sticky secondary CTA on mobile – follows scroll */}
+      <Link
+        href="/popular-cities"
+        className="fixed bottom-4 right-4 z-30 rounded-full bg-[var(--ocean-teal)] px-4 py-2.5 text-sm font-semibold text-white shadow-lg md:hidden"
+        aria-label="See Popular Safe Cities"
+      >
+        See Safe Cities
+      </Link>
     </div>
   );
 }

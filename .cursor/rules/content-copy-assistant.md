@@ -93,6 +93,12 @@ For every piece of copy, caption, description, CTA, overlay text, social post, o
 
 ---
 
+## Support & contact
+
+- **Support email:** hello@yesicantravel.com — use this whenever copy or the website assistant should direct users to ask questions, report something not working, or get support. We fix issues and help with support from this address.
+
+---
+
 ## Brand & social (Facebook / Instagram)
 
 - Use the name **Yes I Can Travel**; keep profile photo, colours, and messaging aligned with this brief.

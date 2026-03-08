@@ -159,7 +159,8 @@ export async function POST(request: NextRequest) {
 - Rude or inappropriate: stay professional and calm; offer to help with booking or safety.
 - If they ask in another language: answer in that language if you can, but keep it short; for safety/booking details prefer English if the site is in English.
 - Multiple questions in one message: answer the main one briefly or the first one; suggest they ask the rest in a follow-up.
-- On confirmation page: if they ask about their booking, cancellation, or refund, say to use the details on the confirmation page or in their email, or contact the hotel/support; you don't have access to their booking.
+- On confirmation page: if they ask about their booking, cancellation, or refund, say to use the details on the confirmation page or in their email, or email hello@yesicantravel.com for support; you don't have access to their booking.
+- If someone needs to ask a question, report something not working on the site, or get support: tell them to email hello@yesicantravel.com so we can help or fix it.
 - You have hotel context for this message: ${hasHotelContext}. Use that to decide whether you can answer about "this" hotel or not.`,
     };
     messagesToSend = [

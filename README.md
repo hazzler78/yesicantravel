@@ -134,8 +134,8 @@ To avoid sending visitors to a broken booking flow, run these checks first.
    If you get 503 or `ok: false`, fix the reported checks (e.g. set `LITEAPI_KEY` in your deployment env) before promoting the site.
 
 2. **One full test booking (sandbox)**  
-   - Use **sandbox** (`LITEAPI_KEY` starting with `sand`) so no real charge is made.  
-   - Do a full path: **Search** → pick a **hotel** → **Select & book** → fill guest details → pay (sandbox test card `4242 4242 4242 4242` if paying by card, or “Charge to account” if available).  
+   - Use a **sandbox** API key so no real charge is made. The app treats the environment as sandbox when the prebook/rates response includes `sandbox: true` (or when `LITEAPI_KEY` starts with `sand` before any API call).  
+   - Do a full path: **Search** → pick a **hotel** → **Select & book** → fill guest details (including phone) → pay (sandbox test card `4242 4242 4242 4242` if paying by card, or “Charge to account” if available).  
    - Confirm you reach the **“You’re all set!”** screen with a booking ID and that **View booking details** (confirmation page) works.
 
 3. **HTTPS for payment**  
@@ -143,7 +143,8 @@ To avoid sending visitors to a broken booking flow, run these checks first.
 
 4. **Optional**  
    - If you use both “Pay with card” and “Charge to account”, test both paths once.  
-   - After deploy, hit `/api/health` from a simple uptime/monitoring check so you get alerted if the API key or LiteAPI becomes invalid.
+   - After deploy, hit `/api/health` from a simple uptime/monitoring check so you get alerted if the API key or LiteAPI becomes invalid.  
+   - **Health check cost:** `/api/health` calls LiteAPI’s `GET /data/places`, which is billed per request. Don’t poll it at high frequency (e.g. every few seconds); a few times per hour or on deploy is enough.
 
 **Map on results page**  
 The results page map uses LiteAPI’s map widget and only runs when you search **by destination** (not by vibe). If the map stays blank, set `NEXT_PUBLIC_LITEAPI_WHITELABEL_DOMAIN` in Vercel to your LiteAPI whitelabel domain (e.g. from your LiteAPI dashboard; default is `whitelabel.nuitee.link`).

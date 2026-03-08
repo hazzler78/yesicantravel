@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prebook } from "@/lib/liteapi";
+import { prebook, LiteAPIError } from "@/lib/liteapi";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,9 +14,12 @@ export async function POST(request: NextRequest) {
     const data = await prebook(offerId, usePaymentSdk);
     return NextResponse.json(data);
   } catch (e) {
-    return NextResponse.json(
-      { error: (e as Error).message },
-      { status: 500 }
-    );
+    const err = e as LiteAPIError & Error;
+    const payload: { error: string; code?: number; description?: string } = { error: err.message ?? "Prebook failed" };
+    if (err.name === "LiteAPIError" && (err.code != null || err.description)) {
+      payload.code = err.code;
+      payload.description = err.description;
+    }
+    return NextResponse.json(payload, { status: 500 });
   }
 }

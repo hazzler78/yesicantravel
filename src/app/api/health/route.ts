@@ -12,6 +12,9 @@ export const maxDuration = 10;
  *
  * Returns 200 with { ok, checks } when ready; 503 when something is wrong.
  * You can call this from a browser, curl, or a simple uptime check.
+ *
+ * Note: The probe uses GET /data/places?textQuery=Paris, which is billed by LiteAPI
+ * (e.g. ~$0.01/request). Avoid calling /api/health at high frequency (e.g. every few seconds).
  */
 export async function GET() {
   const checks: Record<string, boolean | string | number> = {};

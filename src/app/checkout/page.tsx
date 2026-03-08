@@ -8,6 +8,7 @@ import { track } from "@vercel/analytics";
 import { fbqTrack } from "@/lib/metaPixel";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
+const CLIENT_REF_KEY = "liteapi_checkout_client_ref";
 
 function PaymentFormInit({
   secretKey,
@@ -77,6 +78,7 @@ function CheckoutContent() {
     prebookId: string;
     transactionId: string;
     secretKey: string;
+    sandbox?: boolean;
   } | null>(null);
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -170,17 +172,19 @@ function CheckoutContent() {
     (async () => {
       try {
         const guest = JSON.parse(stored);
+        const clientRef = sessionStorage.getItem(CLIENT_REF_KEY);
         const res = await fetch("/api/book", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prebookId,
             transactionId,
+            clientReference: clientRef || undefined,
             holder: {
               firstName: guest.firstName,
               lastName: guest.lastName,
               email: guest.email,
-              ...(guest.phone && { phone: guest.phone }),
+              phone: guest.phone ?? "",
             },
             // LiteAPI expects one primary guest per room (occupancyNumber = room index),
             // and this app currently books a single room with `adults` occupants.
@@ -200,6 +204,7 @@ function CheckoutContent() {
         const data = json.data;
         setBooking(data);
         sessionStorage.removeItem(STORAGE_KEY);
+        sessionStorage.removeItem(CLIENT_REF_KEY);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
         track("booking_complete", {
@@ -272,8 +277,8 @@ function CheckoutContent() {
 
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      alert("Please fill in all guest details.");
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim()) {
+      alert("Please fill in all guest details including phone.");
       return;
     }
     if (!offerId) {
@@ -285,7 +290,7 @@ function CheckoutContent() {
       firstName: firstName.trim(),
       lastName: lastName.trim(),
       email: email.trim(),
-      ...(phone.trim() && { phone: phone.trim() }),
+      phone: phone.trim(),
     };
 
     track("checkout_details_submit", {
@@ -313,6 +318,8 @@ function CheckoutContent() {
 
       const pid = prebookJson.data.prebookId;
 
+      const clientRef = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `ref-${Date.now()}`;
+
       if (paymentMethod === "account") {
         setStep("booking");
         const bookRes = await fetch("/api/book", {
@@ -321,7 +328,8 @@ function CheckoutContent() {
           body: JSON.stringify({
             prebookId: pid,
             paymentMethod: "ACC_CREDIT_CARD",
-            holder: { ...guestPayload, phone: guestPayload.phone || "0000000000" },
+            clientReference: clientRef,
+            holder: guestPayload,
             // Single-room booking: one primary guest with occupancyNumber 1.
             guests: [
               {
@@ -361,14 +369,17 @@ function CheckoutContent() {
 
       const tid = prebookJson.data.transactionId;
       const sk = prebookJson.data.secretKey;
-      setPrebookData({ prebookId: pid, transactionId: tid, secretKey: sk });
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ ...guestPayload, phone: phone.trim() }));
+      const prebookSandbox = prebookJson.data?.sandbox;
+      setPrebookData({ prebookId: pid, transactionId: tid, secretKey: sk, sandbox: prebookSandbox });
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(guestPayload));
+      sessionStorage.setItem(CLIENT_REF_KEY, clientRef);
       setStep("payment");
 
       const base = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
       const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&adults=${adults}&prebookId=${pid}&transactionId=${tid}`;
+      const paymentEnv = typeof prebookSandbox === "boolean" ? (prebookSandbox ? "sandbox" : "live") : (paymentConfig?.paymentEnv ?? "sandbox");
       (window as unknown as { liteAPIConfig?: unknown }).liteAPIConfig = {
-        publicKey: paymentConfig?.paymentEnv ?? "sandbox",
+        publicKey: paymentEnv,
         secretKey: sk,
         returnUrl,
         targetElement: "#payment-form",
@@ -509,7 +520,7 @@ function CheckoutContent() {
               />
             </div>
             <div>
-              <label htmlFor="phone" className="mb-2 block text-base font-medium text-[var(--navy)]">Phone (optional)</label>
+              <label htmlFor="phone" className="mb-2 block text-base font-medium text-[var(--navy)]">Phone</label>
               <input
                 id="phone"
                 type="tel"
@@ -517,6 +528,7 @@ function CheckoutContent() {
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="e.g. +46 70 123 45 67"
                 className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                required
               />
             </div>
             <button
@@ -532,7 +544,7 @@ function CheckoutContent() {
         ) : (
           <div className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
             <h1 className="text-2xl font-bold text-[var(--navy)]">Payment</h1>
-            {paymentConfig?.paymentEnv === "sandbox" && (
+            {(prebookData?.sandbox ?? paymentConfig?.paymentEnv === "sandbox") && (
               <p className="rounded-lg bg-[var(--ocean-teal)]/10 p-4 text-base text-[var(--navy)]">
                 Sandbox: use test card <strong>4242 4242 4242 4242</strong>, any 3 digits for CVV, any future expiration date.
                 {typeof window !== "undefined" &&
@@ -567,7 +579,7 @@ function CheckoutContent() {
             {prebookData && (
               <PaymentFormInit
                 secretKey={prebookData.secretKey}
-                publicKey={paymentConfig?.paymentEnv ?? "sandbox"}
+                publicKey={typeof prebookData.sandbox === "boolean" ? (prebookData.sandbox ? "sandbox" : "live") : (paymentConfig?.paymentEnv ?? "sandbox")}
                 prebookId={prebookData.prebookId}
                 transactionId={prebookData.transactionId}
                 offerId={offerId!}

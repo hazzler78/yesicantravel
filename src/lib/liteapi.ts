@@ -8,6 +8,30 @@ const defaultHeaders = {
   "content-type": "application/json",
 };
 
+/** LiteAPI error shape: { error: { code, description, message } }. Use for logging and idempotency/support. */
+export class LiteAPIError extends Error {
+  code?: number;
+  description?: string;
+  constructor(message: string, opts?: { code?: number; description?: string }) {
+    super(message);
+    this.name = "LiteAPIError";
+    this.code = opts?.code;
+    this.description = opts?.description;
+  }
+}
+
+function parseAndThrow(body: { error?: { code?: number; description?: string; message?: string } }, fallback: string): never {
+  const err = body?.error;
+  const message = err?.message ?? err?.description ?? fallback;
+  if (err && (err.code != null || err.description)) {
+    if (typeof console !== "undefined" && console.error) {
+      console.error("[LiteAPI]", { code: err.code, description: err.description, message: err.message });
+    }
+    throw new LiteAPIError(message, { code: err.code, description: err.description });
+  }
+  throw new LiteAPIError(message);
+}
+
 export async function searchPlaces(query: string) {
   const res = await fetch(
     `${API_BASE}/data/places?textQuery=${encodeURIComponent(query)}`,
@@ -68,7 +92,7 @@ export async function prebook(offerId: string, usePaymentSdk = true) {
     body: JSON.stringify({ usePaymentSdk, offerId }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error?.message ?? `Prebook failed: ${res.status}`);
+  if (!res.ok) parseAndThrow(data ?? {}, `Prebook failed: ${res.status}`);
   return data;
 }
 
@@ -79,24 +103,29 @@ export type BookPayment =
 export async function book(params: {
   prebookId: string;
   payment: BookPayment;
-  holder: { firstName: string; lastName: string; email: string; phone?: string };
+  holder: { firstName: string; lastName: string; email: string; phone: string };
   guests: Array<{ occupancyNumber: number; firstName: string; lastName: string; email: string }>;
+  /** Optional idempotency key to prevent duplicate bookings (client-defined). */
+  clientReference?: string;
 }) {
+  const body: Record<string, unknown> = {
+    prebookId: params.prebookId,
+    holder: params.holder,
+    payment:
+      params.payment.method === "TRANSACTION_ID"
+        ? { method: "TRANSACTION_ID", transactionId: params.payment.transactionId }
+        : { method: "ACC_CREDIT_CARD" },
+    guests: params.guests,
+  };
+  if (params.clientReference) body.clientReference = params.clientReference;
+
   const res = await fetch(`${BOOK_BASE}/rates/book`, {
     method: "POST",
     headers: defaultHeaders,
-    body: JSON.stringify({
-      prebookId: params.prebookId,
-      holder: params.holder,
-      payment:
-        params.payment.method === "TRANSACTION_ID"
-          ? { method: "TRANSACTION_ID", transactionId: params.payment.transactionId }
-          : { method: "ACC_CREDIT_CARD" },
-      guests: params.guests,
-    }),
+    body: JSON.stringify(body),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(data?.error?.message ?? `Book failed: ${res.status}`);
+  if (!res.ok) parseAndThrow(data ?? {}, `Book failed: ${res.status}`);
   return data;
 }
 

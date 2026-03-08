@@ -34,6 +34,7 @@ function ResultsContent() {
   const [minRating, setMinRating] = useState<number | null>(4);
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [onlyFreeCancellation, setOnlyFreeCancellation] = useState(false);
+  const [sortBy, setSortBy] = useState<"rating" | "price">("rating");
   const [placeDetails, setPlaceDetails] = useState<{
     location: { latitude: number; longitude: number };
     viewport?: { high: { latitude: number; longitude: number }; low: { latitude: number; longitude: number } };
@@ -191,9 +192,16 @@ function ResultsContent() {
       if (onlyFreeCancellation && !h.hasFreeCancellation) return false;
       return true;
     });
-    // Proxy for "safest first": higher-rated stays first when available
+    if (sortBy === "price") {
+      return [...filtered].sort((a, b) => {
+        const pa = a.price ?? Number.MAX_SAFE_INTEGER;
+        const pb = b.price ?? Number.MAX_SAFE_INTEGER;
+        return pa - pb;
+      });
+    }
+    // Default: highest rating first (safest first)
     return [...filtered].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-  }, [hotels, minRating, maxPrice, onlyFreeCancellation]);
+  }, [hotels, minRating, maxPrice, onlyFreeCancellation, sortBy]);
 
   const placeId = searchParams.get("placeId");
 
@@ -278,15 +286,42 @@ function ResultsContent() {
         <Link href="/" className="mb-6 inline-block text-[var(--ocean-teal)] font-medium hover:underline">
           ← Back to search
         </Link>
-        <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
           <div>
             <h1 className="mb-1 text-2xl font-bold text-[var(--navy)]">Safer stays for your trip</h1>
             <p className="text-[var(--navy-light)]">Filter by safety, budget, and rating to stay in control.</p>
           </div>
-          <p className="text-sm text-[var(--navy-light)]">
-            Showing <span className="font-semibold text-[var(--navy)]">{filteredAndSortedHotels.length}</span>{" "}
-            {filteredAndSortedHotels.length === 1 ? "place" : "places"}
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-sm text-[var(--navy-light)]">Sort:</span>
+            <div className="flex rounded-lg border border-[var(--navy)]/15 p-0.5">
+              <button
+                type="button"
+                onClick={() => setSortBy("rating")}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  sortBy === "rating"
+                    ? "bg-[var(--ocean-teal)] text-white"
+                    : "text-[var(--navy-light)] hover:bg-[var(--sand)]"
+                }`}
+              >
+                By rating
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("price")}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  sortBy === "price"
+                    ? "bg-[var(--ocean-teal)] text-white"
+                    : "text-[var(--navy-light)] hover:bg-[var(--sand)]"
+                }`}
+              >
+                Cheapest first
+              </button>
+            </div>
+            <p className="text-sm text-[var(--navy-light)]">
+              <span className="font-semibold text-[var(--navy)]">{filteredAndSortedHotels.length}</span>{" "}
+              {filteredAndSortedHotels.length === 1 ? "place" : "places"}
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,260px)_minmax(0,1.4fr)]">

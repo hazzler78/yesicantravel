@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -142,6 +142,7 @@ export default function Home() {
   const [showPlaces, setShowPlaces] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [minPricesByCity, setMinPricesByCity] = useState<Record<string, { minPrice: number | null; currency: string }> | null>(null);
 
   const debounce = useCallback((fn: () => void, ms: number) => {
     let t: ReturnType<typeof setTimeout>;
@@ -214,6 +215,13 @@ export default function Home() {
 
   const minCheckin = new Date().toISOString().slice(0, 10);
   const minCheckout = checkin ? new Date(new Date(checkin).getTime() + 86400000).toISOString().slice(0, 10) : minCheckin;
+
+  useEffect(() => {
+    fetch("/api/popular-cities/min-prices")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("min-prices failed"))))
+      .then((data: Record<string, { minPrice: number | null; currency: string }>) => setMinPricesByCity(data))
+      .catch(() => setMinPricesByCity({}));
+  }, []);
 
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
@@ -453,6 +461,16 @@ export default function Home() {
                   const { checkin: dCheckin, checkout: dCheckout } = getDefaultSearchParams();
                   return popularCities.map((city) => {
                     const href = `/results?${new URLSearchParams({ aiSearch: city.aiSearch, checkin: dCheckin, checkout: dCheckout, adults: "1" })}`;
+                    const priceInfo = minPricesByCity?.[city.slug];
+                    const priceStr =
+                      priceInfo?.minPrice != null
+                        ? priceInfo.currency === "EUR"
+                          ? `€${priceInfo.minPrice}`
+                          : priceInfo.currency === "USD"
+                            ? `$${priceInfo.minPrice}`
+                            : `${priceInfo.minPrice} ${priceInfo.currency}`
+                        : null;
+                    const priceLabel = priceStr ? `Safe stays from ${priceStr}/night` : "Safe stays from €89/night";
                     return (
                       <Link
                         key={city.slug}
@@ -473,7 +491,7 @@ export default function Home() {
                             {city.city}
                           </span>
                           <span className="text-xs text-white/90">
-                            Safe stays from €89/night
+                            {priceLabel}
                           </span>
                         </div>
                         <span className="shrink-0 text-[var(--ocean-teal)] group-hover:text-[var(--ocean-teal-light)]" aria-hidden>→</span>

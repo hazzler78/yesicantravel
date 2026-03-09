@@ -434,12 +434,12 @@ export default function Home() {
           >
             {loading ? "Searching..." : "Find Your Safe Solo Stay Now"}
           </button>
-          <p className="mt-2 text-center text-sm font-medium text-[var(--navy)]">
+          <p className="mt-2 text-center text-sm font-semibold text-[var(--navy)] md:text-base">
             Filter by safety features – start in seconds
           </p>
           <Link
             href="/popular-cities"
-            className="mt-4 flex w-full items-center justify-center rounded-lg border-2 border-white bg-white/10 px-6 py-3.5 text-xl font-semibold text-white backdrop-blur-sm transition-colors hover:bg-white/20"
+            className="mt-4 flex w-full items-center justify-center rounded-lg border border-[var(--navy)]/20 bg-white px-6 py-3.5 text-lg font-semibold text-[var(--navy)] shadow-md transition-colors hover:bg-[var(--sand)] hover:border-[var(--ocean-teal)]/40"
           >
             Not sure where to go? See Popular Safe Cities
           </Link>

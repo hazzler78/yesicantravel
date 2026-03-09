@@ -52,7 +52,7 @@ export default function PopularCitiesPage() {
               >
                 <div className="relative h-40 w-full bg-gradient-to-br from-[var(--ocean-teal)]/20 to-[var(--navy)]/20">
                   <Image
-                    src="/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"
+                    src={city.image ?? "/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"}
                     alt=""
                     fill
                     className="object-cover opacity-80"

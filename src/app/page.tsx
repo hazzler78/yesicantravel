@@ -479,7 +479,7 @@ export default function Home() {
                       >
                         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-[var(--navy)]/30">
                           <Image
-                            src="/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"
+                            src={city.image ?? "/Beautiful_empty_cozy_hotel_balcony_at_soft_golden.png"}
                             alt=""
                             fill
                             className="object-cover opacity-70"

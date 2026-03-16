@@ -8,6 +8,7 @@ import { track } from "@vercel/analytics";
 import { fbqTrack } from "@/lib/metaPixel";
 import { getEventsForHomepage } from "@/data/events";
 import { popularCities } from "@/data/popularCities";
+import NewsletterForm from "../components/NewsletterForm";
 
 /** Default check-in 14 days from now, checkout +2 nights – for trending city links */
 function getDefaultSearchParams() {
@@ -507,6 +508,7 @@ export default function Home() {
       <main>
         <TrustSection />
         <TrendingEventsSection />
+        <NewsletterForm />
       </main>
 
       {/* Sticky secondary CTA on mobile – follows scroll */}

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { fbqTrack } from "@/lib/metaPixel";
+import { pinterestTrack } from "@/lib/pinterest";
 
 interface Booking {
   bookingId?: string;
@@ -67,6 +68,12 @@ function ConfirmationContent() {
         currency: booking.currency ?? "USD",
         content_ids: booking.hotel?.hotelId ? [booking.hotel.hotelId] : undefined,
         content_type: "product",
+      });
+      pinterestTrack("checkout", {
+        event_id: booking.bookingId ?? bookingId ?? undefined,
+        value: booking.price,
+        currency: booking.currency ?? "USD",
+        order_quantity: 1,
       });
     }
   }, [booking]);

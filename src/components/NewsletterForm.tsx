@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { pinterestTrack } from "@/lib/pinterest";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -30,6 +31,7 @@ export default function NewsletterForm() {
       if (res.ok && json.saved) {
         setStatus("success");
         setMessage("You’re in. We’ll send you solo travel tips and safer stay ideas.");
+        pinterestTrack("lead", { lead_type: "Newsletter" });
         setEmail("");
         setFirstName("");
       } else {

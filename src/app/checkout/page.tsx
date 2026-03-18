@@ -6,6 +6,7 @@ import Script from "next/script";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { fbqTrack } from "@/lib/metaPixel";
+import { pinterestTrack } from "@/lib/pinterest";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 const CLIENT_REF_KEY = "liteapi_checkout_client_ref";
@@ -126,6 +127,10 @@ function CheckoutContent() {
         checkout,
         adults,
       });
+      pinterestTrack("checkout", {
+        event_id: `checkout-${offerId}-${hotelId}`,
+        order_quantity: Number(adults),
+      });
     }
   }, [offerId, hotelId, checkin, checkout, adults, step]);
 
@@ -214,6 +219,12 @@ function CheckoutContent() {
           checkout,
           adults,
           paymentMethod: "card",
+        });
+        pinterestTrack("checkout", {
+          event_id: (data as { bookingId?: string }).bookingId ?? undefined,
+          currency: (data as { currency?: string }).currency ?? undefined,
+          value: (data as { price?: number }).price ?? undefined,
+          order_quantity: Number(adults),
         });
         saveCustomerForSuggestions({
           email: guest.email,
@@ -354,6 +365,12 @@ function CheckoutContent() {
           checkout,
           adults,
           paymentMethod: "account",
+        });
+        pinterestTrack("checkout", {
+          event_id: (data as { bookingId?: string }).bookingId ?? undefined,
+          currency: (data as { currency?: string }).currency ?? undefined,
+          value: (data as { price?: number }).price ?? undefined,
+          order_quantity: Number(adults),
         });
         saveCustomerForSuggestions({
           email: guestPayload.email,

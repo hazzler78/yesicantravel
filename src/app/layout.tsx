@@ -88,6 +88,60 @@ pintrk('page');`}
           />
         </noscript>
         {children}
+        <footer className="mt-16 border-t border-[var(--sand)] bg-[var(--background)]">
+          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-center text-sm text-[var(--navy-light)] md:flex-row md:text-left">
+            <p className="font-medium text-[var(--navy)]">
+              More solo travel safety tips on social
+            </p>
+            <div className="flex items-center gap-3">
+              <a
+                href="https://www.instagram.com/yes.i.can.travel"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Yes I Can Travel on Instagram"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
+              >
+                <span className="text-sm font-semibold">IG</span>
+              </a>
+              <a
+                href="https://www.pinterest.com/yesicantravel"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Yes I Can Travel on Pinterest"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
+              >
+                <span className="text-sm font-semibold">P</span>
+              </a>
+              <a
+                href="https://www.facebook.com/YesICanTravelTheWorld"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Yes I Can Travel on Facebook"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
+              >
+                <span className="text-sm font-semibold">f</span>
+              </a>
+              <a
+                href="https://www.twitter.com/yesicantravel"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Yes I Can Travel on X"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
+              >
+                <span className="text-sm font-semibold">X</span>
+              </a>
+              <a
+                href="https://www.tiktok.com/@yesicantravel"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Yes I Can Travel on TikTok"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
+              >
+                <span className="text-sm font-semibold">Tt</span>
+              </a>
+            </div>
+          </div>
+        </footer>
         <Suspense fallback={null}>
           <Chatbot />
         </Suspense>

@@ -444,12 +444,12 @@ export default function Home() {
           >
             Not sure where to go? See Popular Safe Cities
           </Link>
-            <Link
-              href="#trending-events"
-              className="mt-3 flex w-full items-center justify-center rounded-lg border border-white/60 bg-white/5 px-4 py-2.5 text-sm font-medium text-white/95 transition-colors hover:bg-white/10"
-            >
-              See trending events
-            </Link>
+          <Link
+            href="#trending-events"
+            className="mt-3 flex w-full items-center justify-center rounded-lg border border-[var(--navy)]/40 bg-[var(--navy)]/85 px-4 py-2.5 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[var(--navy)] hover:border-[var(--ocean-teal)]/60"
+          >
+            See trending events
+          </Link>
             </div>
 
             {/* Trending Safe Destinations – mjuk ingång under formuläret */}

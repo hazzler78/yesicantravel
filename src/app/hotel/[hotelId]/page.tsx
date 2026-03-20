@@ -4,7 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "@/lib/metaPixel";
+import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
+import { sendMetaCapiEvent } from "@/lib/metaCapi";
 
 interface Rate {
   name: string;
@@ -146,7 +147,8 @@ function HotelContent() {
       checkout,
       adults,
     });
-    fbqTrack("InitiateCheckout", {
+    const eventId = generateMetaEventId("init_checkout");
+    const metaData = {
       content_ids: [hotelId],
       content_type: "product",
       value: total?.amount,
@@ -154,6 +156,13 @@ function HotelContent() {
       checkin,
       checkout,
       adults,
+    };
+    fbqTrack("InitiateCheckout", metaData, { eventId });
+    void sendMetaCapiEvent({
+      eventName: "InitiateCheckout",
+      eventId,
+      eventSourceUrl: window.location.href,
+      customData: metaData,
     });
     const q = new URLSearchParams({
       offerId,

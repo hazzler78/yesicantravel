@@ -7,7 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import Chatbot from "../components/Chatbot";
 
-const META_PIXEL_ID = "948121024567031";
+const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "948121024567031";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

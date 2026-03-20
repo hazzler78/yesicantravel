@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "@/lib/metaPixel";
+import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
+import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { getEventsForHomepage } from "@/data/events";
 import { popularCities } from "@/data/popularCities";
 import NewsletterForm from "../components/NewsletterForm";
@@ -194,10 +195,18 @@ export default function Home() {
       hasPlaceId: Boolean(placeId),
       hasVibeQuery: Boolean(vibeQuery.trim()),
     });
-    fbqTrack("Search", {
+    const eventId = generateMetaEventId("search");
+    const metaSearchData = {
       search_mode: searchMode,
       destination_set: Boolean(placeId),
       has_vibe_query: Boolean(vibeQuery.trim()),
+    };
+    fbqTrack("Search", metaSearchData, { eventId });
+    void sendMetaCapiEvent({
+      eventName: "Search",
+      eventId,
+      eventSourceUrl: window.location.href,
+      customData: metaSearchData,
     });
     setLoading(true);
     const params = new URLSearchParams({

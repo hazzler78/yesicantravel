@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "@/lib/metaPixel";
+import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
+import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { pinterestTrack } from "@/lib/pinterest";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
@@ -118,7 +119,8 @@ function CheckoutContent() {
         checkout,
         adults,
       });
-      fbqTrack("InitiateCheckout", {
+      const eventId = generateMetaEventId("checkout_view");
+      const metaData = {
         content_ids: [hotelId],
         content_type: "product",
         value: undefined,
@@ -126,6 +128,13 @@ function CheckoutContent() {
         checkin,
         checkout,
         adults,
+      };
+      fbqTrack("InitiateCheckout", metaData, { eventId });
+      void sendMetaCapiEvent({
+        eventName: "InitiateCheckout",
+        eventId,
+        eventSourceUrl: window.location.href,
+        customData: metaData,
       });
       pinterestTrack("checkout", {
         event_id: `checkout-${offerId}-${hotelId}`,
@@ -310,11 +319,20 @@ function CheckoutContent() {
       hasPhone: Boolean(phone.trim()),
       paymentMethod,
     });
-    fbqTrack("AddPaymentInfo", {
+    const addPaymentEventId = generateMetaEventId("add_payment");
+    const addPaymentData = {
       content_ids: [hotelId],
       content_type: "product",
       has_phone: Boolean(phone.trim()),
       payment_method: paymentMethod,
+    };
+    fbqTrack("AddPaymentInfo", addPaymentData, { eventId: addPaymentEventId });
+    void sendMetaCapiEvent({
+      eventName: "AddPaymentInfo",
+      eventId: addPaymentEventId,
+      eventSourceUrl: window.location.href,
+      customData: addPaymentData,
+      userData: { email: email.trim(), phone: phone.trim() },
     });
 
     try {

@@ -4,7 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { fbqTrack } from "@/lib/metaPixel";
+import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
+import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { pinterestTrack } from "@/lib/pinterest";
 
 interface Booking {
@@ -63,11 +64,22 @@ function ConfirmationContent() {
 
   useEffect(() => {
     if (booking && booking.price != null) {
-      fbqTrack("Purchase", {
+      const purchaseEventId =
+        booking.bookingId != null
+          ? `purchase_${booking.bookingId}`
+          : generateMetaEventId("purchase");
+      const purchaseData = {
         value: booking.price,
         currency: booking.currency ?? "USD",
         content_ids: booking.hotel?.hotelId ? [booking.hotel.hotelId] : undefined,
         content_type: "product",
+      };
+      fbqTrack("Purchase", purchaseData, { eventId: purchaseEventId });
+      void sendMetaCapiEvent({
+        eventName: "Purchase",
+        eventId: purchaseEventId,
+        eventSourceUrl: window.location.href,
+        customData: purchaseData,
       });
       pinterestTrack("checkout", {
         event_id: booking.bookingId ?? bookingId ?? undefined,

@@ -51,23 +51,6 @@ export async function getPlaceDetails(placeId: string) {
   return res.json();
 }
 
-/** Collect every offerId LiteAPI returns (roomType and per-rate), for prebook validation. */
-export function collectOfferIdsFromRatesData(data: unknown): Set<string> {
-  const ids = new Set<string>();
-  if (!Array.isArray(data)) return ids;
-  for (const hotel of data) {
-    const roomTypes =
-      (hotel as { roomTypes?: Array<{ offerId?: string; rates?: Array<{ offerId?: string }> }> }).roomTypes ?? [];
-    for (const rt of roomTypes) {
-      if (typeof rt.offerId === "string" && rt.offerId) ids.add(rt.offerId);
-      for (const r of rt.rates ?? []) {
-        if (typeof r.offerId === "string" && r.offerId) ids.add(r.offerId);
-      }
-    }
-  }
-  return ids;
-}
-
 export async function searchRates(params: {
   placeId?: string;
   hotelIds?: string[];

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prebook, LiteAPIError, searchRates, collectOfferIdsFromRatesData } from "@/lib/liteapi";
+import { prebook, LiteAPIError } from "@/lib/liteapi";
 
 const STALE_OFFER =
   "This rate is no longer available for these dates. Please go back to the hotel page, refresh, and choose a rate again.";
@@ -7,30 +7,12 @@ const STALE_OFFER =
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { offerId, usePaymentSdk = true, hotelId, checkin, checkout, adults } = body;
+    const { offerId, usePaymentSdk = true } = body;
     if (!offerId) {
       return NextResponse.json(
         { error: "offerId is required" },
         { status: 400 }
       );
-    }
-
-    if (hotelId && checkin && checkout && adults != null && adults !== "") {
-      try {
-        const fresh = await searchRates({
-          hotelIds: [hotelId],
-          checkin,
-          checkout,
-          adults: Number(adults),
-          maxRatesPerHotel: 50,
-        });
-        const knownIds = collectOfferIdsFromRatesData(fresh.data);
-        if (!knownIds.has(offerId)) {
-          return NextResponse.json({ error: STALE_OFFER }, { status: 409 });
-        }
-      } catch {
-        /* rates refresh failed — still try prebook; LiteAPI validates there */
-      }
     }
 
     const data = await prebook(offerId, usePaymentSdk);

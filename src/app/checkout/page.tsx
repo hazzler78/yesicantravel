@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, useRef, Suspense } from "react";
+import { useCallback, useEffect, useState, useRef, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
@@ -8,9 +8,13 @@ import { track } from "@vercel/analytics";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { pinterestTrack } from "@/lib/pinterest";
+import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
+import { CheckoutProgress } from "@/components/checkout/CheckoutProgress";
+import { formatStayTotal } from "@/lib/formatStayPrice";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 const CLIENT_REF_KEY = "liteapi_checkout_client_ref";
+const CHECKOUT_COMPLETED_KEY = "liteapi_checkout_completed";
 
 function PaymentFormInit({
   secretKey,
@@ -63,8 +67,33 @@ function CheckoutContent() {
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
   const adults = searchParams.get("adults") ?? "2";
+  const placeId = searchParams.get("placeId");
+  const aiSearch = searchParams.get("aiSearch");
   const prebookId = searchParams.get("prebookId");
   const transactionId = searchParams.get("transactionId");
+  const totalAmountRaw = searchParams.get("totalAmount");
+  const totalCurrencyParam = searchParams.get("totalCurrency");
+  const quotedTotal =
+    totalAmountRaw != null && totalCurrencyParam
+      ? { amount: Number(totalAmountRaw), currency: totalCurrencyParam }
+      : null;
+  const quotedTotalValid =
+    quotedTotal != null && Number.isFinite(quotedTotal.amount) && quotedTotal.amount > 0;
+
+  const backToHotelsHref = useMemo(() => {
+    if (!checkin || !checkout || !hotelId) return "/";
+    if (placeId || aiSearch) {
+      const q = new URLSearchParams({
+        checkin,
+        checkout,
+        adults,
+      });
+      if (placeId) q.set("placeId", placeId);
+      if (aiSearch) q.set("aiSearch", aiSearch);
+      return `/results?${q}`;
+    }
+    return `/hotel/${hotelId}?checkin=${checkin}&checkout=${checkout}&adults=${adults}`;
+  }, [placeId, aiSearch, checkin, checkout, adults, hotelId]);
 
   const [step, setStep] = useState<"form" | "payment" | "booking" | "done" | "error">("form");
   const [paymentConfig, setPaymentConfig] = useState<{
@@ -85,6 +114,17 @@ function CheckoutContent() {
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [paymentLoadFailed, setPaymentLoadFailed] = useState(false);
+
+  const progressPhase =
+    step === "form" ? "details" : step === "payment" ? "payment" : step === "booking" ? "confirm" : "details";
+
+  const guestDetailsEnteredRef = useRef(false);
+
+  const trackGuestDetailsEntered = useCallback(() => {
+    if (guestDetailsEnteredRef.current || !hotelId || !offerId) return;
+    guestDetailsEnteredRef.current = true;
+    track("Entered Guest Details", { hotelId, offerId, checkin, checkout, adults });
+  }, [hotelId, offerId, checkin, checkout, adults]);
 
   const saveCustomerForSuggestions = useCallback(
     (payload: { email: string; firstName: string; lastName: string; phone?: string; hotelId?: string; checkin?: string; checkout?: string }) => {
@@ -112,7 +152,8 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (offerId && hotelId && checkin && checkout && step === "form") {
-      track("checkout_view", {
+      sessionStorage.removeItem(CHECKOUT_COMPLETED_KEY);
+      track("Viewed Checkout", {
         hotelId,
         offerId,
         checkin,
@@ -142,6 +183,25 @@ function CheckoutContent() {
       });
     }
   }, [offerId, hotelId, checkin, checkout, adults, step]);
+
+  useEffect(() => {
+    if (step !== "payment" || !hotelId || !offerId) return;
+    track("Payment Attempt", { hotelId, offerId, checkin, checkout, adults });
+  }, [step, hotelId, offerId, checkin, checkout, adults]);
+
+  useEffect(() => {
+    const onLeave = () => {
+      try {
+        if (sessionStorage.getItem(CHECKOUT_COMPLETED_KEY) === "1") return;
+        if (step === "done") return;
+        track("Booking Abandoned", { step, hotelId, offerId, checkin, checkout, adults });
+      } catch {
+        /* ignore */
+      }
+    };
+    window.addEventListener("pagehide", onLeave);
+    return () => window.removeEventListener("pagehide", onLeave);
+  }, [step, hotelId, offerId, checkin, checkout, adults]);
 
   // Detect when payment form fails to load (Stripe 400 on HTTP/localhost)
   useEffect(() => {
@@ -221,6 +281,7 @@ function CheckoutContent() {
         sessionStorage.removeItem(CLIENT_REF_KEY);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
+        sessionStorage.setItem(CHECKOUT_COMPLETED_KEY, "1");
         track("booking_complete", {
           bookingId: (data as { bookingId?: string }).bookingId,
           hotelId,
@@ -313,12 +374,7 @@ function CheckoutContent() {
       phone: phone.trim(),
     };
 
-    track("checkout_details_submit", {
-      hotelId,
-      offerId,
-      hasPhone: Boolean(phone.trim()),
-      paymentMethod,
-    });
+    trackGuestDetailsEntered();
     const addPaymentEventId = generateMetaEventId("add_payment");
     const addPaymentData = {
       content_ids: [hotelId],
@@ -376,6 +432,7 @@ function CheckoutContent() {
         setBooking(data);
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
+        sessionStorage.setItem(CHECKOUT_COMPLETED_KEY, "1");
         track("booking_complete", {
           bookingId: (data as { bookingId?: string }).bookingId,
           hotelId,
@@ -469,8 +526,16 @@ function CheckoutContent() {
 
   if (step === "booking") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--sand)]">
-        <div className="text-[var(--navy-light)]">Confirming your stay...</div>
+      <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
+        <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 sm:py-10">
+          <CheckoutTrustBar />
+          <CheckoutProgress phase="confirm" />
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-[var(--navy)]/10 bg-white p-10 text-center shadow-sm">
+            <div className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[var(--ocean-teal)] border-t-transparent" aria-hidden />
+            <p className="text-lg font-medium text-[var(--navy)]">Confirming your stay…</p>
+            <p className="mt-2 text-sm text-[var(--navy-light)]">Please don&apos;t close this page.</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -478,39 +543,64 @@ function CheckoutContent() {
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
       <Script src="https://payment-wrapper.liteapi.travel/dist/liteAPIPayment.js?v=a1" strategy="afterInteractive" />
-      <div className="mx-auto max-w-xl px-6 py-10">
-        <Link href={`/hotel/${hotelId}?checkin=${checkin}&checkout=${checkout}&adults=${adults}`} className="mb-6 inline-block text-[var(--ocean-teal)] font-medium hover:underline">
-          ← Back to stay
+      <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 sm:py-10">
+        <CheckoutTrustBar />
+
+        {(step === "form" || step === "payment") && <CheckoutProgress phase={progressPhase} />}
+
+        <Link
+          href={backToHotelsHref}
+          className="mb-6 flex min-h-[52px] w-full items-center justify-center rounded-xl border-2 border-[var(--navy)]/15 bg-white px-4 text-base font-bold text-[var(--navy)] shadow-sm transition-colors hover:border-[var(--ocean-teal)]/40 hover:bg-[var(--sand)]"
+        >
+          ← Back to hotels
         </Link>
 
         {step === "form" ? (
-          <form onSubmit={handleGuestSubmit} className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h1 className="text-2xl font-bold text-[var(--navy)]">Your details</h1>
-            <p className="text-[var(--navy-light)]">We&apos;ll use this to confirm your booking.</p>
+          <form onSubmit={handleGuestSubmit} className="space-y-5 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:space-y-6 sm:p-6">
+            {quotedTotalValid && quotedTotal && (
+              <div className="rounded-xl border border-[var(--ocean-teal)]/30 bg-[var(--ocean-teal)]/[0.08] px-3 py-3 text-center sm:px-4 sm:text-left">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--navy-light)]">Your price</p>
+                <p className="mt-1 text-2xl font-bold text-[var(--ocean-teal)]">
+                  {formatStayTotal(quotedTotal.amount, quotedTotal.currency)}
+                </p>
+                <p className="mt-2 text-sm leading-snug text-[var(--navy)]">
+                  Including all taxes, fees, and cleaning fee — nothing hidden.
+                </p>
+              </div>
+            )}
+
+            <div className="rounded-xl border border-[var(--coral)]/20 bg-[var(--coral)]/[0.07] px-3 py-3 text-sm font-medium leading-snug text-[var(--navy)] sm:px-4 sm:text-base">
+              Limited rooms available at this price — book now to lock this rate.
+            </div>
+
+            <div>
+              <h1 className="text-xl font-bold text-[var(--navy)] sm:text-2xl">Your details</h1>
+              <p className="mt-1 text-sm text-[var(--navy-light)] sm:text-base">We&apos;ll use this to confirm your booking.</p>
+            </div>
 
             {paymentConfig?.accountPaymentEnabled && (
               <div>
-                <span className="mb-2 block text-base font-medium text-[var(--navy)]">Payment</span>
-                <div className="flex gap-4">
-                  <label className="flex cursor-pointer items-center gap-2">
+                <span className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">Payment method</span>
+                <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                  <label className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[var(--navy)]/15 px-3 py-2 sm:min-h-0">
                     <input
                       type="radio"
                       name="paymentMethod"
                       checked={paymentMethod === "account"}
                       onChange={() => setPaymentMethod("account")}
-                      className="h-4 w-4 accent-[var(--ocean-teal)]"
+                      className="h-5 w-5 shrink-0 accent-[var(--ocean-teal)] sm:h-4 sm:w-4"
                     />
-                    <span>Charge to account</span>
+                    <span className="text-sm sm:text-base">Charge to account</span>
                   </label>
-                  <label className="flex cursor-pointer items-center gap-2">
+                  <label className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[var(--navy)]/15 px-3 py-2 sm:min-h-0">
                     <input
                       type="radio"
                       name="paymentMethod"
                       checked={paymentMethod === "card"}
                       onChange={() => setPaymentMethod("card")}
-                      className="h-4 w-4 accent-[var(--ocean-teal)]"
+                      className="h-5 w-5 shrink-0 accent-[var(--ocean-teal)] sm:h-4 sm:w-4"
                     />
-                    <span>Pay with card at checkout</span>
+                    <span className="text-sm sm:text-base">Pay with card</span>
                   </label>
                 </div>
                 {paymentMethod === "account" && paymentConfig?.paymentEnv === "sandbox" && (
@@ -521,55 +611,81 @@ function CheckoutContent() {
               </div>
             )}
 
-            <div>
-              <label htmlFor="firstName" className="mb-2 block text-base font-medium text-[var(--navy)]">First name</label>
-              <input
-                id="firstName"
-                type="text"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
-                required
-              />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="sm:col-span-1">
+                <label htmlFor="firstName" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
+                  First name
+                </label>
+                <input
+                  id="firstName"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => {
+                    trackGuestDetailsEntered();
+                    setFirstName(e.target.value);
+                  }}
+                  autoComplete="given-name"
+                  className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
+                  required
+                />
+              </div>
+              <div className="sm:col-span-1">
+                <label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
+                  Last name
+                </label>
+                <input
+                  id="lastName"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => {
+                    trackGuestDetailsEntered();
+                    setLastName(e.target.value);
+                  }}
+                  autoComplete="family-name"
+                  className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
+                  required
+                />
+              </div>
             </div>
             <div>
-              <label htmlFor="lastName" className="mb-2 block text-base font-medium text-[var(--navy)]">Last name</label>
-              <input
-                id="lastName"
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="mb-2 block text-base font-medium text-[var(--navy)]">Email</label>
+              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
+                Email
+              </label>
               <input
                 id="email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                onChange={(e) => {
+                  trackGuestDetailsEntered();
+                  setEmail(e.target.value);
+                }}
+                autoComplete="email"
+                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
                 required
               />
             </div>
             <div>
-              <label htmlFor="phone" className="mb-2 block text-base font-medium text-[var(--navy)]">Phone</label>
+              <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
+                Mobile phone
+              </label>
               <input
                 id="phone"
                 type="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="e.g. +46 70 123 45 67"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                onChange={(e) => {
+                  trackGuestDetailsEntered();
+                  setPhone(e.target.value);
+                }}
+                placeholder="+46 70 123 45 67"
+                autoComplete="tel"
+                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
                 required
               />
             </div>
             <button
               type="submit"
               disabled={paymentMethod === "card" && paymentConfig === null}
-              className="w-full rounded-lg bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white hover:bg-[var(--ocean-teal-light)] disabled:opacity-50"
+              className="min-h-[54px] w-full rounded-xl bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white hover:bg-[var(--ocean-teal-light)] disabled:opacity-50"
             >
               {paymentMethod === "card" && paymentConfig === null
                 ? "Loading..."
@@ -577,8 +693,8 @@ function CheckoutContent() {
             </button>
           </form>
         ) : (
-          <div className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h1 className="text-2xl font-bold text-[var(--navy)]">Payment</h1>
+          <div className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:p-6">
+            <h1 className="text-xl font-bold text-[var(--navy)] sm:text-2xl">Payment</h1>
             {(prebookData?.sandbox ?? paymentConfig?.paymentEnv === "sandbox") && (
               <p className="rounded-lg bg-[var(--ocean-teal)]/10 p-4 text-base text-[var(--navy)]">
                 Sandbox: use test card <strong>4242 4242 4242 4242</strong>, any 3 digits for CVV, any future expiration date.

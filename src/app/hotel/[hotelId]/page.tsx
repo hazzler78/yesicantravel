@@ -171,6 +171,14 @@ function HotelContent() {
       checkout: checkout!,
       adults: adults!,
     });
+    const pid = searchParams.get("placeId");
+    const ai = searchParams.get("aiSearch");
+    if (pid) q.set("placeId", pid);
+    if (ai) q.set("aiSearch", ai);
+    if (total?.amount != null && Number.isFinite(total.amount)) {
+      q.set("totalAmount", String(total.amount));
+    }
+    if (total?.currency) q.set("totalCurrency", total.currency);
     window.location.href = `/checkout?${q}`;
   };
 

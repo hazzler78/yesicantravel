@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState, Suspense } from "react";
+import { useEffect, useMemo, useState, useCallback, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { track } from "@vercel/analytics";
+import { formatStayTotal } from "@/lib/formatStayPrice";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
@@ -40,6 +42,17 @@ function ResultsContent() {
     viewport?: { high: { latitude: number; longitude: number }; low: { latitude: number; longitude: number } };
   } | null>(null);
   const [placeDetailsError, setPlaceDetailsError] = useState(false);
+  const [expandedHotelIds, setExpandedHotelIds] = useState<Record<string, boolean>>({});
+
+  const toggleHotelExpanded = useCallback((hotelId: string) => {
+    setExpandedHotelIds((prev) => {
+      const nextOpen = !prev[hotelId];
+      if (nextOpen) {
+        track("Rates Viewed", { hotelId });
+      }
+      return { ...prev, [hotelId]: nextOpen };
+    });
+  }, []);
 
   useEffect(() => {
     const placeId = searchParams.get("placeId");
@@ -434,45 +447,100 @@ function ResultsContent() {
                 />
               )}
             </div>
-            {filteredAndSortedHotels.map((h) => (
-            <Link
-              key={h.id}
-              href={`/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""}${searchParams.get("aiSearch") ? `&aiSearch=${encodeURIComponent(searchParams.get("aiSearch")!)}` : ""}`}
-              className="block overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-white shadow-sm transition-colors hover:border-[var(--ocean-teal)]/40"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <div className="h-48 w-full shrink-0 bg-[var(--sand)] sm:h-40 sm:w-48">
-                  {h.main_photo ? (
-                    <img src={h.main_photo} alt={h.name} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-[var(--navy-light)]">No image</div>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col justify-between p-4">
-                  <div>
-                    <h2 className="text-lg font-semibold text-[var(--navy)]">{h.name}</h2>
-                    {h.address && <p className="mt-1 text-[var(--navy-light)]">{h.address}</p>}
-                    {h.rating != null && (
-                      <p className="mt-1 text-[var(--ocean-teal)]">★ {h.rating}</p>
-                    )}
+            {filteredAndSortedHotels.map((h) => {
+              const hotelHref = `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
+                searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""
+              }${searchParams.get("aiSearch") ? `&aiSearch=${encodeURIComponent(searchParams.get("aiSearch")!)}` : ""}`;
+              const expanded = Boolean(expandedHotelIds[h.id]);
+              return (
+                <div
+                  key={h.id}
+                  className="overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-white shadow-sm transition-colors hover:border-[var(--ocean-teal)]/40"
+                >
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
+                    <Link href={hotelHref} className="block h-48 w-full shrink-0 bg-[var(--sand)] sm:h-40 sm:w-48">
+                      {h.main_photo ? (
+                        <img src={h.main_photo} alt={h.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-[var(--navy-light)]">No image</div>
+                      )}
+                    </Link>
+                    <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
+                          <h2 className="text-lg font-semibold text-[var(--navy)]">
+                            <Link href={hotelHref} className="hover:text-[var(--ocean-teal)]">
+                              {h.name}
+                            </Link>
+                          </h2>
+                          {h.address && <p className="mt-1 text-[var(--navy-light)]">{h.address}</p>}
+                          {h.rating != null && (
+                            <p className="mt-1 text-[var(--ocean-teal)]">★ {h.rating}</p>
+                          )}
+                          <div className="mt-3 flex flex-wrap items-center gap-2">
+                            {h.hasFreeCancellation && (
+                              <span className="inline-flex items-center rounded-full bg-[var(--ocean-teal)]/10 px-3 py-1 text-xs font-medium text-[var(--ocean-teal)]">
+                                Free cancellation
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleHotelExpanded(h.id)}
+                          aria-expanded={expanded}
+                          className="shrink-0 rounded-lg border border-[var(--navy)]/15 bg-[var(--sand)] px-3 py-2 text-xs font-semibold text-[var(--navy)] hover:border-[var(--ocean-teal)]/40 hover:bg-white sm:text-sm"
+                        >
+                          {expanded ? "Hide rates" : "Rates & details"}
+                        </button>
+                      </div>
+                      {h.price != null && !expanded && (
+                        <p className="text-base font-semibold text-[var(--ocean-teal)]">
+                          {formatStayTotal(h.price, h.currency ?? "USD")}
+                          <span className="pl-1 text-sm font-normal text-[var(--navy-light)]">total stay</span>
+                        </p>
+                      )}
+                      {h.price == null && !expanded && (
+                        <p className="text-sm text-[var(--navy-light)]">Open rates for pricing.</p>
+                      )}
+                      {expanded && h.price != null && (
+                        <div className="shrink-0 rounded-xl border-2 border-[var(--ocean-teal)]/35 bg-[var(--ocean-teal)]/[0.08] px-4 py-4 shadow-sm">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--navy-light)]">
+                            Total for your stay
+                          </p>
+                          <p className="mt-1 text-2xl font-bold leading-tight text-[var(--ocean-teal)] sm:text-3xl">
+                            {formatStayTotal(h.price, h.currency ?? "USD")}
+                          </p>
+                          <p className="mt-2 text-sm font-medium leading-snug text-[var(--navy)]">
+                            For your entire stay — includes taxes, fees, and cleaning fee
+                          </p>
+                          <p className="mt-1 text-xs text-[var(--navy-light)]">
+                            Choose a room on the next page, then continue to checkout.
+                          </p>
+                          <Link
+                            href={hotelHref}
+                            className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-[var(--ocean-teal)] px-4 py-3 text-center text-base font-semibold text-white hover:bg-[var(--ocean-teal-light)]"
+                          >
+                            View rooms &amp; book
+                          </Link>
+                        </div>
+                      )}
+                      {expanded && h.price == null && (
+                        <div className="rounded-xl border border-[var(--navy)]/15 bg-[var(--sand)]/80 px-4 py-4">
+                          <p className="text-sm text-[var(--navy)]">See live rates and room types for your dates.</p>
+                          <Link
+                            href={hotelHref}
+                            className="mt-3 inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-[var(--ocean-teal)] px-4 py-3 text-center text-base font-semibold text-white hover:bg-[var(--ocean-teal-light)]"
+                          >
+                            View rooms &amp; book
+                          </Link>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {h.price != null && (
-                      <p className="text-lg font-semibold text-[var(--ocean-teal)]">
-                        {h.currency} {h.price.toFixed(2)}
-                        <span className="text-base font-normal text-[var(--navy-light)]"> / total stay</span>
-                      </p>
-                    )}
-                    {h.hasFreeCancellation && (
-                      <span className="inline-flex items-center rounded-full bg-[var(--ocean-teal)]/10 px-3 py-1 text-xs font-medium text-[var(--ocean-teal)]">
-                        Free cancellation
-                      </span>
-                    )}
-                  </div>
                 </div>
-              </div>
-            </Link>
-            ))}
+              );
+            })}
             {filteredAndSortedHotels.length === 0 && (
               <p className="text-[var(--navy-light)]">
                 No stays match these filters. Try relaxing your rating, budget, or cancellation preferences.

@@ -6,6 +6,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
+import { formatStayTotal } from "@/lib/formatStayPrice";
 
 interface PlaceDetails {
   location: { latitude: number; longitude: number };
@@ -93,7 +94,7 @@ export default function ResultsMap({ placeDetails, hotels, className = "" }: Res
                 {h.rating != null && <p className="text-[var(--ocean-teal)]">★ {h.rating}</p>}
                 {h.price != null && (
                   <p className="text-sm font-medium text-[var(--ocean-teal)]">
-                    {h.currency ?? "USD"} {h.price.toFixed(2)}
+                    {formatStayTotal(h.price, h.currency ?? "USD")} total stay
                   </p>
                 )}
               </div>

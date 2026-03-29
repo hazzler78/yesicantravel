@@ -396,7 +396,14 @@ function CheckoutContent() {
       const prebookRes = await fetch("/api/prebook", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId, usePaymentSdk }),
+        body: JSON.stringify({
+          offerId,
+          usePaymentSdk,
+          hotelId,
+          checkin,
+          checkout,
+          adults: Number(adults),
+        }),
       });
       const prebookJson = await prebookRes.json();
       if (!prebookRes.ok) throw new Error(prebookJson.error ?? "Prebook failed");

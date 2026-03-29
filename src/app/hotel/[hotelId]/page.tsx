@@ -69,7 +69,7 @@ function HotelContent() {
               checkin,
               checkout,
               adults: Number(adults),
-              maxRatesPerHotel: 10,
+              maxRatesPerHotel: 50,
             }),
           }),
         ]);
@@ -94,7 +94,8 @@ function HotelContent() {
             }
             allRates.push({
               ...r,
-              offerId: rt.offerId ?? r.offerId,
+              // Prebook must use the bookable id: prefer per-rate offerId when the API sends it, else roomType offerId (LiteAPI default).
+              offerId: r.offerId ?? rt.offerId,
             });
           }
         }

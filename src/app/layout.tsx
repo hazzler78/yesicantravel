@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     template: "%s | Yes I Can Travel",
   },
   description:
-    "Yes I Can Travel is a safety-first booking platform for women travelling solo in Western & Central Europe. Compare safer places to stay, filter by safety features, and book with confidence.",
+    "Safe solo travel stays for women in Europe & worldwide. Women-reviewed hotels with 24/7 reception, safety filters & expert tips. Book confidently and feel prepared.",
   openGraph: {
     type: "website",
     url: "/",
     siteName: "Yes I Can Travel",
     title: "Yes I Can Travel – Safe solo travel stays for women in Europe",
     description:
-      "Find safer hotels and stays across Europe, with filters for 24/7 staffed reception, well-lit areas, neighbourhood safety info and more—designed for women travelling solo.",
+      "Safe solo travel stays for women in Europe & worldwide. Women-reviewed hotels with 24/7 reception, safety filters & expert tips. Book confidently and feel prepared.",
     images: [
       {
         url: "/logo.png",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Yes I Can Travel – Safe solo travel stays for women in Europe",
     description:
-      "Safety-first booking for women travelling solo in Western & Central Europe. Reassuring, clear, and empowering.",
+      "Safe solo travel stays for women in Europe & worldwide. Women-reviewed hotels with 24/7 reception, safety filters & expert tips. Book confidently and feel prepared.",
     images: ["/logo.png"],
   },
 };

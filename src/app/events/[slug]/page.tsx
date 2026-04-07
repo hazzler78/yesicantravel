@@ -11,24 +11,19 @@ import EventPriceBadge from "@/components/EventPriceBadge";
 
 type Props = { params: Promise<{ slug: string }> };
 
-function buildMetaTitle(event: { city: string; eventShortName: string; dateRange: string }): string {
-  return `Hotels ${event.city} ${event.eventShortName} ${event.dateRange} | Yes I Can Travel – Safe stays near venue`;
-}
-
-function buildMetaDescription(
-  event: { city: string; eventName: string; dateRange: string }
-): string {
-  return `Book safe hotels in ${event.city} for ${event.eventName} (${event.dateRange}). Pre-filled search ready—change dates anytime. Best deals via Yes I Can Travel.`;
-}
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const event = getEventBySlug(slug);
-  if (!event) return { title: "Event not found" };
+  if (!event) {
+    return { title: "Event Not Found | Yes I Can Travel" };
+  }
 
-  const baseUrl = "https://www.yesicantravel.com";
-  const title = buildMetaTitle(event);
-  const description = buildMetaDescription(event);
+  const year = event.startDate.slice(0, 4);
+  const eventNameWithYear = `${event.eventName} ${year}`;
+
+  const title = `${eventNameWithYear} – Safe Solo Stays for Women | Yes I Can Travel`;
+  const description = `Safe, women-reviewed hotels near ${eventNameWithYear}. 24/7 reception, safety filters & expert tips for solo female travelers. Book confidently and feel prepared.`;
+  const eventUrl = `https://yesicantravel.com/events/${event.slug}`;
 
   return {
     title,
@@ -36,14 +31,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: `${baseUrl}/events/${slug}`,
+      url: eventUrl,
     },
     twitter: {
-      card: "summary_large_image",
       title,
       description,
     },
-    alternates: { canonical: `${baseUrl}/events/${slug}` },
+    alternates: { canonical: eventUrl },
   };
 }
 

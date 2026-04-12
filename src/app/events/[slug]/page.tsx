@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = `${eventNameWithYear} – Safe Solo Stays for Women | Yes I Can Travel`;
   const description = `Safe, women-reviewed hotels near ${eventNameWithYear}. 24/7 reception, safety filters & expert tips for solo female travelers. Book confidently and feel prepared.`;
-  const eventUrl = `https://yesicantravel.com/events/${event.slug}`;
+  const eventUrl = `https://www.yesicantravel.com/events/${event.slug}`;
 
   return {
     title,

@@ -1,4 +1,4 @@
-import { LeadEventType } from "@prisma/client";
+import { LeadEventType, Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { getAttributionFromRequest } from "@/lib/attribution";
 import { logLeadEvent, upsertBookingWithRevenue, upsertLeadProfile } from "@/lib/revenueAgent";
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         pageUrl: body.event.pageUrl,
         contentSlug: body.event.contentSlug,
         leadProfileId,
-        metadata: body.event.metadata,
+        metadata: body.event.metadata as Prisma.InputJsonValue | undefined,
       });
       return NextResponse.json({ ok: true });
     }

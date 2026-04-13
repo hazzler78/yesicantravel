@@ -1,4 +1,4 @@
-import { JobStatus } from "@prisma/client";
+import { JobStatus, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { buildMonthlyReport, monthKey, proposeAdBudget, validateAdExecutionApproval } from "@/lib/revenueAgent";
 import { seedKeywordTargets } from "@/lib/agents/keywordResearch";
@@ -10,7 +10,7 @@ async function startRun(jobName: string, runKey?: string) {
   });
 }
 
-async function finishRun(id: string, status: JobStatus, errorMessage?: string, context?: Record<string, unknown>) {
+async function finishRun(id: string, status: JobStatus, errorMessage?: string, context?: Prisma.InputJsonValue) {
   await prisma.jobRun.update({
     where: { id },
     data: {

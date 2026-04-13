@@ -5,7 +5,24 @@ import { prisma } from "@/lib/prisma";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await prisma.contentItem.findUnique({ where: { slug } });
+  let post: { slug: string; seoTitle: string | null; title: string; seoDescription: string | null; excerpt: string | null } | null = null;
+  try {
+    post = await prisma.contentItem.findUnique({
+      where: { slug },
+      select: {
+        slug: true,
+        seoTitle: true,
+        title: true,
+        seoDescription: true,
+        excerpt: true,
+      },
+    });
+  } catch {
+    return {
+      title: "Solo Travel Safety Blog",
+      description: "Blog post temporarily unavailable.",
+    };
+  }
   if (!post) return {};
 
   return {
@@ -17,7 +34,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const post = await prisma.contentItem.findUnique({ where: { slug } });
+  let post:
+    | {
+        title: string;
+        excerpt: string | null;
+        bodyMarkdown: string;
+        status: ContentStatus;
+      }
+    | null = null;
+  try {
+    post = await prisma.contentItem.findUnique({
+      where: { slug },
+      select: {
+        title: true,
+        excerpt: true,
+        bodyMarkdown: true,
+        status: true,
+      },
+    });
+  } catch {
+    return (
+      <main className="mx-auto max-w-3xl px-6 py-10 text-[var(--navy)]">
+        <p className="text-[var(--coral)]">
+          This blog post is temporarily unavailable while data connection is being restored.
+        </p>
+      </main>
+    );
+  }
   if (!post || post.status !== ContentStatus.published) notFound();
 
   return (

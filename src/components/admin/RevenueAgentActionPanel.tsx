@@ -22,6 +22,18 @@ async function postJson(path: string, token: string, payload?: Record<string, un
   return json;
 }
 
+async function getJson(path: string, token: string) {
+  const response = await fetch(path, {
+    method: "GET",
+    headers: {
+      "x-admin-token": token,
+    },
+  });
+  const json = (await response.json().catch(() => ({}))) as ActionResult;
+  if (!response.ok) throw new Error(json.error ?? `Request failed (${response.status})`);
+  return json;
+}
+
 export default function RevenueAgentActionPanel({
   periodMonth,
   approvalRequestId,
@@ -33,6 +45,7 @@ export default function RevenueAgentActionPanel({
   const [loading, setLoading] = useState<string | null>(null);
   const [result, setResult] = useState<string>("");
   const [approvalId, setApprovalId] = useState(approvalRequestId ?? "");
+  const [reportPreview, setReportPreview] = useState<string>("");
   const normalizedToken = useMemo(() => {
     const raw = token.trim();
     if (!raw) return "";
@@ -63,6 +76,9 @@ export default function RevenueAgentActionPanel({
       if (id === "proposal") {
         const newApprovalId = String((json.approvalRequest as { id?: string } | undefined)?.id ?? "");
         if (newApprovalId) setApprovalId(newApprovalId);
+      }
+      if (id === "report_fetch") {
+        setReportPreview(JSON.stringify(json, null, 2));
       }
       setResult(`${id}: success`);
     } catch (error) {
@@ -138,6 +154,17 @@ export default function RevenueAgentActionPanel({
         >
           {loading === "ads_execute" ? "Executing..." : "Run ads execution"}
         </button>
+        <button
+          className="rounded-lg bg-[var(--ocean-teal-light,#5fb8b0)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          disabled={Boolean(loading)}
+          onClick={() =>
+            runAction("report_fetch", () =>
+              getJson(`/api/automation/report?periodMonth=${encodeURIComponent(periodMonth)}`, normalizedToken)
+            )
+          }
+        >
+          {loading === "report_fetch" ? "Fetching..." : "Fetch report JSON"}
+        </button>
       </div>
       {approvalId ? (
         <p className="mt-3 text-xs text-[var(--navy-light)]">Active approval request: {approvalId}</p>
@@ -145,6 +172,11 @@ export default function RevenueAgentActionPanel({
         <p className="mt-3 text-xs text-[var(--navy-light)]">No approval request ID yet. Generate proposal first.</p>
       )}
       {result && <p className="mt-3 text-sm font-medium text-[var(--navy)]">{result}</p>}
+      {reportPreview && (
+        <pre className="mt-3 max-h-64 overflow-auto rounded-lg bg-[var(--sand)]/40 p-3 text-xs text-[var(--navy)]">
+          {reportPreview}
+        </pre>
+      )}
     </section>
   );
 }

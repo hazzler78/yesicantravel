@@ -10,11 +10,28 @@ export const metadata = {
 };
 
 export default async function BlogIndexPage() {
-  const posts = await prisma.contentItem.findMany({
-    where: { status: ContentStatus.published },
-    orderBy: { publishedAt: "desc" },
-    take: 100,
-  });
+  let posts: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    excerpt: string | null;
+  }> = [];
+  let dbUnavailable = false;
+  try {
+    posts = await prisma.contentItem.findMany({
+      where: { status: ContentStatus.published },
+      orderBy: { publishedAt: "desc" },
+      take: 100,
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        excerpt: true,
+      },
+    });
+  } catch {
+    dbUnavailable = true;
+  }
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-10 text-[var(--navy)]">
@@ -24,6 +41,11 @@ export default async function BlogIndexPage() {
       </p>
 
       <div className="mt-8 space-y-4">
+        {dbUnavailable && (
+          <p className="text-sm text-[var(--coral)]">
+            Blog is temporarily unavailable while data connection is being restored.
+          </p>
+        )}
         {posts.length === 0 && <p className="text-sm text-[var(--navy-light)]">No published guides yet.</p>}
         {posts.map((post) => (
           <article key={post.id} className="rounded-xl border border-[var(--sand)] bg-white p-5 shadow-sm">

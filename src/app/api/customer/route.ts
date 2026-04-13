@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { LeadEventType } from "@prisma/client";
+import { getAttributionFromRequest } from "@/lib/attribution";
+import { logLeadEvent, upsertLeadProfile } from "@/lib/revenueAgent";
 
 /**
  * Save customer to MailerLite after a successful booking.
@@ -30,10 +33,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
     }
 
+    const attribution = await getAttributionFromRequest();
+    const leadProfile = await upsertLeadProfile(
+      {
+        email,
+        firstName,
+        lastName,
+        phone,
+        consentMarketing: true,
+      },
+      attribution
+    );
+    await logLeadEvent({
+      type: LeadEventType.newsletter_signup,
+      eventName: "newsletter_signup",
+      leadProfileId: leadProfile?.id,
+      metadata: {
+        hotelId,
+        checkin,
+        checkout,
+        source: "api_customer",
+      },
+    });
+
     const apiKey = process.env.MAILERLITE_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { saved: false, reason: "MailerLite not configured" },
+        { saved: true, reason: "Lead stored, MailerLite not configured" },
         { status: 200 }
       );
     }

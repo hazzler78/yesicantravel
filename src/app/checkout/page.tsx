@@ -137,6 +137,38 @@ function CheckoutContent() {
     []
   );
 
+  const ingestBookingRevenue = useCallback(
+    (payload: {
+      bookingId?: string;
+      status?: string;
+      hotelName?: string;
+      grossRevenue?: number;
+      currency?: string;
+      leadEmail?: string;
+    }) => {
+      if (!payload.bookingId) return;
+      fetch("/api/automation/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "booking",
+          booking: {
+            bookingId: payload.bookingId,
+            status: payload.status ?? "confirmed",
+            hotelId: hotelId ?? undefined,
+            hotelName: payload.hotelName,
+            checkin: checkin ?? undefined,
+            checkout: checkout ?? undefined,
+            grossRevenue: payload.grossRevenue ?? 0,
+            currency: payload.currency ?? "EUR",
+            leadEmail: payload.leadEmail,
+          },
+        }),
+      }).catch(() => {});
+    },
+    [hotelId, checkin, checkout]
+  );
+
   useEffect(() => {
     fetch("/api/config")
       .then((r) => r.json())
@@ -305,12 +337,20 @@ function CheckoutContent() {
           checkin: checkin ?? undefined,
           checkout: checkout ?? undefined,
         });
+        ingestBookingRevenue({
+          bookingId: (data as { bookingId?: string }).bookingId,
+          status: String((data as { status?: string }).status ?? "confirmed"),
+          hotelName: (data as { hotel?: { name?: string } }).hotel?.name,
+          grossRevenue: (data as { price?: number }).price ?? 0,
+          currency: (data as { currency?: string }).currency ?? "EUR",
+          leadEmail: guest.email,
+        });
       } catch (e) {
         setError((e as Error).message);
         setStep("error");
       }
     })();
-  }, [step, prebookId, transactionId, adults, hotelId, checkin, checkout, saveCustomerForSuggestions]);
+  }, [step, prebookId, transactionId, adults, hotelId, checkin, checkout, saveCustomerForSuggestions, ingestBookingRevenue]);
 
   // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
   // Must run unconditionally (before any early return) to avoid React "fewer hooks" error.
@@ -462,6 +502,14 @@ function CheckoutContent() {
           hotelId: hotelId ?? undefined,
           checkin: checkin ?? undefined,
           checkout: checkout ?? undefined,
+        });
+        ingestBookingRevenue({
+          bookingId: (data as { bookingId?: string }).bookingId,
+          status: String((data as { status?: string }).status ?? "confirmed"),
+          hotelName: (data as { hotel?: { name?: string } }).hotel?.name,
+          grossRevenue: (data as { price?: number }).price ?? 0,
+          currency: (data as { currency?: string }).currency ?? "EUR",
+          leadEmail: guestPayload.email,
         });
         return;
       }

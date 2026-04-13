@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import Chatbot from "../components/Chatbot";
+import AttributionBootstrap from "../components/AttributionBootstrap";
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "948121024567031";
 
@@ -165,6 +166,7 @@ pintrk('page');`}
         <Suspense fallback={null}>
           <Chatbot />
         </Suspense>
+        <AttributionBootstrap />
         <Analytics />
         <SpeedInsights />
       </body>

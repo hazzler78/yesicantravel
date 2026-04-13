@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/automation/jobs/run",
+      "schedule": "0 6 1 * *"
+    },
+    {
+      "path": "/api/automation/jobs/run?mode=ads_execute",
+      "schedule": "0 7 1 * *"
+    }
+  ]
+}

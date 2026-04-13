@@ -87,6 +87,24 @@ function ConfirmationContent() {
         currency: booking.currency ?? "USD",
         order_quantity: 1,
       });
+      fetch("/api/automation/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: "event",
+          event: {
+            type: "booking_completed",
+            eventName: "confirmation_purchase",
+            eventId: purchaseEventId,
+            pageUrl: window.location.href,
+            metadata: {
+              bookingId: booking.bookingId ?? bookingId ?? undefined,
+              value: booking.price,
+              currency: booking.currency ?? "USD",
+            },
+          },
+        }),
+      }).catch(() => {});
     }
   }, [booking]);
 

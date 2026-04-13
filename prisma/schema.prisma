@@ -1,0 +1,291 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum JobStatus {
+  pending
+  running
+  succeeded
+  failed
+  blocked
+}
+
+enum ApprovalStatus {
+  pending
+  approved
+  rejected
+}
+
+enum ContentStatus {
+  draft
+  review
+  published
+  archived
+}
+
+enum LeadEventType {
+  newsletter_signup
+  lead_magnet_download
+  checkout_started
+  booking_completed
+}
+
+enum AttributionModel {
+  first_touch
+  last_touch
+  position_based
+}
+
+model KeywordTarget {
+  id           String      @id @default(cuid())
+  keyword      String      @unique
+  cluster      String?
+  intent       String?
+  language     String      @default("en")
+  country      String?
+  monthlyScore Float?
+  priority     Int         @default(50)
+  isActive     Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  contentItems ContentItem[]
+
+  @@index([isActive, priority])
+  @@index([cluster, intent])
+}
+
+model ContentItem {
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  title           String
+  excerpt         String?
+  bodyMarkdown    String
+  seoTitle        String?
+  seoDescription  String?
+  canonicalUrl    String?
+  targetKeyword   String?
+  destination     String?
+  status          ContentStatus  @default(draft)
+  publishedAt     DateTime?
+  qualityScore    Float?
+  internalLinks   Json?
+  draftSource     String?
+  keywordTargetId String?
+  keywordTarget   KeywordTarget? @relation(fields: [keywordTargetId], references: [id])
+  leadEvents      LeadEvent[]
+  touches         AttributionTouch[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([targetKeyword, status])
+  @@index([destination, status])
+}
+
+model LeadProfile {
+  id               String             @id @default(cuid())
+  email            String             @unique
+  firstName        String?
+  lastName         String?
+  phone            String?
+  consentMarketing Boolean            @default(false)
+  source           String?
+  medium           String?
+  campaign         String?
+  utmTerm          String?
+  utmContent       String?
+  gclid            String?
+  fbclid           String?
+  firstReferrer    String?
+  lastReferrer     String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  leadEvents       LeadEvent[]
+  emailEvents      EmailEvent[]
+  bookingEvents    BookingEvent[]
+  touches          AttributionTouch[]
+
+  @@index([createdAt])
+  @@index([source, medium, campaign])
+}
+
+model LeadEvent {
+  id            String        @id @default(cuid())
+  type          LeadEventType
+  eventName     String
+  eventAt       DateTime      @default(now())
+  pageUrl       String?
+  eventId       String?
+  metadata      Json?
+  leadProfileId String?
+  contentItemId String?
+  leadProfile   LeadProfile?  @relation(fields: [leadProfileId], references: [id])
+  contentItem   ContentItem?  @relation(fields: [contentItemId], references: [id])
+  createdAt     DateTime      @default(now())
+
+  @@index([type, eventAt])
+  @@index([leadProfileId, eventAt])
+  @@index([contentItemId, eventAt])
+  @@index([eventName, eventAt])
+}
+
+model EmailEvent {
+  id            String       @id @default(cuid())
+  eventType     String
+  provider      String       @default("mailerlite")
+  campaignId    String?
+  campaignName  String?
+  metadata      Json?
+  eventAt       DateTime     @default(now())
+  leadProfileId String?
+  leadProfile   LeadProfile? @relation(fields: [leadProfileId], references: [id])
+  createdAt     DateTime     @default(now())
+
+  @@index([eventType, eventAt])
+  @@index([leadProfileId, eventAt])
+  @@index([campaignName, eventAt])
+}
+
+model BookingEvent {
+  id                String             @id @default(cuid())
+  bookingId         String             @unique
+  provider          String             @default("liteapi")
+  status            String
+  hotelId           String?
+  hotelName         String?
+  checkin           DateTime?
+  checkout          DateTime?
+  grossRevenue      Float              @default(0)
+  currency          String             @default("EUR")
+  estimatedCommission Float            @default(0)
+  actualCommission  Float?
+  eventAt           DateTime           @default(now())
+  leadProfileId     String?
+  leadProfile       LeadProfile?       @relation(fields: [leadProfileId], references: [id])
+  touches           AttributionTouch[]
+  revenueLedger     RevenueLedger[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  @@index([status, eventAt])
+  @@index([leadProfileId, eventAt])
+  @@index([hotelId, checkin, checkout])
+  @@index([currency, eventAt])
+}
+
+model AttributionTouch {
+  id            String       @id @default(cuid())
+  channel       String
+  source        String?
+  medium        String?
+  campaign      String?
+  touchWeight   Float        @default(1)
+  touchedAt     DateTime     @default(now())
+  metadata      Json?
+  leadProfileId String?
+  bookingEventId String?
+  contentItemId String?
+  leadProfile   LeadProfile? @relation(fields: [leadProfileId], references: [id])
+  bookingEvent  BookingEvent? @relation(fields: [bookingEventId], references: [id])
+  contentItem   ContentItem? @relation(fields: [contentItemId], references: [id])
+  createdAt     DateTime     @default(now())
+
+  @@index([channel, touchedAt])
+  @@index([leadProfileId, touchedAt])
+  @@index([bookingEventId, touchedAt])
+  @@index([campaign, touchedAt])
+}
+
+model RevenueLedger {
+  id             String       @id @default(cuid())
+  bookingEventId String
+  periodMonth    String
+  grossRevenue   Float        @default(0)
+  commission     Float        @default(0)
+  adSpend        Float        @default(0)
+  netRevenue     Float        @default(0)
+  roi            Float?
+  metadata       Json?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  bookingEvent   BookingEvent @relation(fields: [bookingEventId], references: [id])
+
+  @@unique([bookingEventId, periodMonth])
+  @@index([periodMonth])
+  @@index([periodMonth, commission])
+}
+
+model AdBudgetCycle {
+  id                 String         @id @default(cuid())
+  periodMonth        String         @unique
+  commissionRevenue  Float          @default(0)
+  allocationPercent  Float          @default(0.2)
+  proposedBudget     Float          @default(0)
+  approvedBudget     Float?
+  spentBudget        Float          @default(0)
+  status             ApprovalStatus @default(pending)
+  notes              String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  approvals          ApprovalRequest[]
+
+  @@index([status, periodMonth])
+}
+
+model ApprovalRequest {
+  id            String         @id @default(cuid())
+  requestType   String
+  periodMonth   String
+  status        ApprovalStatus @default(pending)
+  approvalText  String?
+  requestedData Json?
+  responseData  Json?
+  requestedAt   DateTime       @default(now())
+  resolvedAt    DateTime?
+  adBudgetCycleId String?
+  adBudgetCycle AdBudgetCycle? @relation(fields: [adBudgetCycleId], references: [id])
+
+  @@index([requestType, periodMonth, requestedAt])
+  @@index([status, periodMonth])
+}
+
+model MonthlyReport {
+  id                String   @id @default(cuid())
+  periodMonth       String   @unique
+  contentPublished  Int      @default(0)
+  leadsCaptured     Int      @default(0)
+  bookingsInfluenced Int     @default(0)
+  grossRevenue      Float    @default(0)
+  commissionRevenue Float    @default(0)
+  adSpend           Float    @default(0)
+  roi               Float?
+  reportJson        Json?
+  sentAt            DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([sentAt, periodMonth])
+}
+
+model JobRun {
+  id          String    @id @default(cuid())
+  jobName     String
+  runKey      String?
+  status      JobStatus @default(pending)
+  startedAt   DateTime  @default(now())
+  finishedAt  DateTime?
+  retryCount  Int       @default(0)
+  errorMessage String?
+  context     Json?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([jobName, startedAt])
+  @@index([status, startedAt])
+  @@index([runKey, jobName])
+}

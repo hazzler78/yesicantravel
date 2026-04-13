@@ -2,6 +2,8 @@ import Link from "next/link";
 import { ContentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Solo Travel Safety Blog",
   description: "SEO guides and destination safety content for women traveling solo.",

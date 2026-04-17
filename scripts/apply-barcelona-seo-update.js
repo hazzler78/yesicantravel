@@ -1,4 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const prisma = new PrismaClient();
 
@@ -324,17 +326,38 @@ Start with:
 That's how you'll feel prepared and in control before you even pack.
 `;
 
-async function main() {
+const TITLE = "Safe Solo Hotels in Barcelona for Women: The 2026 Safety-First Guide";
+const EXCERPT =
+  "Find safe solo hotels in Barcelona for women with a practical 2026 checklist to book with calm confidence.";
+const TARGET_KEYWORD = "safe solo hotels in Barcelona for women";
+
+function getPayload() {
+  return {
+    slug: SLUG,
+    title: TITLE,
+    excerpt: EXCERPT,
+    seoTitle: SEO_TITLE,
+    seoDescription: SEO_DESCRIPTION,
+    bodyMarkdown: BODY_MARKDOWN,
+    targetKeyword: TARGET_KEYWORD,
+    destination: "Barcelona",
+    publish: true,
+  };
+}
+
+async function updateLocalDb() {
+  const payload = getPayload();
   const post = await prisma.contentItem.update({
     where: { slug: SLUG },
     data: {
-      title: "Safe Solo Hotels in Barcelona for Women: The 2026 Safety-First Guide",
-      excerpt:
-        "Find safe solo hotels in Barcelona for women with a practical 2026 checklist to book with calm confidence.",
-      seoTitle: SEO_TITLE,
-      seoDescription: SEO_DESCRIPTION,
-      bodyMarkdown: BODY_MARKDOWN,
-      targetKeyword: "safe solo hotels in Barcelona for women",
+      title: payload.title,
+      excerpt: payload.excerpt,
+      seoTitle: payload.seoTitle,
+      seoDescription: payload.seoDescription,
+      bodyMarkdown: payload.bodyMarkdown,
+      targetKeyword: payload.targetKeyword,
+      destination: payload.destination,
+      draftSource: "manual-seo-override",
     },
     select: {
       id: true,
@@ -345,8 +368,60 @@ async function main() {
       updatedAt: true,
     },
   });
+  return post;
+}
 
-  console.log(JSON.stringify({ ok: true, updated: post }, null, 2));
+async function upsertRemote({ baseUrl, adminToken }) {
+  const payload = getPayload();
+  const response = await fetch(`${baseUrl}/api/automation/content/upsert`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      "x-admin-token": adminToken,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(`Remote upsert failed (${response.status}): ${JSON.stringify(data)}`);
+  }
+  return data;
+}
+
+function readEnvValueFromFile(filePath, key) {
+  if (!fs.existsSync(filePath)) return undefined;
+  const lines = fs.readFileSync(filePath, "utf8").split(/\r?\n/);
+  const prefix = `${key}=`;
+  const row = lines.find((line) => line.startsWith(prefix));
+  return row ? row.slice(prefix.length).trim() : undefined;
+}
+
+function resolveAdminToken() {
+  if (process.env.REVENUE_AGENT_ADMIN_TOKEN) return process.env.REVENUE_AGENT_ADMIN_TOKEN;
+  const cwd = process.cwd();
+  const fromLocal = readEnvValueFromFile(path.join(cwd, ".env.local"), "REVENUE_AGENT_ADMIN_TOKEN");
+  if (fromLocal) return fromLocal;
+  return readEnvValueFromFile(path.join(cwd, ".env"), "REVENUE_AGENT_ADMIN_TOKEN");
+}
+
+async function main() {
+  const mode = process.argv[2] ?? "local";
+
+  if (mode === "remote") {
+    const baseUrl = process.argv[3] ?? "https://www.yesicantravel.com";
+    const adminToken = resolveAdminToken();
+    if (!adminToken) {
+      throw new Error("REVENUE_AGENT_ADMIN_TOKEN is required for remote mode.");
+    }
+
+    const result = await upsertRemote({ baseUrl, adminToken });
+    console.log(JSON.stringify({ ok: true, mode, baseUrl, result }, null, 2));
+    return;
+  }
+
+  const post = await updateLocalDb();
+  console.log(JSON.stringify({ ok: true, mode, updated: post }, null, 2));
 }
 
 main()

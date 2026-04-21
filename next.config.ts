@@ -1,13 +1,27 @@
 import type { NextConfig } from "next";
+import { destinationToEventRedirects } from "./src/lib/legacyRedirects";
 
 const nextConfig: NextConfig = {
   async redirects() {
+    const destinationRedirects = Object.entries(destinationToEventRedirects).map(
+      ([from, to]) => ({
+        source: `/destinations/${from}`,
+        destination: `/events/${to}`,
+        permanent: true,
+      }),
+    );
+
     return [
-      { source: "/destinations/milan", destination: "/events/milan-paralympics-2026", permanent: true },
-      { source: "/destinations/cancun", destination: "/events/cancun-spring-break-2026", permanent: true },
-      { source: "/destinations/austin", destination: "/events/austin-sxsw-2026", permanent: true },
-      { source: "/destinations/miami", destination: "/events/miami-spring-break-2026", permanent: true },
-      { source: "/destinations/key-west", destination: "/events/key-west-spring-break-2026", permanent: true },
+      // Canonicalize apex domain → www to avoid duplicate indexing.
+      // Google was indexing both `yesicantravel.com/...` and
+      // `www.yesicantravel.com/...` as separate URLs, splitting ranking signal.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "yesicantravel.com" }],
+        destination: "https://www.yesicantravel.com/:path*",
+        permanent: true,
+      },
+      ...destinationRedirects,
     ];
   },
 };

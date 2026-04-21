@@ -3,18 +3,23 @@ import { getAllDestinationSlugs } from "@/data/destinations";
 import { getAllEventSlugs } from "@/data/events";
 import { ContentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { redirectedDestinationSlugs } from "@/lib/legacyRedirects";
 
 const BASE_URL = "https://www.yesicantravel.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
 
-  const destinations = getAllDestinationSlugs().map((slug) => ({
-    url: `${BASE_URL}/destinations/${slug}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.8,
-  }));
+  // Skip destination slugs that 301 to event pages — submitting them
+  // causes "Page with redirect" entries in GSC Coverage and wastes crawl budget.
+  const destinations = getAllDestinationSlugs()
+    .filter((slug) => !redirectedDestinationSlugs.has(slug))
+    .map((slug) => ({
+      url: `${BASE_URL}/destinations/${slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }));
 
   const eventSlugs = getAllEventSlugs().map((slug) => ({
     url: `${BASE_URL}/events/${slug}`,
@@ -54,15 +59,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: `${BASE_URL}/popular-cities`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/lead-magnet`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
     ...destinations,
     ...eventSlugs,
     ...blogUrls,
-    {
-      url: `${BASE_URL}/confirmation`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.4,
-    },
   ];
 }
 

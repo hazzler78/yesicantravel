@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = "https://www.yesicantravel.com";
+const BASE_URL = "https://yesicantravel.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -11,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: "www.yesicantravel.com",
+    host: "yesicantravel.com",
   };
 }
 

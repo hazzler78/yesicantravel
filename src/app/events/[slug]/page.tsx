@@ -10,7 +10,7 @@ import {
 import { searchPlaces } from "@/lib/liteapi";
 import EventPriceBadge from "@/components/EventPriceBadge";
 
-const BASE_URL = "https://www.yesicantravel.com";
+const BASE_URL = "https://yesicantravel.com";
 
 type Props = { params: Promise<{ slug: string }> };
 

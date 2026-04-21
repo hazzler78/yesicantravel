@@ -5,7 +5,7 @@ import { ContentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { redirectedDestinationSlugs } from "@/lib/legacyRedirects";
 
-const BASE_URL = "https://www.yesicantravel.com";
+const BASE_URL = "https://yesicantravel.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();

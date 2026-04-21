@@ -7,7 +7,7 @@ import {
   getRelatedDestinations,
 } from "@/data/destinations";
 
-const BASE_URL = "https://www.yesicantravel.com";
+const BASE_URL = "https://yesicantravel.com";
 
 type Props = { params: Promise<{ slug: string }> };
 

@@ -21,7 +21,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.yesicantravel.com"),
+  metadataBase: new URL("https://yesicantravel.com"),
   other: {
     "p:domain_verify": "3e1e4ae20aa959e7498943dfcd7a909e",
   },

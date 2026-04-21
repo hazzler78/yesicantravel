@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
           event_source_url:
             body?.eventSourceUrl ||
             request.headers.get("origin") ||
-            "https://www.yesicantravel.com",
+            "https://yesicantravel.com",
           user_data,
           custom_data: body?.customData ?? {},
         },

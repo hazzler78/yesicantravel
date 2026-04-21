@@ -11,18 +11,10 @@ const nextConfig: NextConfig = {
       }),
     );
 
-    return [
-      // Canonicalize apex domain → www to avoid duplicate indexing.
-      // Google was indexing both `yesicantravel.com/...` and
-      // `www.yesicantravel.com/...` as separate URLs, splitting ranking signal.
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "yesicantravel.com" }],
-        destination: "https://www.yesicantravel.com/:path*",
-        permanent: true,
-      },
-      ...destinationRedirects,
-    ];
+    // Note: apex-vs-www canonicalization is handled at the Vercel domain
+    // level (www.yesicantravel.com → 308 → yesicantravel.com). Do NOT
+    // add a conflicting redirect here — apex is canonical.
+    return [...destinationRedirects];
   },
 };
 

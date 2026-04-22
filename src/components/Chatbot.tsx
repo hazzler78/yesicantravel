@@ -17,7 +17,7 @@ export default function Chatbot() {
       id: "welcome",
       role: "assistant",
       content:
-        "Hi, I’m your Yes I Can Travel assistant. Ask me anything about safer solo stays, bookings, or how this site works.",
+        "Hi, I’m your Yes I Can Travel assistant. Ask about safer solo stays, bookings, how the site works—or paste text (e.g. a German review) and ask me to translate it into your language.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -57,15 +57,16 @@ export default function Chatbot() {
         body: JSON.stringify({
           pathname,
           search,
+          locale: typeof navigator !== "undefined" ? navigator.language : "en",
           messages: [
             {
               role: "system",
               content:
-                "You are the Yes I Can Travel website assistant. Be calm, reassuring, and practical. Always prioritise women’s safety, clarity, and a sense of control. Do not make medical, legal, or emergency safety guarantees. If someone is in immediate danger, tell them to contact local emergency services. For questions, support, or if something is not working on the website, tell them to email hello@yesicantravel.com so we can help or fix it. Keep every reply SHORT: 1–3 sentences max. No intros, no long lists, no repetition. Get to the point.",
+                "You are the Yes I Can Travel website assistant. Be calm, reassuring, and practical. Always prioritise women’s safety, clarity, and a sense of control. Do not make medical, legal, or emergency safety guarantees. If someone is in immediate danger, tell them to contact local emergency services. For questions, support, or if something is not working on the website, tell them to email hello@yesicantravel.com so we can help or fix it. The server sends current site copy, product updates, and your visitor’s browser language—use those for accurate answers and translations. Prefer the visitor’s language (see locale) unless they switch language in their message. Keep replies concise (1–3 sentences) except when they only want a translation—you may then give a short faithful translation.",
             },
             {
               role: "system",
-              content: `The visitor is currently on the path: "${pathname}". Use this to infer what they are trying to do (homepage, results, hotel details, checkout, confirmation). When they are on a hotel page, hotel-specific context will be provided separately—answer using that data for questions about that hotel.`,
+              content: `The visitor is currently on the path: "${pathname}". Use this to infer what they are trying to do (homepage, results, hotel details, checkout, confirmation). When they are on a hotel page, hotel-specific context (including guest reviews that may be in German or other languages) will be provided separately—answer and translate using that data when relevant.`,
             },
             ...messages.map(({ role, content }) => ({ role, content })),
             { role: "user", content: trimmed },
@@ -186,7 +187,7 @@ export default function Chatbot() {
                 onChange={(event) => setInput(event.target.value)}
                 rows={1}
                 className="max-h-24 min-h-[2.5rem] flex-1 resize-none rounded-lg border border-[color:var(--sand)] bg-white px-2.5 py-1.5 text-sm text-[color:var(--foreground)] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--ocean-teal)]"
-                placeholder="Ask about safety, bookings, or a page you’re on…"
+                placeholder="Ask anything, or paste text to translate…"
               />
               <button
                 type="submit"

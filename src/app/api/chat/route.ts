@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getHotel, getHotelReviews } from "@/lib/liteapi";
+import { buildSiteAndI18nSystemBlock } from "@/lib/chatSiteKnowledge";
 
 const XAI_API_URL = "https://api.x.ai/v1/chat/completions";
 
@@ -19,6 +20,95 @@ function getHotelIdFromRequest(pathname: string, search: string): string | null 
     return params.get("hotelId");
   }
   return null;
+}
+
+type ReviewSnippet = {
+  name?: string;
+  country?: string;
+  language?: string;
+  headline?: string;
+  pros?: string;
+  cons?: string;
+  averageScore?: number;
+};
+
+/** Parse LiteAPI reviews response: sentiment + individual reviews (any language). */
+function parseReviewsPayload(reviewsRes: unknown): {
+  sentiment?: {
+    pros?: string[];
+    cons?: string[];
+    categories?: Array<{ name?: string; rating?: number; description?: string }>;
+  };
+  items: ReviewSnippet[];
+} {
+  const items: ReviewSnippet[] = [];
+  let sentiment:
+    | {
+        pros?: string[];
+        cons?: string[];
+        categories?: Array<{ name?: string; rating?: number; description?: string }>;
+      }
+    | undefined;
+
+  if (!reviewsRes || typeof reviewsRes !== "object") return { items };
+
+  const r = reviewsRes as Record<string, unknown>;
+  const data = r.data as Record<string, unknown> | ReviewSnippet[] | undefined;
+
+  if (Array.isArray(data)) {
+    for (const row of data) {
+      if (row && typeof row === "object") items.push(row as ReviewSnippet);
+    }
+  } else if (data && typeof data === "object") {
+    const arr = data.reviews;
+    if (Array.isArray(arr)) {
+      for (const row of arr) {
+        if (row && typeof row === "object") items.push(row as ReviewSnippet);
+      }
+    }
+    const s = (data.sentiment ?? data.sentiment_analysis ?? r.sentiment_analysis) as
+      | {
+          pros?: string[];
+          cons?: string[];
+          categories?: Array<{ name?: string; rating?: number; description?: string }>;
+        }
+      | undefined;
+    if (s && (s.pros?.length || s.cons?.length || s.categories?.length)) sentiment = s;
+  }
+
+  if (!sentiment) {
+    const s = r.sentiment_analysis as
+      | {
+          pros?: string[];
+          cons?: string[];
+          categories?: Array<{ name?: string; rating?: number; description?: string }>;
+        }
+      | undefined;
+    if (s && (s.pros?.length || s.cons?.length || s.categories?.length)) sentiment = s;
+  }
+
+  return { sentiment, items };
+}
+
+function formatReviewSnippetsForAi(items: ReviewSnippet[], max = 12): string {
+  const useful = items.filter(
+    (it) =>
+      (it.headline && it.headline.trim()) ||
+      (it.pros && it.pros.trim()) ||
+      (it.cons && it.cons.trim()),
+  );
+  if (!useful.length) return "";
+  const lines = useful.slice(0, max).map((it, i) => {
+    const who = [it.name, it.country, it.language ? `lang=${it.language}` : ""]
+      .filter(Boolean)
+      .join(", ");
+    const score = typeof it.averageScore === "number" ? ` score=${it.averageScore}/10` : "";
+    const bits = [it.headline, it.pros ? `Pros: ${it.pros}` : "", it.cons ? `Cons: ${it.cons}` : ""]
+      .filter(Boolean)
+      .join(" | ");
+    return `Guest review ${i + 1} (${who}${score}): ${bits}`;
+  });
+  return `Individual guest reviews (original language may not be English—translate faithfully when asked):\n${lines.join("\n")}`;
 }
 
 /** Build a "what others say" block from sentiment/reviews data for the AI. */
@@ -100,10 +190,13 @@ export async function POST(request: NextRequest) {
       messages,
       pathname = "",
       search = "",
+      locale = "",
     } = body as {
       messages?: { role: "user" | "assistant" | "system"; content: string }[];
       pathname?: string;
       search?: string;
+      /** BCP 47, e.g. en-US, de-DE — from navigator.language in the chat widget */
+      locale?: string;
     };
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
@@ -125,22 +218,17 @@ export async function POST(request: NextRequest) {
         ]);
         const hotelData = (hotelRes as { data?: Record<string, unknown> })?.data;
         if (hotelData) {
-          let reviewsSentiment: Parameters<typeof buildReviewsContext>[0] | undefined;
-          if (reviewsRes && typeof reviewsRes === "object") {
-            const r = reviewsRes as Record<string, unknown>;
-            const data = r.data as Record<string, unknown> | undefined;
-            const sentiment = (data?.sentiment ?? data?.sentiment_analysis ?? r.sentiment_analysis) as Parameters<typeof buildReviewsContext>[0] | undefined;
-            if (sentiment && (sentiment.pros?.length || sentiment.cons?.length || sentiment.categories?.length))
-              reviewsSentiment = sentiment;
-          }
-          const hotelContext = buildHotelContext(
+          const { sentiment: reviewsSentiment, items: reviewItems } = parseReviewsPayload(reviewsRes);
+          let hotelContext = buildHotelContext(
             hotelData as Parameters<typeof buildHotelContext>[0],
-            reviewsSentiment
+            reviewsSentiment,
           );
+          const snippetsBlock = formatReviewSnippetsForAi(reviewItems);
+          if (snippetsBlock) hotelContext = `${hotelContext}\n\n${snippetsBlock}`;
           hasHotelContext = true;
           const hotelSystemMessage = {
             role: "system" as const,
-            content: `The visitor is currently viewing this hotel. Use ONLY the following data to answer questions about it (e.g. "Is this good for a woman travelling alone?", "Do they have breakfast?", "What are the facilities?", "What do others say?", "Is it close to the city / centrum?"). The data includes address, city, country, coordinates, guest review summaries and sentiment (including a "Location" category when present). For "close to city/centrum?" use the address, city, and the description or the guest-review "Location" score/description; if no distance to center is in the data, say so and suggest checking the map or the hotel description. Do not invent details.\n\n${hotelContext}`,
+            content: `The visitor is currently viewing this hotel. Use ONLY the following data to answer questions about it (e.g. "Is this good for a woman travelling alone?", "Do they have breakfast?", "What are the facilities?", "What do others say?", "What did [name] say?", "Translate this review", "Is it close to the city / centrum?"). The data includes address, city, country, coordinates, guest review summaries and sentiment (including a "Location" category when present), and individual guest review lines which may be in German or other languages—translate accurately when asked. For "close to city/centrum?" use the address, city, and the description or the guest-review "Location" score/description; if no distance to center is in the data, say so and suggest checking the map or the hotel description. Do not invent details.\n\n${hotelContext}`,
           };
           messagesToSend = [hotelSystemMessage, ...messagesToSend];
         }
@@ -157,14 +245,20 @@ export async function POST(request: NextRequest) {
 - Off-topic (weather, visas, "what is 2+2", general travel tips): give a very short, friendly answer and offer to help with booking or safety on Yes I Can Travel.
 - Ambiguous or very short ("breakfast?", "safe?", "good?"): interpret in the current page context and the data you have; if no hotel data, ask them to open a hotel page or clarify which hotel.
 - Rude or inappropriate: stay professional and calm; offer to help with booking or safety.
-- If they ask in another language: answer in that language if you can, but keep it short; for safety/booking details prefer English if the site is in English.
+- Multilingual replies and translation: follow the SITE AND COPY / LANGUAGE block above (match locale or the visitor's writing; translate review or pasted text faithfully).
 - Multiple questions in one message: answer the main one briefly or the first one; suggest they ask the rest in a follow-up.
 - On confirmation page: if they ask about their booking, cancellation, or refund, say to use the details on the confirmation page or in their email, or email hello@yesicantravel.com for support; you don't have access to their booking.
 - If someone needs to ask a question, report something not working on the site, or get support: tell them to email hello@yesicantravel.com so we can help or fix it.
 - You have hotel context for this message: ${hasHotelContext}. Use that to decide whether you can answer about "this" hotel or not.`,
     };
+    const siteAndI18n = {
+      role: "system" as const,
+      content: buildSiteAndI18nSystemBlock(typeof locale === "string" ? locale : ""),
+    };
+
     messagesToSend = [
       { role: "system" as const, content: BOOKING_TERMS },
+      siteAndI18n,
       edgeCasesMessage,
       ...messagesToSend,
     ];
@@ -179,7 +273,7 @@ export async function POST(request: NextRequest) {
         model: process.env.XAI_MODEL ?? "grok-3-mini",
         messages: messagesToSend,
         temperature: 0.3,
-        max_tokens: 150,
+        max_tokens: 280,
       }),
     });
 

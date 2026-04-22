@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { track } from "@vercel/analytics";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { getEventsForHomepage } from "@/data/events";
 import { popularCities } from "@/data/popularCities";
 import NewsletterForm from "../components/NewsletterForm";
@@ -86,9 +86,14 @@ function TrustSection() {
 
         <div className="mt-16 text-center">
           <p className="mx-auto max-w-3xl text-xl italic text-[var(--navy)]">
-            &quot;I booked my first solo trip through Yes I Can Travel and felt calm from search to check-out. It&apos;s the first time a booking site really spoke to my safety.&quot;
+            &quot;Felt really safe — didn&apos;t have any problem, nor felt like I would.&quot;
           </p>
-          <p className="mt-4 text-[var(--navy-light)]">– Sofia, 29, travelling alone in Spain</p>
+          <p className="mt-4 text-sm text-[var(--navy-light)]">
+            Solo female traveller, shared on r/solofemaletravel
+          </p>
+          <p className="mt-1 text-xs text-[var(--navy-light)]/70">
+            Community feedback from the broader solo-female-travel community. We quote traveller experiences with clear attribution — we don&apos;t fabricate testimonials.
+          </p>
         </div>
       </div>
     </section>
@@ -139,7 +144,7 @@ export default function Home() {
   const [placeDisplay, setPlaceDisplay] = useState("");
   const [checkin, setCheckin] = useState("");
   const [checkout, setCheckout] = useState("");
-  const [guests, setGuests] = useState(2);
+  const [guests, setGuests] = useState(1);
   const [places, setPlaces] = useState<Array<{ placeId: string; displayName: string; formattedAddress?: string }>>([]);
   const [showPlaces, setShowPlaces] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -190,7 +195,7 @@ export default function Home() {
       setFormError("Describe your ideal stay (e.g. central, well-lit area).");
       return;
     }
-    track("search_submit", {
+    trackFunnelEvent("Search", {
       mode: searchMode,
       hasPlaceId: Boolean(placeId),
       hasVibeQuery: Boolean(vibeQuery.trim()),
@@ -274,13 +279,13 @@ export default function Home() {
           <div className="mx-auto w-full max-w-3xl md:pl-0">
             <div className="mb-6 md:mb-8">
               <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md">
-                Safer solo stays worldwide
+                For women travelling solo
               </p>
               <h1 className="mb-3 text-4xl font-bold tracking-tight text-white drop-shadow-md md:text-5xl">
-                Safer places to stay, picked for women travelling solo.
+                The first place you can stay where you don&apos;t have to be on alert.
               </h1>
               <p className="mb-4 text-lg text-white drop-shadow-lg md:mb-6">
-                Safety-first stays across the world—so you can feel prepared, supported, and in control on every trip.
+                Safer hotels picked for women travelling solo — 24/7 reception, well-lit streets, and real reviews by women who&apos;ve stayed there.
               </p>
               {/* Trust badges: 2 strong signals, small circles, centered, mobile wrap */}
               <div className="flex flex-wrap items-center justify-center gap-6 text-white drop-shadow-md">
@@ -298,7 +303,7 @@ export default function Home() {
                 </span>
               </div>
               <p className="mt-4 text-center text-sm italic text-white drop-shadow-md md:mt-5">
-                &quot;First time I felt truly safe planning my solo trip.&quot; – Sofia, 29, Spain
+                &quot;Felt really safe — didn&apos;t have any problem, nor felt like I would.&quot; — from our community
               </p>
             </div>
 
@@ -442,7 +447,7 @@ export default function Home() {
             disabled={loading}
             className="min-h-[48px] w-full rounded-lg border-2 border-white bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-2xl transition-colors hover:bg-[var(--coral-light)] hover:shadow-2xl disabled:opacity-60 [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
           >
-            {loading ? "Searching..." : "Find Your Safe Solo Stay Now"}
+            {loading ? "Searching..." : "Find a safer stay"}
           </button>
           <p className="mt-2 text-center text-sm font-semibold text-[var(--navy)] md:text-base">
             Filter by safety features – start in seconds

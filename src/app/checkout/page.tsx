@@ -8,6 +8,7 @@ import { track } from "@vercel/analytics";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { pinterestTrack } from "@/lib/pinterest";
+import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress";
 import { formatStayTotal } from "@/lib/formatStayPrice";
@@ -105,6 +106,11 @@ function CheckoutContent() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [stayInfo, setStayInfo] = useState<{
+    name?: string;
+    address?: string;
+    mainPhoto?: string;
+  } | null>(null);
   const [prebookData, setPrebookData] = useState<{
     prebookId: string;
     transactionId: string;
@@ -182,10 +188,45 @@ function CheckoutContent() {
       .catch(() => setPaymentConfig({ accountPaymentEnabled: false, paymentEnv: "sandbox" }));
   }, []);
 
+  // Fetch hotel basics so the user sees exactly what they're booking on this page.
+  // Missing this context is a known abandonment driver at payment forms.
+  useEffect(() => {
+    if (!hotelId) return;
+    let cancelled = false;
+    fetch(`/api/hotel?hotelId=${encodeURIComponent(hotelId)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled || !j) return;
+        const d = (j.data ?? j) as {
+          name?: string;
+          address?: string;
+          main_photo?: string;
+          hotelImages?: Array<{ url?: string }>;
+        };
+        setStayInfo({
+          name: d.name,
+          address: d.address,
+          mainPhoto: d.main_photo ?? d.hotelImages?.[0]?.url,
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [hotelId]);
+
+  const nights = useMemo(() => {
+    if (!checkin || !checkout) return 0;
+    const start = new Date(checkin).getTime();
+    const end = new Date(checkout).getTime();
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return 0;
+    return Math.max(0, Math.round((end - start) / 86_400_000));
+  }, [checkin, checkout]);
+
   useEffect(() => {
     if (offerId && hotelId && checkin && checkout && step === "form") {
       sessionStorage.removeItem(CHECKOUT_COMPLETED_KEY);
-      track("Viewed Checkout", {
+      trackFunnelEvent("CheckoutStart", {
         hotelId,
         offerId,
         checkin,
@@ -218,7 +259,7 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (step !== "payment" || !hotelId || !offerId) return;
-    track("Payment Attempt", { hotelId, offerId, checkin, checkout, adults });
+    trackFunnelEvent("PaymentSubmit", { hotelId, offerId, checkin, checkout, adults });
   }, [step, hotelId, offerId, checkin, checkout, adults]);
 
   useEffect(() => {
@@ -314,7 +355,7 @@ function CheckoutContent() {
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
         sessionStorage.setItem(CHECKOUT_COMPLETED_KEY, "1");
-        track("booking_complete", {
+        trackFunnelEvent("BookingSuccess", {
           bookingId: (data as { bookingId?: string }).bookingId,
           hotelId,
           checkin,
@@ -398,8 +439,8 @@ function CheckoutContent() {
 
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim()) {
-      alert("Please fill in all guest details including phone.");
+    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      alert("Please fill in your name and email to continue.");
       return;
     }
     if (!offerId) {
@@ -480,7 +521,7 @@ function CheckoutContent() {
         sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
         setStep("done");
         sessionStorage.setItem(CHECKOUT_COMPLETED_KEY, "1");
-        track("booking_complete", {
+        trackFunnelEvent("BookingSuccess", {
           bookingId: (data as { bookingId?: string }).bookingId,
           hotelId,
           checkin,
@@ -612,6 +653,49 @@ function CheckoutContent() {
 
         {step === "form" ? (
           <form onSubmit={handleGuestSubmit} className="space-y-5 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:space-y-6 sm:p-6">
+            {(stayInfo?.name || checkin) && (
+              <div className="flex gap-3 rounded-xl border border-[var(--navy)]/15 bg-[var(--sand)]/40 p-3">
+                {stayInfo?.mainPhoto ? (
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[var(--sand)] sm:h-24 sm:w-24">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={stayInfo.mainPhoto}
+                      alt=""
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-[var(--sand)] text-[var(--navy-light)] sm:h-24 sm:w-24" aria-hidden>
+                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4.5 10.5V21h15V10.5" />
+                    </svg>
+                  </div>
+                )}
+                <div className="flex min-w-0 flex-1 flex-col justify-center">
+                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--navy-light)]">
+                    You&apos;re booking
+                  </p>
+                  {stayInfo?.name ? (
+                    <p className="truncate text-base font-semibold text-[var(--navy)] sm:text-lg">
+                      {stayInfo.name}
+                    </p>
+                  ) : (
+                    <p className="truncate text-sm text-[var(--navy-light)]">Loading stay details…</p>
+                  )}
+                  {stayInfo?.address && (
+                    <p className="truncate text-xs text-[var(--navy-light)] sm:text-sm">{stayInfo.address}</p>
+                  )}
+                  {checkin && checkout && (
+                    <p className="mt-1 text-xs text-[var(--navy)] sm:text-sm">
+                      {checkin} → {checkout}
+                      {nights > 0 && <> · {nights} night{nights === 1 ? "" : "s"}</>}
+                      {adults && <> · {adults} guest{Number(adults) === 1 ? "" : "s"}</>}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
             {quotedTotalValid && quotedTotal && (
               <div className="rounded-xl border border-[var(--ocean-teal)]/30 bg-[var(--ocean-teal)]/[0.08] px-3 py-3 text-center sm:px-4 sm:text-left">
                 <p className="text-xs font-semibold uppercase tracking-wide text-[var(--navy-light)]">Your price</p>
@@ -721,7 +805,7 @@ function CheckoutContent() {
             </div>
             <div>
               <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
-                Mobile phone
+                Mobile phone <span className="font-normal text-[var(--navy-light)]">(optional)</span>
               </label>
               <input
                 id="phone"
@@ -734,8 +818,10 @@ function CheckoutContent() {
                 placeholder="+46 70 123 45 67"
                 autoComplete="tel"
                 className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
-                required
               />
+              <p className="mt-1.5 text-xs text-[var(--navy-light)]">
+                Only shared with the hotel — handy for late check-in or flight-delay updates. We don&apos;t text or call you.
+              </p>
             </div>
             <button
               type="submit"

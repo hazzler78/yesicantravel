@@ -396,9 +396,6 @@ function ResultsContent() {
                     </span>
                   </span>
                 </label>
-                <p className="mt-1 text-xs text-[var(--navy-light)]">
-                  Future versions will let you filter by women-only options, neighbourhood safety and lighting.
-                </p>
               </div>
             </div>
           </aside>

@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 function formatRelative(date: Date) {
   const diffMs = Date.now() - date.getTime();
@@ -15,67 +18,85 @@ function formatRelative(date: Date) {
 async function getSearchDashboard(days: number) {
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-  const [totalSearches, emptySearches, apiNoResults, filteredOut, topQueries, topEmptyQueries, modeBreakdown, latest] =
-    await Promise.all([
-      prisma.searchEvent.count({ where: { createdAt: { gte: since } } }),
-      prisma.searchEvent.count({ where: { createdAt: { gte: since }, emptyReason: { not: null } } }),
-      prisma.searchEvent.count({ where: { createdAt: { gte: since }, emptyReason: "no_api_results" } }),
-      prisma.searchEvent.count({ where: { createdAt: { gte: since }, emptyReason: "filtered_out" } }),
-      prisma.searchEvent.groupBy({
-        by: ["normalizedQuery"],
-        where: { createdAt: { gte: since }, normalizedQuery: { not: null } },
-        _count: { _all: true },
-        orderBy: { _count: { normalizedQuery: "desc" } },
-        take: 12,
-      }),
-      prisma.searchEvent.groupBy({
-        by: ["normalizedQuery", "emptyReason"],
-        where: {
-          createdAt: { gte: since },
-          normalizedQuery: { not: null },
-          emptyReason: { not: null },
-        },
-        _count: { _all: true },
-        orderBy: { _count: { normalizedQuery: "desc" } },
-        take: 12,
-      }),
-      prisma.searchEvent.groupBy({
-        by: ["mode"],
-        where: { createdAt: { gte: since } },
-        _count: { _all: true },
-        orderBy: { _count: { mode: "desc" } },
-      }),
-      prisma.searchEvent.findMany({
-        where: { createdAt: { gte: since } },
-        orderBy: { createdAt: "desc" },
-        take: 30,
-        select: {
-          id: true,
-          createdAt: true,
-          mode: true,
-          placeId: true,
-          aiSearch: true,
-          normalizedQuery: true,
-          emptyReason: true,
-          apiRateCount: true,
-          enrichedHotelCount: true,
-          filteredHotelCount: true,
-        },
-      }),
-    ]);
+  try {
+    const [totalSearches, emptySearches, apiNoResults, filteredOut, topQueries, topEmptyQueries, modeBreakdown, latest] =
+      await Promise.all([
+        prisma.searchEvent.count({ where: { createdAt: { gte: since } } }),
+        prisma.searchEvent.count({ where: { createdAt: { gte: since }, emptyReason: { not: null } } }),
+        prisma.searchEvent.count({ where: { createdAt: { gte: since }, emptyReason: "no_api_results" } }),
+        prisma.searchEvent.count({ where: { createdAt: { gte: since }, emptyReason: "filtered_out" } }),
+        prisma.searchEvent.groupBy({
+          by: ["normalizedQuery"],
+          where: { createdAt: { gte: since }, normalizedQuery: { not: null } },
+          _count: { _all: true },
+          orderBy: { _count: { normalizedQuery: "desc" } },
+          take: 12,
+        }),
+        prisma.searchEvent.groupBy({
+          by: ["normalizedQuery", "emptyReason"],
+          where: {
+            createdAt: { gte: since },
+            normalizedQuery: { not: null },
+            emptyReason: { not: null },
+          },
+          _count: { _all: true },
+          orderBy: { _count: { normalizedQuery: "desc" } },
+          take: 12,
+        }),
+        prisma.searchEvent.groupBy({
+          by: ["mode"],
+          where: { createdAt: { gte: since } },
+          _count: { _all: true },
+          orderBy: { _count: { mode: "desc" } },
+        }),
+        prisma.searchEvent.findMany({
+          where: { createdAt: { gte: since } },
+          orderBy: { createdAt: "desc" },
+          take: 30,
+          select: {
+            id: true,
+            createdAt: true,
+            mode: true,
+            placeId: true,
+            aiSearch: true,
+            normalizedQuery: true,
+            emptyReason: true,
+            apiRateCount: true,
+            enrichedHotelCount: true,
+            filteredHotelCount: true,
+          },
+        }),
+      ]);
 
-  return {
-    since,
-    totalSearches,
-    emptySearches,
-    apiNoResults,
-    filteredOut,
-    topQueries,
-    topEmptyQueries,
-    modeBreakdown,
-    latest,
-    emptyRate: totalSearches > 0 ? (emptySearches / totalSearches) * 100 : 0,
-  };
+    return {
+      since,
+      totalSearches,
+      emptySearches,
+      apiNoResults,
+      filteredOut,
+      topQueries,
+      topEmptyQueries,
+      modeBreakdown,
+      latest,
+      emptyRate: totalSearches > 0 ? (emptySearches / totalSearches) * 100 : 0,
+    };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
+      return {
+        since,
+        totalSearches: 0,
+        emptySearches: 0,
+        apiNoResults: 0,
+        filteredOut: 0,
+        topQueries: [],
+        topEmptyQueries: [],
+        modeBreakdown: [],
+        latest: [],
+        emptyRate: 0,
+      };
+    }
+    throw error;
+  }
 }
 
 export default async function SearchAnalyticsPage({

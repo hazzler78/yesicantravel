@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 
 type AdminModule = {
   id: string;
@@ -28,24 +31,36 @@ const modules: AdminModule[] = [
 ];
 
 async function getQuickStats() {
-  const [searchesTotal, emptySearches, searchesToday] = await Promise.all([
-    prisma.searchEvent.count(),
-    prisma.searchEvent.count({ where: { emptyReason: { not: null } } }),
-    prisma.searchEvent.count({
-      where: {
-        createdAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  try {
+    const [searchesTotal, emptySearches, searchesToday] = await Promise.all([
+      prisma.searchEvent.count(),
+      prisma.searchEvent.count({ where: { emptyReason: { not: null } } }),
+      prisma.searchEvent.count({
+        where: {
+          createdAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          },
         },
-      },
-    }),
-  ]);
+      }),
+    ]);
 
-  return {
-    searchesTotal,
-    emptySearches,
-    searchesToday,
-    emptyRate: searchesTotal > 0 ? (emptySearches / searchesTotal) * 100 : 0,
-  };
+    return {
+      searchesTotal,
+      emptySearches,
+      searchesToday,
+      emptyRate: searchesTotal > 0 ? (emptySearches / searchesTotal) * 100 : 0,
+    };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
+      return {
+        searchesTotal: 0,
+        emptySearches: 0,
+        searchesToday: 0,
+        emptyRate: 0,
+      };
+    }
+    throw error;
+  }
 }
 
 export default async function AdminHomePage() {

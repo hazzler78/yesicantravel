@@ -134,6 +134,43 @@ model LeadEvent {
   @@index([eventName, eventAt])
 }
 
+model SearchEvent {
+  id                    String   @id @default(cuid())
+  mode                  String
+  placeId               String?
+  aiSearch              String?
+  normalizedQuery       String?
+  checkin               String?
+  checkout              String?
+  adults                Int?
+  currency              String?
+  guestNationality      String?
+  sessionId             String?
+  pageUrl               String?
+  referrer              String?
+  userAgent             String?
+  apiRateCount          Int      @default(0)
+  apiHotelCount         Int      @default(0)
+  uniqueHotelCount      Int      @default(0)
+  enrichedHotelCount    Int      @default(0)
+  filteredHotelCount    Int      @default(0)
+  hotelsWithCoordsCount Int      @default(0)
+  emptyReason           String?
+  filters               Json?
+  sampleHotels          Json?
+  attribution           Json?
+  liteApiError          String?
+  context               Json?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([createdAt])
+  @@index([mode, createdAt])
+  @@index([emptyReason, createdAt])
+  @@index([placeId, createdAt])
+  @@index([normalizedQuery, createdAt])
+}
+
 model EmailEvent {
   id            String       @id @default(cuid())
   eventType     String

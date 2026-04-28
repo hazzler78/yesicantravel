@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback, Suspense } from "react";
+import { useEffect, useMemo, useState, useCallback, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -28,6 +28,49 @@ interface HotelListItem extends HotelBasic {
   lng?: number;
 }
 
+type SearchAnalyticsOutcome = {
+  apiRateCount: number;
+  apiHotelCount: number;
+  uniqueHotelCount: number;
+  enrichedHotelCount: number;
+  sampleHotels: Array<{
+    id?: string;
+    name?: string;
+    rating?: number;
+    price?: number;
+    currency?: string;
+  }>;
+};
+
+const SEARCH_SESSION_STORAGE_KEY = "yict_search_session_id";
+
+function getSearchSessionId() {
+  if (typeof window === "undefined") return undefined;
+  try {
+    const existing = window.localStorage.getItem(SEARCH_SESSION_STORAGE_KEY);
+    if (existing) return existing;
+    const next =
+      typeof window.crypto?.randomUUID === "function"
+        ? window.crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    window.localStorage.setItem(SEARCH_SESSION_STORAGE_KEY, next);
+    return next;
+  } catch {
+    return undefined;
+  }
+}
+
+function sendSearchAnalyticsEvent(payload: Record<string, unknown>) {
+  fetch("/api/search-events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    keepalive: true,
+  }).catch(() => {
+    // Analytics must never interrupt browsing results.
+  });
+}
+
 function ResultsContent() {
   const searchParams = useSearchParams();
   const [hotels, setHotels] = useState<HotelListItem[]>([]);
@@ -43,6 +86,8 @@ function ResultsContent() {
   } | null>(null);
   const [placeDetailsError, setPlaceDetailsError] = useState(false);
   const [expandedHotelIds, setExpandedHotelIds] = useState<Record<string, boolean>>({});
+  const [searchAnalyticsOutcome, setSearchAnalyticsOutcome] = useState<SearchAnalyticsOutcome | null>(null);
+  const lastSearchEventSignature = useRef<string | null>(null);
 
   const toggleHotelExpanded = useCallback((hotelId: string) => {
     setExpandedHotelIds((prev) => {
@@ -62,6 +107,18 @@ function ResultsContent() {
     const adults = searchParams.get("adults") ?? "2";
 
     if ((!placeId && !aiSearch) || !checkin || !checkout) {
+      sendSearchAnalyticsEvent({
+        mode: aiSearch ? "vibe" : "destination",
+        placeId,
+        aiSearch,
+        checkin,
+        checkout,
+        adults: Number(adults),
+        sessionId: getSearchSessionId(),
+        pageUrl: window.location.href,
+        emptyReason: "missing_params",
+        context: { source: "results_page" },
+      });
       setError("Missing search parameters.");
       setLoading(false);
       return;
@@ -69,6 +126,7 @@ function ResultsContent() {
 
     async function run() {
       try {
+        setSearchAnalyticsOutcome(null);
         const body: Record<string, string | number> = {
           checkin: checkin!,
           checkout: checkout!,
@@ -98,6 +156,9 @@ function ResultsContent() {
           location?: { latitude?: number; longitude?: number };
           rating?: number; // guest review rating, when present
         })[];
+        const uniqueHotelIds = [
+          ...new Set([...data.map((d) => d.hotelId), ...hotelsFromApi.map((h) => h.id)].filter(Boolean)),
+        ];
 
         if (aiSearch && hotelsFromApi.length > 0) {
           // For vibe/AI search, enrich basic hotel data with full details (including coordinates)
@@ -147,6 +208,19 @@ function ResultsContent() {
             };
           });
           setHotels(merged);
+          setSearchAnalyticsOutcome({
+            apiRateCount: data.length,
+            apiHotelCount: hotelsFromApi.length,
+            uniqueHotelCount: uniqueHotelIds.length,
+            enrichedHotelCount: merged.length,
+            sampleHotels: merged.slice(0, 5).map((h) => ({
+              id: h.id,
+              name: h.name,
+              rating: h.rating,
+              price: h.price,
+              currency: h.currency,
+            })),
+          });
         } else {
           const ids: string[] = [...new Set(data.map((d) => d.hotelId))];
           const details = await Promise.all(
@@ -184,9 +258,35 @@ function ResultsContent() {
             lng: h.location?.longitude,
           }));
           setHotels(merged);
+          setSearchAnalyticsOutcome({
+            apiRateCount: data.length,
+            apiHotelCount: hotelsFromApi.length,
+            uniqueHotelCount: uniqueHotelIds.length,
+            enrichedHotelCount: merged.length,
+            sampleHotels: merged.slice(0, 5).map((h) => ({
+              id: h.id,
+              name: h.name,
+              rating: h.rating,
+              price: h.price,
+              currency: h.currency,
+            })),
+          });
         }
       } catch (e) {
-        setError((e as Error).message);
+        const message = (e as Error).message;
+        sendSearchAnalyticsEvent({
+          mode: aiSearch ? "vibe" : "destination",
+          placeId,
+          aiSearch,
+          checkin,
+          checkout,
+          adults: Number(adults),
+          sessionId: getSearchSessionId(),
+          pageUrl: window.location.href,
+          liteApiError: message,
+          context: { source: "results_page_error" },
+        });
+        setError(message);
       } finally {
         setLoading(false);
       }
@@ -197,6 +297,8 @@ function ResultsContent() {
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
   const adults = searchParams.get("adults") ?? "2";
+  const placeId = searchParams.get("placeId");
+  const aiSearch = searchParams.get("aiSearch");
 
   const filteredAndSortedHotels = useMemo(() => {
     const filtered = hotels.filter((h) => {
@@ -215,8 +317,6 @@ function ResultsContent() {
     // Default: highest rating first (safest first)
     return [...filtered].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
   }, [hotels, minRating, maxPrice, onlyFreeCancellation, sortBy]);
-
-  const placeId = searchParams.get("placeId");
 
   // Fetch place details server-side (avoids CORS with LiteAPI whitelabel) for map when searching by destination.
   useEffect(() => {
@@ -254,6 +354,50 @@ function ResultsContent() {
       ),
     [filteredAndSortedHotels]
   );
+
+  useEffect(() => {
+    if (!searchAnalyticsOutcome || loading) return;
+
+    const filters = {
+      minRating,
+      maxPrice,
+      onlyFreeCancellation,
+      sortBy,
+    };
+    const payload = {
+      mode: aiSearch ? "vibe" : "destination",
+      placeId,
+      aiSearch,
+      checkin,
+      checkout,
+      adults: Number(adults),
+      sessionId: getSearchSessionId(),
+      pageUrl: window.location.href,
+      ...searchAnalyticsOutcome,
+      filteredHotelCount: filteredAndSortedHotels.length,
+      hotelsWithCoordsCount: hotelsWithCoords.length,
+      filters,
+      context: { source: "results_page" },
+    };
+    const signature = JSON.stringify(payload);
+    if (signature === lastSearchEventSignature.current) return;
+    lastSearchEventSignature.current = signature;
+    sendSearchAnalyticsEvent(payload);
+  }, [
+    adults,
+    aiSearch,
+    checkin,
+    checkout,
+    filteredAndSortedHotels.length,
+    hotelsWithCoords.length,
+    loading,
+    maxPrice,
+    minRating,
+    onlyFreeCancellation,
+    placeId,
+    searchAnalyticsOutcome,
+    sortBy,
+  ]);
 
   const derivedPlaceFromHotels = useMemo(() => {
     if (hotelsWithCoords.length === 0) return null;

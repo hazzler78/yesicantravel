@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: post.seoTitle ?? post.title,
     description: post.seoDescription ?? post.excerpt ?? "",
-    alternates: { canonical: `/blog/${post.slug}` },
+    alternates: { canonical: `https://yesicantravel.com/blog/${post.slug}` },
   };
 }
 

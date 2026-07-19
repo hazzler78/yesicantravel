@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Popular Safe Cities – Yes I Can Travel",
   description:
     "Explore safer stays in Paris, Berlin, Amsterdam, Barcelona, Milan and London. Stays reviewed by women travellers, 24/7 reception, well-lit areas.",
+  alternates: {
+    canonical: "https://yesicantravel.com/popular-cities",
+  },
 };
 
 export default function PopularCitiesLayout({

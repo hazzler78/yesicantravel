@@ -3,6 +3,9 @@ import LeadMagnetForm from "@/components/LeadMagnetForm";
 export const metadata = {
   title: "Solo Female Safety Checklist",
   description: "Free checklist to help women plan safer solo stays with confidence.",
+  alternates: {
+    canonical: "https://yesicantravel.com/lead-magnet",
+  },
 };
 
 export default function LeadMagnetPage() {

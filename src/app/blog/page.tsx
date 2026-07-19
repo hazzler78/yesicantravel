@@ -7,6 +7,9 @@ export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Solo Travel Safety Blog",
   description: "SEO guides and destination safety content for women traveling solo.",
+  alternates: {
+    canonical: "https://yesicantravel.com/blog",
+  },
 };
 
 export default async function BlogIndexPage() {

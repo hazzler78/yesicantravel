@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     "Safe solo travel stays for women in Europe & worldwide. Women-reviewed hotels with 24/7 reception, safety filters & expert tips. Book confidently and feel prepared.",
   openGraph: {
     type: "website",
-    url: "/",
+    url: "https://yesicantravel.com/",
     siteName: "Yes I Can Travel",
     title: "Yes I Can Travel – Safe solo travel stays for women in Europe",
     description:
@@ -50,9 +50,6 @@ export const metadata: Metadata = {
         alt: "Yes I Can Travel logo",
       },
     ],
-  },
-  alternates: {
-    canonical: "/",
   },
   twitter: {
     card: "summary_large_image",

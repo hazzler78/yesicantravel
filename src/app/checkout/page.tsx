@@ -300,6 +300,12 @@ function CheckoutContent() {
           setFirstName(guest.firstName ?? "");
           setLastName(guest.lastName ?? "");
           setEmail(guest.email ?? "");
+          setPhone(guest.phone ?? "");
+          if (!String(guest.phone ?? "").trim()) {
+            setError("Mobile phone is required to complete the booking. Please start checkout again and include your phone number.");
+            setStep("form");
+            return;
+          }
           setStep("booking");
         } catch {
           setError("Guest details not found. Please start the checkout again.");
@@ -319,6 +325,9 @@ function CheckoutContent() {
     (async () => {
       try {
         const guest = JSON.parse(stored);
+        if (!String(guest.phone ?? "").trim()) {
+          throw new Error("Mobile phone is required to complete the booking. Please start checkout again and include your phone number.");
+        }
         const clientRef = sessionStorage.getItem(CLIENT_REF_KEY);
         const res = await fetch("/api/book", {
           method: "POST",
@@ -331,7 +340,7 @@ function CheckoutContent() {
               firstName: guest.firstName,
               lastName: guest.lastName,
               email: guest.email,
-              phone: guest.phone ?? "",
+              phone: String(guest.phone).trim(),
             },
             // LiteAPI expects one primary guest per room (occupancyNumber = room index),
             // and this app currently books a single room with `adults` occupants.

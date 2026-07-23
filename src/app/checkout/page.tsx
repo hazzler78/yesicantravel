@@ -439,8 +439,8 @@ function CheckoutContent() {
 
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
-      alert("Please fill in your name and email to continue.");
+    if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim()) {
+      alert("Please fill in your name, email, and mobile phone to continue.");
       return;
     }
     if (!offerId) {
@@ -805,7 +805,7 @@ function CheckoutContent() {
             </div>
             <div>
               <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
-                Mobile phone <span className="font-normal text-[var(--navy-light)]">(optional)</span>
+                Mobile phone
               </label>
               <input
                 id="phone"
@@ -817,10 +817,11 @@ function CheckoutContent() {
                 }}
                 placeholder="+46 70 123 45 67"
                 autoComplete="tel"
+                required
                 className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
               />
               <p className="mt-1.5 text-xs text-[var(--navy-light)]">
-                Only shared with the hotel — handy for late check-in or flight-delay updates. We don&apos;t text or call you.
+                Required for the hotel booking. Only shared with the hotel — handy for late check-in or flight-delay updates. We don&apos;t text or call you.
               </p>
             </div>
             <button

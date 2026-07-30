@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { pinterestTrack } from "@/lib/pinterest";
+import { TextField } from "@/components/ui/TextField";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
 
 export default function NewsletterForm() {
   const [email, setEmail] = useState("");
@@ -57,41 +59,38 @@ export default function NewsletterForm() {
           </p>
         </div>
         <form onSubmit={handleSubmit} className="md:w-1/2">
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 md:flex-row">
             <div className="flex-1">
-              <label htmlFor="newsletter-first-name" className="sr-only">
-                First name
-              </label>
-              <input
+              <TextField
                 id="newsletter-first-name"
+                label="First name"
+                hideLabel
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="First name (optional)"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/70 focus:border-[var(--ocean-teal)] focus:outline-none focus:ring-2 focus:ring-[var(--ocean-teal)]/40"
+                className="border-white/20 bg-white/10 text-white placeholder:text-white/70"
               />
             </div>
             <div className="flex-1">
-              <label htmlFor="newsletter-email" className="sr-only">
-                Email
-              </label>
-              <input
+              <TextField
                 id="newsletter-email"
+                label="Email"
+                hideLabel
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email to get safer stay tips"
                 required
-                className="w-full rounded-lg border border-white/20 bg-white px-4 py-3 text-sm text-[var(--navy)] placeholder:text-[var(--navy)]/60 focus:border-[var(--ocean-teal)] focus:outline-none focus:ring-2 focus:ring-[var(--ocean-teal)]/40"
               />
             </div>
-            <button
+            <PrimaryButton
               type="submit"
               disabled={status === "loading"}
-              className="mt-1 inline-flex items-center justify-center rounded-lg bg-[var(--ocean-teal)] px-5 py-3 text-sm font-semibold text-white shadow-md transition-colors hover:bg-[var(--ocean-teal-light)] disabled:opacity-70 sm:mt-0"
+              className="mt-0 shrink-0 text-sm font-semibold sm:text-sm md:w-auto"
             >
               {status === "loading" ? "Joining..." : "Join newsletter"}
-            </button>
+            </PrimaryButton>
           </div>
           {message && (
             <p
@@ -111,4 +110,3 @@ export default function NewsletterForm() {
     </section>
   );
 }
-

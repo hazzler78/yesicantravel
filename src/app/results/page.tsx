@@ -6,6 +6,8 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { formatStayTotal } from "@/lib/formatStayPrice";
+import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
+import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
@@ -26,6 +28,7 @@ interface HotelListItem extends HotelBasic {
   hasFreeCancellation?: boolean;
   lat?: number;
   lng?: number;
+  safetyBadges?: string[];
 }
 
 type SearchAnalyticsOutcome = {
@@ -87,6 +90,8 @@ function ResultsContent() {
   const [placeDetailsError, setPlaceDetailsError] = useState(false);
   const [expandedHotelIds, setExpandedHotelIds] = useState<Record<string, boolean>>({});
   const [searchAnalyticsOutcome, setSearchAnalyticsOutcome] = useState<SearchAnalyticsOutcome | null>(null);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const lastSearchEventSignature = useRef<string | null>(null);
 
   const toggleHotelExpanded = useCallback((hotelId: string) => {
@@ -104,7 +109,7 @@ function ResultsContent() {
     const aiSearch = searchParams.get("aiSearch");
     const checkin = searchParams.get("checkin");
     const checkout = searchParams.get("checkout");
-    const adults = searchParams.get("adults") ?? "2";
+    const adults = searchParams.get("adults") ?? "1";
 
     if ((!placeId && !aiSearch) || !checkin || !checkout) {
       sendSearchAnalyticsEvent({
@@ -175,7 +180,7 @@ function ResultsContent() {
           );
           const byHotelId: Record<
             string,
-            { address?: string; rating?: number; lat?: number; lng?: number }
+            { address?: string; rating?: number; lat?: number; lng?: number; safetyBadges?: string[] }
           > = {};
           for (const d of details) {
             if (!d?.id) continue;
@@ -186,6 +191,7 @@ function ResultsContent() {
               rating: typeof d.rating === "number" ? d.rating : d.starRating,
               lat: typeof loc?.latitude === "number" ? loc.latitude : undefined,
               lng: typeof loc?.longitude === "number" ? loc.longitude : undefined,
+              safetyBadges: safetyBadgesFromHotel(d),
             };
           }
 
@@ -205,6 +211,7 @@ function ResultsContent() {
               hasFreeCancellation: freeCancellation,
               lat: extra.lat,
               lng: extra.lng,
+              safetyBadges: extra.safetyBadges ?? [],
             };
           });
           setHotels(merged);
@@ -256,6 +263,7 @@ function ResultsContent() {
             hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
             lat: h.location?.latitude,
             lng: h.location?.longitude,
+            safetyBadges: safetyBadgesFromHotel(h),
           }));
           setHotels(merged);
           setSearchAnalyticsOutcome({
@@ -296,7 +304,7 @@ function ResultsContent() {
 
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
-  const adults = searchParams.get("adults") ?? "2";
+  const adults = searchParams.get("adults") ?? "1";
   const placeId = searchParams.get("placeId");
   const aiSearch = searchParams.get("aiSearch");
 
@@ -439,14 +447,16 @@ function ResultsContent() {
 
   return (
     <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-      <div className="mx-auto max-w-6xl px-6 py-10">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <Link href="/" className="mb-6 inline-block text-[var(--ocean-teal)] font-medium hover:underline">
           ← Back to search
         </Link>
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
           <div>
             <h1 className="mb-1 text-2xl font-bold text-[var(--navy)]">Safer stays for your trip</h1>
-            <p className="text-[var(--navy-light)]">Filter by safety, budget, and rating to stay in control.</p>
+            <p className="text-[var(--navy-light)]">
+              Filter by rating, budget, and free cancellation. Safety signals appear on each stay when hotels list them.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-sm text-[var(--navy-light)]">Sort:</span>
@@ -454,24 +464,24 @@ function ResultsContent() {
               <button
                 type="button"
                 onClick={() => setSortBy("rating")}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`min-h-[44px] rounded-md px-3 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:py-1.5 ${
                   sortBy === "rating"
                     ? "bg-[var(--ocean-teal)] text-white"
                     : "text-[var(--navy-light)] hover:bg-[var(--sand)]"
                 }`}
               >
-                By rating
+                Highest rated
               </button>
               <button
                 type="button"
                 onClick={() => setSortBy("price")}
-                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                className={`min-h-[44px] rounded-md px-3 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:py-1.5 ${
                   sortBy === "price"
                     ? "bg-[var(--ocean-teal)] text-white"
                     : "text-[var(--navy-light)] hover:bg-[var(--sand)]"
                 }`}
               >
-                Cheapest first
+                Lowest price
               </button>
             </div>
             <p className="text-sm text-[var(--navy-light)]">
@@ -481,9 +491,32 @@ function ResultsContent() {
           </div>
         </div>
 
+        <div className="mb-4 flex gap-2 lg:hidden">
+          <button
+            type="button"
+            onClick={() => setFiltersOpen((o) => !o)}
+            aria-expanded={filtersOpen}
+            className="min-h-[44px] flex-1 rounded-lg border border-[var(--navy)]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[var(--navy)] shadow-sm"
+          >
+            {filtersOpen ? "Hide filters" : "Filters"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setMapOpen((o) => !o)}
+            aria-expanded={mapOpen}
+            className="min-h-[44px] flex-1 rounded-lg border border-[var(--navy)]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[var(--navy)] shadow-sm"
+          >
+            {mapOpen ? "Hide map" : "Show map"}
+          </button>
+        </div>
+
         <div className="grid gap-8 lg:grid-cols-[minmax(0,260px)_minmax(0,1.4fr)]">
-          <aside className="h-fit rounded-xl border border-[var(--navy)]/10 bg-white p-5 shadow-sm">
-            <h2 className="mb-3 text-base font-semibold text-[var(--navy)]">Safety & comfort filters</h2>
+          <aside
+            className={`h-fit rounded-xl border border-[var(--navy)]/10 bg-white p-5 shadow-sm ${
+              filtersOpen ? "block" : "hidden lg:block"
+            }`}
+          >
+            <h2 className="mb-3 text-base font-semibold text-[var(--navy)]">Comfort filters</h2>
             <div className="space-y-4 text-sm">
               <div>
                 <p className="mb-1 text-[var(--navy)] font-medium">Minimum rating</p>
@@ -493,7 +526,7 @@ function ResultsContent() {
                       key={String(value)}
                       type="button"
                       onClick={() => setMinRating(value)}
-                      className={`rounded-full px-3 py-1 text-xs font-medium border ${
+                      className={`min-h-[36px] rounded-full border px-3 py-1.5 text-xs font-medium ${
                         minRating === value
                           ? "border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/10 text-[var(--ocean-teal)]"
                           : "border-[var(--navy)]/15 text-[var(--navy-light)] hover:border-[var(--ocean-teal)]/40"
@@ -513,7 +546,7 @@ function ResultsContent() {
                       key={String(value)}
                       type="button"
                       onClick={() => setMaxPrice(value)}
-                      className={`rounded-full px-3 py-1 text-xs font-medium border ${
+                      className={`min-h-[36px] rounded-full border px-3 py-1.5 text-xs font-medium ${
                         maxPrice === value
                           ? "border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/10 text-[var(--ocean-teal)]"
                           : "border-[var(--navy)]/15 text-[var(--navy-light)] hover:border-[var(--ocean-teal)]/40"
@@ -547,7 +580,9 @@ function ResultsContent() {
           <div className="space-y-6">
             <div
               id="yict-map"
-              className="h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)] flex items-center justify-center"
+              className={`h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)] ${
+                mapOpen ? "flex items-center justify-center" : "hidden lg:flex lg:items-center lg:justify-center"
+              }`}
               aria-label="Map of safer stays in this area"
             >
               {!effectivePlaceForMap && !placeId ? (
@@ -618,19 +653,19 @@ function ResultsContent() {
                           {h.rating != null && (
                             <p className="mt-1 text-[var(--ocean-teal)]">★ {h.rating}</p>
                           )}
-                          <div className="mt-3 flex flex-wrap items-center gap-2">
-                            {h.hasFreeCancellation && (
-                              <span className="inline-flex items-center rounded-full bg-[var(--ocean-teal)]/10 px-3 py-1 text-xs font-medium text-[var(--ocean-teal)]">
-                                Free cancellation
-                              </span>
-                            )}
+                          <div className="mt-3">
+                            <SafetyBadgeList
+                              badges={h.safetyBadges ?? []}
+                              freeCancellation={Boolean(h.hasFreeCancellation)}
+                              max={4}
+                            />
                           </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => toggleHotelExpanded(h.id)}
                           aria-expanded={expanded}
-                          className="shrink-0 rounded-lg border border-[var(--navy)]/15 bg-[var(--sand)] px-3 py-2 text-xs font-semibold text-[var(--navy)] hover:border-[var(--ocean-teal)]/40 hover:bg-white sm:text-sm"
+                          className="shrink-0 rounded-lg border border-[var(--navy)]/15 bg-[var(--sand)] px-3 py-2.5 text-xs font-semibold text-[var(--navy)] hover:border-[var(--ocean-teal)]/40 hover:bg-white min-h-[44px] sm:min-h-0 sm:text-sm"
                         >
                           {expanded ? "Hide rates" : "Rates & details"}
                         </button>

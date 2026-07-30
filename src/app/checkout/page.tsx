@@ -12,6 +12,10 @@ import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress";
 import { formatStayTotal } from "@/lib/formatStayPrice";
+import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
+import { TextField } from "@/components/ui/TextField";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 const CLIENT_REF_KEY = "liteapi_checkout_client_ref";
@@ -67,7 +71,7 @@ function CheckoutContent() {
   const hotelId = searchParams.get("hotelId");
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
-  const adults = searchParams.get("adults") ?? "2";
+  const adults = searchParams.get("adults") ?? "1";
   const placeId = searchParams.get("placeId");
   const aiSearch = searchParams.get("aiSearch");
   const prebookId = searchParams.get("prebookId");
@@ -110,7 +114,14 @@ function CheckoutContent() {
     name?: string;
     address?: string;
     mainPhoto?: string;
+    safetyBadges?: string[];
   } | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  }>({});
   const [prebookData, setPrebookData] = useState<{
     prebookId: string;
     transactionId: string;
@@ -202,11 +213,14 @@ function CheckoutContent() {
           address?: string;
           main_photo?: string;
           hotelImages?: Array<{ url?: string }>;
+          facilities?: Array<{ name?: string }>;
+          hotelFacilities?: string[];
         };
         setStayInfo({
           name: d.name,
           address: d.address,
           mainPhoto: d.main_photo ?? d.hotelImages?.[0]?.url,
+          safetyBadges: safetyBadgesFromHotel(d),
         });
       })
       .catch(() => {});
@@ -448,10 +462,19 @@ function CheckoutContent() {
 
   const handleGuestSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firstName.trim() || !lastName.trim() || !email.trim() || !phone.trim()) {
-      alert("Please fill in your name, email, and mobile phone to continue.");
-      return;
-    }
+    const nextErrors: {
+      firstName?: string;
+      lastName?: string;
+      email?: string;
+      phone?: string;
+    } = {};
+    if (!firstName.trim()) nextErrors.firstName = "Please enter your first name.";
+    if (!lastName.trim()) nextErrors.lastName = "Please enter your last name.";
+    if (!email.trim()) nextErrors.email = "Please enter your email.";
+    if (!phone.trim()) nextErrors.phone = "Please enter your mobile phone.";
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
+
     if (!offerId) {
       setError("Missing offer. Go back and select an offer.");
       return;
@@ -663,45 +686,50 @@ function CheckoutContent() {
         {step === "form" ? (
           <form onSubmit={handleGuestSubmit} className="space-y-5 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:space-y-6 sm:p-6">
             {(stayInfo?.name || checkin) && (
-              <div className="flex gap-3 rounded-xl border border-[var(--navy)]/15 bg-[var(--sand)]/40 p-3">
-                {stayInfo?.mainPhoto ? (
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[var(--sand)] sm:h-24 sm:w-24">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={stayInfo.mainPhoto}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ) : (
-                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-[var(--sand)] text-[var(--navy-light)] sm:h-24 sm:w-24" aria-hidden>
-                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4.5 10.5V21h15V10.5" />
-                    </svg>
-                  </div>
-                )}
-                <div className="flex min-w-0 flex-1 flex-col justify-center">
-                  <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--navy-light)]">
-                    You&apos;re booking
-                  </p>
-                  {stayInfo?.name ? (
-                    <p className="truncate text-base font-semibold text-[var(--navy)] sm:text-lg">
-                      {stayInfo.name}
-                    </p>
+              <div className="space-y-3 rounded-xl border border-[var(--navy)]/15 bg-[var(--sand)]/40 p-3">
+                <div className="flex gap-3">
+                  {stayInfo?.mainPhoto ? (
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[var(--sand)] sm:h-24 sm:w-24">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={stayInfo.mainPhoto}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   ) : (
-                    <p className="truncate text-sm text-[var(--navy-light)]">Loading stay details…</p>
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-[var(--sand)] text-[var(--navy-light)] sm:h-24 sm:w-24" aria-hidden>
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4.5 10.5V21h15V10.5" />
+                      </svg>
+                    </div>
                   )}
-                  {stayInfo?.address && (
-                    <p className="truncate text-xs text-[var(--navy-light)] sm:text-sm">{stayInfo.address}</p>
-                  )}
-                  {checkin && checkout && (
-                    <p className="mt-1 text-xs text-[var(--navy)] sm:text-sm">
-                      {checkin} → {checkout}
-                      {nights > 0 && <> · {nights} night{nights === 1 ? "" : "s"}</>}
-                      {adults && <> · {adults} guest{Number(adults) === 1 ? "" : "s"}</>}
+                  <div className="flex min-w-0 flex-1 flex-col justify-center">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--navy-light)]">
+                      You&apos;re booking
                     </p>
-                  )}
+                    {stayInfo?.name ? (
+                      <p className="truncate text-base font-semibold text-[var(--navy)] sm:text-lg">
+                        {stayInfo.name}
+                      </p>
+                    ) : (
+                      <p className="truncate text-sm text-[var(--navy-light)]">Loading stay details…</p>
+                    )}
+                    {stayInfo?.address && (
+                      <p className="truncate text-xs text-[var(--navy-light)] sm:text-sm">{stayInfo.address}</p>
+                    )}
+                    {checkin && checkout && (
+                      <p className="mt-1 text-xs text-[var(--navy)] sm:text-sm">
+                        {checkin} → {checkout}
+                        {nights > 0 && <> · {nights} night{nights === 1 ? "" : "s"}</>}
+                        {adults && <> · {adults} guest{Number(adults) === 1 ? "" : "s"}</>}
+                      </p>
+                    )}
+                  </div>
                 </div>
+                {(stayInfo?.safetyBadges?.length ?? 0) > 0 && (
+                  <SafetyBadgeList badges={stayInfo?.safetyBadges ?? []} max={3} />
+                )}
               </div>
             )}
 
@@ -717,8 +745,8 @@ function CheckoutContent() {
               </div>
             )}
 
-            <div className="rounded-xl border border-[var(--coral)]/20 bg-[var(--coral)]/[0.07] px-3 py-3 text-sm font-medium leading-snug text-[var(--navy)] sm:px-4 sm:text-base">
-              Limited rooms available at this price — book now to lock this rate.
+            <div className="rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)]/50 px-3 py-3 text-sm leading-snug text-[var(--navy-light)] sm:px-4 sm:text-base">
+              Ready when you are — your details confirm the booking with the hotel.
             </div>
 
             <div>
@@ -760,88 +788,74 @@ function CheckoutContent() {
             )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="sm:col-span-1">
-                <label htmlFor="firstName" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
-                  First name
-                </label>
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => {
-                    trackGuestDetailsEntered();
-                    setFirstName(e.target.value);
-                  }}
-                  autoComplete="given-name"
-                  className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
-                  required
-                />
-              </div>
-              <div className="sm:col-span-1">
-                <label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
-                  Last name
-                </label>
-                <input
-                  id="lastName"
-                  type="text"
-                  value={lastName}
-                  onChange={(e) => {
-                    trackGuestDetailsEntered();
-                    setLastName(e.target.value);
-                  }}
-                  autoComplete="family-name"
-                  className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
-                Email
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
+              <TextField
+                id="firstName"
+                label="First name"
+                type="text"
+                value={firstName}
                 onChange={(e) => {
                   trackGuestDetailsEntered();
-                  setEmail(e.target.value);
+                  setFirstName(e.target.value);
+                  if (fieldErrors.firstName) setFieldErrors((prev) => ({ ...prev, firstName: undefined }));
                 }}
-                autoComplete="email"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
+                autoComplete="given-name"
                 required
+                error={fieldErrors.firstName}
               />
-            </div>
-            <div>
-              <label htmlFor="phone" className="mb-1.5 block text-sm font-medium text-[var(--navy)] sm:mb-2 sm:text-base">
-                Mobile phone
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                value={phone}
+              <TextField
+                id="lastName"
+                label="Last name"
+                type="text"
+                value={lastName}
                 onChange={(e) => {
                   trackGuestDetailsEntered();
-                  setPhone(e.target.value);
+                  setLastName(e.target.value);
+                  if (fieldErrors.lastName) setFieldErrors((prev) => ({ ...prev, lastName: undefined }));
                 }}
-                placeholder="+46 70 123 45 67"
-                autoComplete="tel"
+                autoComplete="family-name"
                 required
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-4 text-base text-[var(--navy)] placeholder-[var(--navy-light)]/60 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:py-3.5"
+                error={fieldErrors.lastName}
               />
-              <p className="mt-1.5 text-xs text-[var(--navy-light)]">
-                Required for the hotel booking. Only shared with the hotel — handy for late check-in or flight-delay updates. We don&apos;t text or call you.
-              </p>
             </div>
-            <button
+            <TextField
+              id="email"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => {
+                trackGuestDetailsEntered();
+                setEmail(e.target.value);
+                if (fieldErrors.email) setFieldErrors((prev) => ({ ...prev, email: undefined }));
+              }}
+              autoComplete="email"
+              required
+              error={fieldErrors.email}
+            />
+            <TextField
+              id="phone"
+              label="Mobile phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => {
+                trackGuestDetailsEntered();
+                setPhone(e.target.value);
+                if (fieldErrors.phone) setFieldErrors((prev) => ({ ...prev, phone: undefined }));
+              }}
+              placeholder="+46 70 123 45 67"
+              autoComplete="tel"
+              required
+              error={fieldErrors.phone}
+              hint="Required for the hotel booking. Only shared with the hotel — handy for late check-in or flight-delay updates. We don't text or call you."
+            />
+            <PrimaryButton
               type="submit"
               disabled={paymentMethod === "card" && paymentConfig === null}
-              className="min-h-[54px] w-full rounded-xl bg-[var(--ocean-teal)] px-6 py-4 text-lg font-semibold text-white hover:bg-[var(--ocean-teal-light)] disabled:opacity-50"
+              className="rounded-xl text-lg font-semibold sm:text-lg"
             >
               {paymentMethod === "card" && paymentConfig === null
                 ? "Loading..."
                 : "Continue to payment"}
-            </button>
+            </PrimaryButton>
           </form>
         ) : (
           <div className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:p-6">

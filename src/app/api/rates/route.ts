@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
       aiSearch: body.aiSearch,
       checkin: body.checkin,
       checkout: body.checkout,
-      adults: body.adults ?? 2,
+      adults: body.adults ?? 1,
       currency: body.currency,
       guestNationality: body.guestNationality,
       maxRatesPerHotel: body.maxRatesPerHotel,

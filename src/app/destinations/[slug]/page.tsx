@@ -158,7 +158,7 @@ export default async function DestinationPage({ params }: Props) {
           <ul className="space-y-2 text-[var(--navy-light)]">
             <li className="flex items-start gap-2">
               <span className="text-[var(--ocean-teal)]">✓</span>
-              Filter for 24/7 staffed reception and well-lit entrances
+              Filter for rating, budget and free cancellation; see safety signals on each stay
             </li>
             <li className="flex items-start gap-2">
               <span className="text-[var(--ocean-teal)]">✓</span>

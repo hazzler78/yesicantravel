@@ -33,6 +33,10 @@ export default function Chatbot() {
     containerRef.current.scrollTop = containerRef.current.scrollHeight;
   }, [messages, isOpen]);
 
+  // Keep checkout/confirmation calm — no floating assistant over payment.
+  const hideOnTransactional =
+    pathname.startsWith("/checkout") || pathname.startsWith("/confirmation");
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     const trimmed = input.trim();
@@ -102,6 +106,8 @@ export default function Chatbot() {
       setIsLoading(false);
     }
   }
+
+  if (hideOnTransactional) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-40">

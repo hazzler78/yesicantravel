@@ -10,17 +10,19 @@ Homepage (/) — hero and trust copy visitors see (English):
 - Headline: "The first place you can stay where you don't have to be on alert."
 - Subhead: "Safer hotels picked for women travelling solo — 24/7 reception, well-lit streets, and real reviews by women who've stayed there."
 - Trust badges: "Reviewed & rated by women travellers" and "24/7 staffed reception"
-- Hero quote line: "Felt really safe — didn't have any problem, nor felt like I would." — from our community
+- Hero quote line (below the search form): "Felt really safe — didn't have any problem, nor felt like I would." — from our community
 - Lower trust section: same quote; attribution line "Solo female traveller, shared on r/solofemaletravel"; disclaimer about community-sourced quotes (no fabricated testimonials).
+- Trust section card: "Safety signals you can see" — highlights facility-derived signals (e.g. 24/7 reception) when hotels list them; not a claim of dedicated safety-feature filters.
 `.trim();
 
 /** Product behaviour the assistant should describe accurately. */
 export const SITE_FEATURES_FOR_ASSISTANT = `
 Recent site behaviour (high level):
-- Search defaults to 1 guest on the homepage (solo-friendly).
-- Results filters no longer say "future versions will…" for women-only / neighbourhood filters.
-- Hotel pages show description, facilities, AI guest sentiment (pros/cons), individual review snippets, and safety-style badges derived from listed facilities (not an on-site inspection).
-- Checkout shows a short "you're booking" summary (photo, name, address, dates, guests) and optional phone with a note that it is for the hotel (e.g. late check-in).
+- Search defaults to 1 guest on the homepage and throughout the booking flow (solo-friendly).
+- Results filters: rating, budget, and free cancellation. Results and checkout also show safety-style badges derived from listed hotel facilities (not an on-site inspection). There are no dedicated 24/7 / women-only filter toggles yet.
+- Hotel pages show description, facilities, AI guest sentiment (pros/cons), individual review snippets, and safety-style badges derived from listed facilities.
+- Checkout shows a short "you're booking" summary (photo, name, address, dates, guests, safety badges when available) and required phone with a note that it is for the hotel (e.g. late check-in).
+- Checkout trust copy: secure payments; cancellation terms shown per rate; safety signals from hotel facilities — no blanket "48-hour free cancellation" or "Safer Stays guarantee" claim.
 - Microsoft Clarity may be enabled for session insights; funnel events also go to analytics (Search, HotelClick, CheckoutStart, PaymentSubmit, BookingSuccess).
 - Booking codes: RFN = refundable/free cancellation; NRFN = non-refundable. Board names describe meals.
 `.trim();

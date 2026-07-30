@@ -2,7 +2,7 @@ export function CheckoutTrustBar() {
   return (
     <div className="mb-6 space-y-4 rounded-xl border border-[var(--ocean-teal)]/25 bg-white p-4 shadow-sm">
       <p className="text-center text-sm font-semibold leading-snug text-[var(--navy)] sm:text-base">
-        Secure payments · Free cancellation up to 48 hours · Safer Stays guarantee
+        Secure payments · Cancellation terms shown per rate · Safety signals from hotel facilities
       </p>
       <div
         className="flex flex-wrap items-center justify-center gap-4 border-t border-[var(--navy)]/10 pt-4"

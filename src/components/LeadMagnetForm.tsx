@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { TextField } from "@/components/ui/TextField";
+import { PrimaryButton } from "@/components/ui/PrimaryButton";
 
 export default function LeadMagnetForm() {
   const [email, setEmail] = useState("");
@@ -48,28 +50,28 @@ export default function LeadMagnetForm() {
 
   return (
     <form onSubmit={onSubmit} className="mt-6 space-y-3">
-      <input
+      <TextField
+        id="lead-first-name"
+        label="First name (optional)"
         type="text"
-        placeholder="First name (optional)"
         value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
-        className="w-full rounded-lg border border-[var(--sand)] bg-white px-4 py-3 text-sm"
+        placeholder="First name"
+        className="border-[var(--sand)] text-sm"
       />
-      <input
+      <TextField
+        id="lead-email"
+        label="Email address"
         type="email"
         required
-        placeholder="Email address"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        className="w-full rounded-lg border border-[var(--sand)] bg-white px-4 py-3 text-sm"
+        placeholder="you@example.com"
+        className="border-[var(--sand)] text-sm"
       />
-      <button
-        type="submit"
-        disabled={status === "loading"}
-        className="w-full rounded-lg bg-[var(--ocean-teal)] px-4 py-3 text-sm font-semibold text-white"
-      >
+      <PrimaryButton type="submit" disabled={status === "loading"} className="text-sm font-semibold sm:text-sm">
         {status === "loading" ? "Sending..." : "Get the free safety checklist"}
-      </button>
+      </PrimaryButton>
       {message && (
         <p className={`text-sm ${status === "success" ? "text-[var(--ocean-teal)]" : "text-[var(--coral)]"}`}>
           {message}

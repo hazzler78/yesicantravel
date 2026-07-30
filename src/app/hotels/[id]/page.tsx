@@ -21,7 +21,7 @@ export default async function LegacyHotelsRedirect({ searchParams }: Props) {
   const placeId = firstParam(sp.placeId).trim();
   const checkin = firstParam(sp.checkin).trim();
   const checkout = firstParam(sp.checkout).trim();
-  const adults = firstParam(sp.adults).trim() || "2";
+  const adults = firstParam(sp.adults).trim() || "1";
   let name = firstParam(sp.name).trim();
   try {
     name = decodeURIComponent(name);

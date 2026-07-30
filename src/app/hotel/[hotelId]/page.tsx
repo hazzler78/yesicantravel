@@ -7,6 +7,7 @@ import { track } from "@vercel/analytics";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { normalizeFacilityNames, deriveSafetyBadges } from "@/lib/safetyBadges";
 
 interface Rate {
   name: string;
@@ -69,39 +70,6 @@ interface SentimentAnalysis {
   categories?: Array<{ name?: string; rating?: number; description?: string }>;
 }
 
-// Map raw facility strings to user-facing safety badges. Conservative — only fire a badge
-// when we're confident the facility actually exists. Keyword match is case-insensitive.
-const SAFETY_BADGE_RULES: Array<{ label: string; keywords: string[] }> = [
-  { label: "24/7 reception", keywords: ["24-hour front desk", "24 hour front desk", "24/7 front desk", "24-hour reception", "24 hour reception"] },
-  { label: "Security on site", keywords: ["security", "cctv", "surveillance cameras", "24-hour security"] },
-  { label: "In-room safe", keywords: ["safety deposit box", "in-room safe", " safe "] },
-  { label: "Lift access", keywords: ["elevator", "lift"] },
-  { label: "Well-lit entrance", keywords: ["illuminated parking", "lit parking"] },
-  { label: "Non-smoking property", keywords: ["non-smoking"] },
-  { label: "Free WiFi", keywords: ["free wifi", "wi-fi", "wifi"] },
-];
-
-function deriveSafetyBadges(facilityNames: string[]): string[] {
-  const lower = facilityNames.map((f) => f.toLowerCase());
-  const hits = new Set<string>();
-  for (const rule of SAFETY_BADGE_RULES) {
-    if (rule.keywords.some((k) => lower.some((f) => f.includes(k.toLowerCase())))) {
-      hits.add(rule.label);
-    }
-  }
-  return Array.from(hits);
-}
-
-function normalizeFacilityNames(hotel: HotelDetail | null): string[] {
-  if (!hotel) return [];
-  const fromObjects = (hotel.facilities ?? [])
-    .map((f) => f.name)
-    .filter((n): n is string => Boolean(n));
-  const fromStrings = hotel.hotelFacilities ?? [];
-  const combined = [...fromObjects, ...fromStrings];
-  return Array.from(new Set(combined.map((s) => s.trim()).filter(Boolean)));
-}
-
 function stripHtml(html: string): string {
   return html
     .replace(/<br\s*\/?>/gi, "\n")
@@ -131,7 +99,7 @@ function HotelContent() {
 
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
-  const adults = searchParams.get("adults") ?? "2";
+  const adults = searchParams.get("adults") ?? "1";
 
   useEffect(() => {
     if (!hotelId) return;

@@ -50,3 +50,33 @@ html {
 .lp-submit-button:hover {
   background-color: var(--ocean-teal-light) !important;
 }
+
+/*
+  Native date/time inputs on iOS Safari / mobile WebKit ignore width:100%
+  and expand from internal UI (calendar icon + spinner). That overflows
+  flex/grid parents whose default min-width is auto.
+*/
+input[type="date"],
+input[type="time"],
+input[type="month"],
+input[type="datetime-local"] {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  line-height: 1.25;
+  overflow: hidden;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+}
+
+select {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}

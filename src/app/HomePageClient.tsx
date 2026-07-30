@@ -275,8 +275,8 @@ export default function Home() {
           </Link>
         </div>
         {/* Content overlay: pt-24 so headline never under logo; mobile py-8, desktop center */}
-        <div className="relative z-10 flex min-h-screen flex-col px-6 pt-24 pb-8 md:justify-center md:pt-16 md:pb-16">
-          <div className="mx-auto w-full max-w-3xl md:pl-0">
+        <div className="relative z-10 flex min-h-screen min-w-0 flex-col px-4 pt-24 pb-8 sm:px-6 md:justify-center md:pt-16 md:pb-16">
+          <div className="mx-auto w-full min-w-0 max-w-3xl md:pl-0">
             <div className="mb-6 md:mb-8">
               <p className="mb-2 text-sm font-medium uppercase tracking-wider text-white drop-shadow-md">
                 For women travelling solo
@@ -307,12 +307,12 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-[var(--navy)]/10 bg-white/95 p-6 shadow-lg backdrop-blur-sm">
-          <div className="mb-6 flex gap-2">
+            <div className="min-w-0 overflow-hidden rounded-2xl border border-[var(--navy)]/10 bg-white/95 p-4 shadow-lg backdrop-blur-sm sm:p-6">
+          <div className="mb-5 flex flex-col gap-2 sm:mb-6 sm:flex-row sm:flex-wrap">
             <button
               type="button"
               onClick={() => setSearchMode("destination")}
-              className={`rounded-lg px-4 py-2.5 text-base font-medium transition-colors ${
+              className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-colors sm:w-auto sm:px-4 sm:text-base ${
                 searchMode === "destination"
                   ? "bg-[var(--ocean-teal)] text-white"
                   : "bg-[var(--sand)] text-[var(--navy-light)] hover:bg-[var(--sand)]/80"
@@ -323,7 +323,7 @@ export default function Home() {
             <button
               type="button"
               onClick={() => setSearchMode("vibe")}
-              className={`rounded-lg px-4 py-2.5 text-base font-medium transition-colors ${
+              className={`w-full rounded-lg px-3 py-2.5 text-sm font-medium transition-colors sm:w-auto sm:px-4 sm:text-base ${
                 searchMode === "vibe"
                   ? "bg-[var(--ocean-teal)] text-white"
                   : "bg-[var(--sand)] text-[var(--navy-light)] hover:bg-[var(--sand)]/80"
@@ -334,8 +334,8 @@ export default function Home() {
           </div>
 
           {searchMode === "destination" ? (
-            <div className="relative mb-6">
-              <label htmlFor="destination" className="mb-2 block text-base font-medium text-[var(--navy)]">
+            <div className="relative mb-5 min-w-0 sm:mb-6">
+              <label htmlFor="destination" className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">
                 Where to?
               </label>
               <input
@@ -349,9 +349,9 @@ export default function Home() {
                   fetchPlaces();
                 }}
                 onFocus={() => places.length > 0 && setShowPlaces(true)}
-                placeholder="e.g. Paris, Berlin, Barcelona, Amsterdam..."
+                placeholder="e.g. Paris, Berlin, Barcelona..."
                 aria-label="Destination"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy)]/75 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="box-border w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-3 py-3 text-base text-[var(--navy)] placeholder-[var(--navy)]/75 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:px-4 sm:py-3.5"
               />
               {showPlaces && places.length > 0 && (
                 <ul className="absolute left-0 right-0 top-full z-10 mt-1 max-h-56 overflow-auto rounded-lg border border-[var(--navy)]/10 bg-white shadow-lg" role="listbox">
@@ -362,9 +362,11 @@ export default function Home() {
                         onClick={() => selectPlace(p)}
                         className="block w-full px-4 py-3.5 text-left text-[var(--navy)] hover:bg-[var(--sand)]"
                       >
-                        {p.displayName}
+                        <span className="block truncate">{p.displayName}</span>
                         {p.formattedAddress && (
-                          <span className="ml-2 text-[var(--navy-light)]">({p.formattedAddress})</span>
+                          <span className="mt-0.5 block truncate text-sm text-[var(--navy-light)]">
+                            {p.formattedAddress}
+                          </span>
                         )}
                       </button>
                     </li>
@@ -373,8 +375,8 @@ export default function Home() {
               )}
             </div>
           ) : (
-            <div className="mb-6">
-              <label htmlFor="vibe" className="mb-2 block text-base font-medium text-[var(--navy)]">
+            <div className="mb-5 min-w-0 sm:mb-6">
+              <label htmlFor="vibe" className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">
                 Describe your ideal stay
               </label>
               <input
@@ -382,16 +384,17 @@ export default function Home() {
                 type="text"
                 value={vibeQuery}
                 onChange={(e) => { setVibeQuery(e.target.value); setFormError(null); }}
-                placeholder="e.g. central, well-lit area, quiet neighbourhood..."
+                placeholder="e.g. central, well-lit, quiet..."
                 aria-label="Describe your ideal stay"
-                className="w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] placeholder-[var(--navy)]/75 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="box-border w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-3 py-3 text-base text-[var(--navy)] placeholder-[var(--navy)]/75 focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:px-4 sm:py-3.5"
               />
             </div>
           )}
 
-          <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="min-w-0">
-              <label htmlFor="checkin" className="mb-2 block text-base font-medium text-[var(--navy)]">
+          {/* Stack on phone + small tablets; 3-col only from md so date pickers don't crush */}
+          <div className="mb-5 grid grid-cols-1 gap-3 sm:mb-6 sm:gap-4 md:grid-cols-3">
+            <div className="min-w-0 overflow-hidden">
+              <label htmlFor="checkin" className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">
                 Check-in
               </label>
               <input
@@ -401,11 +404,11 @@ export default function Home() {
                 onChange={(e) => { setCheckin(e.target.value); setFormError(null); }}
                 min={minCheckin}
                 aria-label="Check-in date"
-                className="w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 [overflow:hidden] [text-overflow:ellipsis] max-sm:text-base"
+                className="box-border w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-3 py-3 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:px-4 sm:py-3.5"
               />
             </div>
-            <div className="min-w-0">
-              <label htmlFor="checkout" className="mb-2 block text-base font-medium text-[var(--navy)]">
+            <div className="min-w-0 overflow-hidden">
+              <label htmlFor="checkout" className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">
                 Check-out
               </label>
               <input
@@ -415,11 +418,11 @@ export default function Home() {
                 onChange={(e) => { setCheckout(e.target.value); setFormError(null); }}
                 min={minCheckout}
                 aria-label="Check-out date"
-                className="w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 [overflow:hidden] [text-overflow:ellipsis] max-sm:text-base"
+                className="box-border w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-3 py-3 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:px-4 sm:py-3.5"
               />
             </div>
-            <div className="min-w-0">
-              <label htmlFor="guests" className="mb-2 block text-base font-medium text-[var(--navy)]">
+            <div className="min-w-0 overflow-hidden">
+              <label htmlFor="guests" className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">
                 Travellers
               </label>
               <select
@@ -427,7 +430,7 @@ export default function Home() {
                 value={guests}
                 onChange={(e) => setGuests(Number(e.target.value))}
                 aria-label="Number of guests"
-                className="w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3.5 text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30"
+                className="box-border w-full min-w-0 max-w-full rounded-lg border border-[var(--navy)]/20 bg-white px-3 py-3 text-base text-[var(--navy)] focus:border-[var(--ocean-teal)] focus:ring-2 focus:ring-[var(--ocean-teal)]/30 sm:px-4 sm:py-3.5"
               >
                 {[1, 2, 3, 4, 5, 6].map((n) => (
                   <option key={n} value={n}>{n} {n === 1 ? "traveller" : "travellers"}</option>
@@ -445,7 +448,7 @@ export default function Home() {
             type="button"
             onClick={handleSearch}
             disabled={loading}
-            className="min-h-[48px] w-full rounded-lg border-2 border-white bg-[var(--coral)] px-6 py-4 text-xl font-bold text-white shadow-2xl transition-colors hover:bg-[var(--coral-light)] hover:shadow-2xl disabled:opacity-60 [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
+            className="min-h-[48px] w-full rounded-lg border-2 border-white bg-[var(--coral)] px-4 py-3.5 text-lg font-bold text-white shadow-2xl transition-colors hover:bg-[var(--coral-light)] hover:shadow-2xl disabled:opacity-60 sm:px-6 sm:py-4 sm:text-xl [text-shadow:0_1px_3px_rgba(0,0,0,0.35)]"
           >
             {loading ? "Searching..." : "Find a safer stay"}
           </button>
@@ -454,7 +457,7 @@ export default function Home() {
           </p>
           <Link
             href="/popular-cities"
-            className="mt-4 flex w-full items-center justify-center rounded-lg border border-[var(--navy)]/20 bg-white px-6 py-3.5 text-lg font-semibold text-[var(--navy)] shadow-md transition-colors hover:bg-[var(--sand)] hover:border-[var(--ocean-teal)]/40"
+            className="mt-4 flex w-full items-center justify-center rounded-lg border border-[var(--navy)]/20 bg-white px-4 py-3 text-center text-base font-semibold leading-snug text-[var(--navy)] shadow-md transition-colors hover:bg-[var(--sand)] hover:border-[var(--ocean-teal)]/40 sm:px-6 sm:py-3.5 sm:text-lg"
           >
             Not sure where to go? See Popular Safe Cities
           </Link>

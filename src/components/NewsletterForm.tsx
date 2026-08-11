@@ -47,19 +47,19 @@ export default function NewsletterForm() {
   };
 
   return (
-    <section className="bg-[var(--navy)] py-12 md:py-16">
-      <div className="mx-auto flex max-w-4xl flex-col gap-6 px-6 md:flex-row md:items-center">
+    <section className="bg-surface-inverse">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8 px-4 py-12 sm:px-6 md:flex-row md:items-center md:py-14">
         <div className="md:w-1/2">
-          <h2 className="text-2xl font-semibold text-white md:text-3xl">
-            Stay in the loop for safer solo stays
+          <h2 className="font-display text-2xl font-semibold tracking-tight text-ink-inverse md:text-3xl">
+            Solo travel notes, a few times a year
           </h2>
-          <p className="mt-3 text-sm text-white/80 md:text-base">
-            Get occasional updates with new safer destinations, hotel picks and solo travel tips.
-            No spam, just genuinely helpful ideas.
+          <p className="mt-3 text-[0.9375rem] text-ink-inverse/70">
+            New destinations we&apos;ve looked into, stays worth knowing about, and practical tips
+            from women who travel on their own. No spam.
           </p>
         </div>
         <form onSubmit={handleSubmit} className="md:w-1/2">
-          <div className="flex flex-col gap-3 md:flex-row">
+          <div className="flex flex-col gap-2.5 sm:flex-row">
             <div className="flex-1">
               <TextField
                 id="newsletter-first-name"
@@ -69,7 +69,6 @@ export default function NewsletterForm() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="First name (optional)"
-                className="border-white/20 bg-white/10 text-white placeholder:text-white/70"
               />
             </div>
             <div className="flex-1">
@@ -80,30 +79,33 @@ export default function NewsletterForm() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email to get safer stay tips"
+                placeholder="you@example.com"
                 required
               />
             </div>
             <PrimaryButton
               type="submit"
+              variant="coral"
+              size="md"
+              fullWidth={false}
               disabled={status === "loading"}
-              className="mt-0 shrink-0 text-sm font-semibold sm:text-sm md:w-auto"
+              className="shrink-0"
             >
-              {status === "loading" ? "Joining..." : "Join newsletter"}
+              {status === "loading" ? "Joining…" : "Join"}
             </PrimaryButton>
           </div>
           {message && (
             <p
-              className={`mt-3 text-xs md:text-sm ${
-                status === "success" ? "text-[var(--ocean-teal-light)]" : "text-red-300"
+              role="status"
+              className={`mt-3 text-[0.8125rem] ${
+                status === "success" ? "text-teal-soft" : "text-coral-soft"
               }`}
             >
               {message}
             </p>
           )}
-          <p className="mt-2 text-[10px] text-white/60 md:text-[11px]">
-            By joining, you agree to receive occasional emails about solo travel and safer stays.
-            You can unsubscribe at any time.
+          <p className="mt-2.5 text-xs text-ink-inverse/50">
+            Occasional emails about solo travel and safer stays. Unsubscribe any time.
           </p>
         </form>
       </div>

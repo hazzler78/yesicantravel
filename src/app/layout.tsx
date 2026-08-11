@@ -1,24 +1,30 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Suspense } from "react";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import Chatbot from "../components/Chatbot";
 import AttributionBootstrap from "../components/AttributionBootstrap";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { textSizeBootstrapScript } from "@/components/layout/TextSizeControl";
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "948121024567031";
 const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  display: "swap",
+  axes: ["SOFT", "WONK", "opsz"],
 });
 
 export const metadata: Metadata = {
@@ -27,7 +33,10 @@ export const metadata: Metadata = {
     "p:domain_verify": "3e1e4ae20aa959e7498943dfcd7a909e",
   },
   icons: {
-    icon: "/logo.png",
+    icon: [
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/logo.png", type: "image/png" },
+    ],
   },
   title: {
     default: "Yes I Can Travel – Safe solo travel stays for women in Europe",
@@ -67,9 +76,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
-      >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: textSizeBootstrapScript }} />
+      </head>
+      <body className={`${inter.variable} ${fraunces.variable} flex min-h-screen flex-col`}>
         <Script id="pinterest-tag" strategy="afterInteractive">
           {`!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
 n=window.pintrk;n.queue=[],n.version="3.0";var
@@ -116,61 +126,17 @@ pintrk('page');`}
           />
         </noscript>
 
-        {children}
-        <footer className="mt-16 border-t border-[var(--sand)] bg-[var(--background)]">
-          <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-8 text-center text-sm text-[var(--navy-light)] md:flex-row md:text-left">
-            <p className="font-medium text-[var(--navy)]">
-              More solo travel safety tips on social
-            </p>
-            <div className="flex items-center gap-3">
-              <a
-                href="https://www.instagram.com/yes.i.can.travel"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Yes I Can Travel on Instagram"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
-              >
-                <span className="text-sm font-semibold">IG</span>
-              </a>
-              <a
-                href="https://www.pinterest.com/yesicantravel"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Yes I Can Travel on Pinterest"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
-              >
-                <span className="text-sm font-semibold">P</span>
-              </a>
-              <a
-                href="https://www.facebook.com/YesICanTravelTheWorld"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Yes I Can Travel on Facebook"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
-              >
-                <span className="text-sm font-semibold">f</span>
-              </a>
-              <a
-                href="https://www.twitter.com/yesicantravel"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Yes I Can Travel on X"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
-              >
-                <span className="text-sm font-semibold">X</span>
-              </a>
-              <a
-                href="https://www.tiktok.com/@yesicantravel"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Yes I Can Travel on TikTok"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--navy)] text-[var(--sand)] shadow-sm transition-colors hover:bg-[var(--ocean-teal)]"
-              >
-                <span className="text-sm font-semibold">Tt</span>
-              </a>
-            </div>
-          </div>
-        </footer>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-control focus:bg-ink focus:px-4 focus:py-2 focus:text-ink-inverse"
+        >
+          Skip to content
+        </a>
+        <SiteHeader />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <SiteFooter />
         <Suspense fallback={null}>
           <Chatbot />
         </Suspense>

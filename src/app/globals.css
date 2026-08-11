@@ -1,54 +1,111 @@
 @import "tailwindcss";
 
-:root {
-  --background: #faf8f6;
-  --foreground: #1b263b;
-  --coral: #e07a5f;
-  --coral-light: #f4a261;
-  --sand: #f2e9e4;
-  --ocean-teal: #2d6a6f;
-  --ocean-teal-light: #40916c;
-  --navy: #1b263b;
-  --navy-light: #415a77;
-  --plum: #6b4e71;
+/*
+  Design tokens. Semantic names only — components should never reach for a raw
+  hex or a brand-noun colour. The palette is deliberately small: one accent for
+  safety/trust (teal), one for action (coral, pulled toward the red in the logo
+  so the mark stops clashing with its own site), and a warm neutral ramp.
+*/
+@theme {
+  --color-canvas: #fbf9f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f4efe9;
+  --color-surface-inverse: #16233c;
+
+  --color-border: #e6dfd7;
+  --color-border-strong: #d3c8bc;
+
+  --color-ink: #16233c;
+  --color-ink-muted: #5a6377;
+  --color-ink-inverse: #f7f4f1;
+
+  --color-teal: #14595e;
+  --color-teal-hover: #0f4649;
+  --color-teal-soft: #e6f0ef;
+
+  --color-coral: #c9462f;
+  --color-coral-hover: #a8351f;
+  --color-coral-soft: #fbeeea;
+
+  --color-gold: #a9741a;
+  --color-positive: #1f7a4c;
+  --color-positive-soft: #e8f4ee;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+
+  --shadow-card: 0 1px 2px rgba(22, 35, 60, 0.06), 0 1px 3px rgba(22, 35, 60, 0.05);
+  --shadow-pop: 0 12px 32px -12px rgba(22, 35, 60, 0.28), 0 2px 6px rgba(22, 35, 60, 0.06);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-fraunces);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+/*
+  Legacy brand variables. Older pages still reference these directly; they are
+  mapped onto the new palette so nothing renders unstyled mid-migration.
+*/
+:root {
+  --background: var(--color-canvas);
+  --foreground: var(--color-ink);
+  --sand: var(--color-surface-muted);
+  --navy: var(--color-ink);
+  --navy-light: var(--color-ink-muted);
+  --ocean-teal: var(--color-teal);
+  --ocean-teal-light: var(--color-teal-hover);
+  --coral: var(--color-coral);
+  --coral-light: var(--color-coral-hover);
+  --plum: #6b4e71;
 }
 
-/* Larger base text for accessibility */
+/*
+  Base size is 16px. Readers who want larger text opt in via the control in the
+  site header, which writes this attribute and persists the choice.
+*/
 html {
+  font-size: 16px;
+}
+
+html[data-text-size="large"] {
   font-size: 18px;
 }
 
-/* Focus styles for keyboard navigation */
+html[data-text-size="xlarge"] {
+  font-size: 20px;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prices and dates should never jitter as digits change. */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
 *:focus-visible {
-  outline: 2px solid var(--ocean-teal);
+  outline: 2px solid var(--color-teal);
   outline-offset: 2px;
 }
 
+/* MailerLite injects its own markup, so the submit button is styled by class. */
 .lp-submit-button {
-  background-color: var(--ocean-teal) !important;
+  background-color: var(--color-teal) !important;
   color: white !important;
-  padding: 0.875rem 1.5rem !important;
-  border-radius: 0.5rem !important;
+  padding: 0.75rem 1.25rem !important;
+  border-radius: var(--radius-control) !important;
   font-weight: 600 !important;
-  font-size: 1rem !important;
+  font-size: 0.9375rem !important;
   width: 100% !important;
 }
 
 .lp-submit-button:hover {
-  background-color: var(--ocean-teal-light) !important;
+  background-color: var(--color-teal-hover) !important;
 }
 
 /*

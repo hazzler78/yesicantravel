@@ -2,9 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPlaceDetails } from "@/lib/liteapi";
 
 /** Extract latitude/longitude from various API response shapes (LiteAPI / Google-style). */
+function extractDisplayName(data: Record<string, unknown>): string | undefined {
+  const candidates: unknown[] = [data.displayName, data.name, data.formattedAddress];
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) return candidate.trim();
+    if (candidate && typeof candidate === "object") {
+      const text = (candidate as Record<string, unknown>).text;
+      if (typeof text === "string" && text.trim()) return text.trim();
+    }
+  }
+  return undefined;
+}
+
 function normalizePlaceLocation(raw: unknown): {
   location: { latitude: number; longitude: number };
   viewport?: { high: { latitude: number; longitude: number }; low: { latitude: number; longitude: number } };
+  displayName?: string;
 } | null {
   const obj = raw && typeof raw === "object" ? raw as Record<string, unknown> : null;
   if (!obj) return null;
@@ -50,6 +63,7 @@ function normalizePlaceLocation(raw: unknown): {
   return {
     location: { latitude: lat, longitude: lng },
     viewport,
+    displayName: extractDisplayName(data),
   };
 }
 

@@ -53,7 +53,12 @@ export function SearchBar({
   const listboxId = `${reactId}-places`;
 
   const [mode, setMode] = useState<SearchMode>(initialMode);
-  const [destination, setDestination] = useState(initialDestination);
+  // Null until typed, so a destination label that resolves after mount still shows.
+  const [typedDestination, setTypedDestination] = useState<string | null>(
+    initialDestination || null
+  );
+  const destination = typedDestination ?? initialDestination;
+  const setDestination = setTypedDestination;
   const [placeId, setPlaceId] = useState(initialPlaceId);
   const [vibe, setVibe] = useState(initialVibe);
   const [checkin, setCheckin] = useState(initialCheckin ?? isoDaysFromNow(14));

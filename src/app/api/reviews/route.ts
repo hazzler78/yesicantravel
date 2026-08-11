@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getHotelReviews } from "@/lib/liteapi";
+import { fixtureReviews } from "@/lib/__uiFixtures";
 
 export async function GET(request: NextRequest) {
   const hotelId = request.nextUrl.searchParams.get("hotelId");
@@ -15,6 +16,7 @@ export async function GET(request: NextRequest) {
   const getSentiment = request.nextUrl.searchParams.get("getSentiment") !== "false";
 
   try {
+    if (process.env.YICT_UI_FIXTURES === "1") return NextResponse.json(fixtureReviews());
     const data = await getHotelReviews(hotelId, { getSentiment, limit, timeout: 4 });
     // Cache at the edge for 10 min; stale-while-revalidate 1h. Reviews don't change minute-to-minute.
     return NextResponse.json(data, {

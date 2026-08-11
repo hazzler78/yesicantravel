@@ -10,6 +10,7 @@ export type HotelCardData = {
   main_photo?: string;
   address?: string;
   rating?: number;
+  reviewCount?: number;
   price?: number;
   currency?: string;
   hasFreeCancellation?: boolean;
@@ -55,14 +56,19 @@ export function HotelCard({ hotel, href, nights, onSelect }: HotelCardProps) {
 
         <div className="flex min-w-0 flex-1 flex-col gap-3 p-4 sm:flex-row sm:gap-5">
           <div className="min-w-0 flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <h3 className="min-w-0 font-display text-lg font-semibold leading-snug text-ink">
-                <Link href={href} onClick={onSelect} className="hover:text-teal">
-                  {hotel.name}
-                </Link>
-              </h3>
-              {hotel.rating != null && <RatingBadge rating={hotel.rating} className="shrink-0" />}
-            </div>
+            <h3 className="min-w-0 font-display text-lg font-semibold leading-snug text-ink">
+              <Link href={href} onClick={onSelect} className="hover:text-teal">
+                {hotel.name}
+              </Link>
+            </h3>
+
+            {hotel.rating != null && (
+              <RatingBadge
+                rating={hotel.rating}
+                reviewCount={hotel.reviewCount}
+                className="mt-2"
+              />
+            )}
 
             {hotel.address && (
               <p className="mt-1.5 flex items-start gap-1.5 text-[0.8125rem] text-ink-muted">

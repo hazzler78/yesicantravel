@@ -23,6 +23,7 @@ interface HotelBasic {
   main_photo?: string;
   address?: string;
   rating?: number;
+  reviewCount?: number;
 }
 
 interface HotelListItem extends HotelBasic, HotelCardData {
@@ -51,10 +52,20 @@ type SearchAnalyticsOutcome = {
 const SEARCH_SESSION_STORAGE_KEY = "yict_search_session_id";
 
 const DEFAULT_FILTERS: ResultsFilterState = {
-  minRating: 4,
+  minRating: 8,
   maxPrice: null,
   onlyFreeCancellation: false,
 };
+
+/**
+ * Guest scores arrive on a 10-point scale, star ratings on a 5-point one.
+ * Normalising to 10 keeps the badge and the rating filter meaning one thing.
+ */
+function normaliseRating(rating?: number, starRating?: number) {
+  if (typeof rating === "number" && rating > 0) return rating;
+  if (typeof starRating === "number" && starRating > 0) return starRating * 2;
+  return undefined;
+}
 
 function getSearchSessionId() {
   if (typeof window === "undefined") return undefined;
@@ -202,15 +213,22 @@ function ResultsContent() {
           );
           const byHotelId: Record<
             string,
-            { address?: string; rating?: number; lat?: number; lng?: number; safetyBadges?: string[] }
+            {
+              address?: string;
+              rating?: number;
+              reviewCount?: number;
+              lat?: number;
+              lng?: number;
+              safetyBadges?: string[];
+            }
           > = {};
           for (const d of details) {
             if (!d?.id) continue;
             const loc = d.location;
             byHotelId[d.id] = {
               address: d.address,
-              // Prefer guest review rating; fall back to star rating.
-              rating: typeof d.rating === "number" ? d.rating : d.starRating,
+              rating: normaliseRating(d.rating, d.starRating),
+              reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : undefined,
               lat: typeof loc?.latitude === "number" ? loc.latitude : undefined,
               lng: typeof loc?.longitude === "number" ? loc.longitude : undefined,
               safetyBadges: safetyBadgesFromHotel(d),
@@ -226,8 +244,8 @@ function ResultsContent() {
             return {
               ...h,
               address: extra.address ?? h.address,
-              // Again, prefer review rating from details, then any rating on the list item.
-              rating: extra.rating ?? h.rating,
+              rating: extra.rating ?? normaliseRating(h.rating),
+              reviewCount: extra.reviewCount,
               price: firstRate?.retailRate?.total?.[0]?.amount,
               currency: firstRate?.retailRate?.total?.[0]?.currency ?? "USD",
               hasFreeCancellation: freeCancellation,
@@ -278,8 +296,8 @@ function ResultsContent() {
             name: h.name,
             main_photo: h.main_photo ?? h.hotelImages?.[0]?.url,
             address: h.address,
-            // Prefer guest review rating if available; fall back to star rating.
-            rating: typeof h.rating === "number" ? h.rating : h.starRating,
+            rating: normaliseRating(h.rating, h.starRating),
+            reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
             price: rateByHotel[h.id]?.amount,
             currency: rateByHotel[h.id]?.currency ?? "USD",
             hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,

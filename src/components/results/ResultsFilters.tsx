@@ -14,9 +14,9 @@ type ResultsFiltersProps = ResultsFilterState & {
 
 const RATING_OPTIONS: Array<{ value: number | null; label: string }> = [
   { value: null, label: "Any" },
-  { value: 3, label: "3+" },
-  { value: 4, label: "4+" },
-  { value: 4.5, label: "4.5+" },
+  { value: 7, label: "7+" },
+  { value: 8, label: "8+" },
+  { value: 9, label: "9+" },
 ];
 
 const PRICE_OPTIONS: Array<{ value: number | null; label: string }> = [
@@ -92,6 +92,7 @@ export function ResultsFilters({
 
       <PillGroup
         legend="Guest rating"
+        hint="Out of 10, from verified stays"
         options={RATING_OPTIONS}
         value={minRating}
         onSelect={(value) => onChange({ minRating: value })}

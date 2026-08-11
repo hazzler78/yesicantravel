@@ -66,11 +66,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: textSizeBootstrapScript }} />
-      </head>
+    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${fraunces.variable} flex min-h-screen flex-col`}>
+        {/* Runs before the page paints so a stored text-size choice doesn't flash. */}
+        <script dangerouslySetInnerHTML={{ __html: textSizeBootstrapScript }} />
         <Script id="pinterest-tag" strategy="afterInteractive">
           {`!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
 n=window.pintrk;n.queue=[],n.version="3.0";var

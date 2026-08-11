@@ -58,6 +58,8 @@ interface HotelDetail {
   address?: string;
   city?: string;
   starRating?: number;
+  rating?: number;
+  reviewCount?: number;
   hotelDescription?: string;
   facilities?: Facility[];
   hotelFacilities?: string[];
@@ -361,6 +363,8 @@ function HotelContent() {
   const descriptionShort = description.length > 420 ? `${description.slice(0, 420).trim()}…` : description;
   const reviewScores = reviews.map((r) => r.averageScore).filter((s): s is number => typeof s === "number" && !Number.isNaN(s));
   const reviewAvg = reviewScores.length > 0 ? reviewScores.reduce((a, b) => a + b, 0) / reviewScores.length : null;
+  // The property's own aggregate is more representative than the sampled reviews.
+  const guestScore = typeof hotel.rating === "number" && hotel.rating > 0 ? hotel.rating : reviewAvg;
   const reviewsToShow = reviews.filter((r) => (r.pros && r.pros.trim()) || (r.cons && r.cons.trim())).slice(0, 5);
 
   const allRates = roomGroups.flatMap((group) => group.rates);
@@ -392,21 +396,24 @@ function HotelContent() {
             <h1 className="font-display text-2xl font-semibold tracking-tight text-ink md:text-3xl">
               {hotel.name}
             </h1>
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2">
               {hotel.address && (
                 <p className="flex items-center gap-1.5 text-[0.9375rem] text-ink-muted">
                   <MapPin className="h-4 w-4 shrink-0" aria-hidden />
                   {hotel.address}
                 </p>
               )}
-              {hotel.starRating != null && <RatingBadge rating={hotel.starRating} />}
-              {reviewAvg != null && (
+              {hotel.starRating != null && (
                 <span className="text-[0.9375rem] text-ink-muted">
-                  <span className="tnum font-semibold text-ink">{reviewAvg.toFixed(1)}/10</span> from{" "}
-                  {reviews.length} guest review{reviews.length === 1 ? "" : "s"}
+                  {hotel.starRating}-star property
                 </span>
               )}
             </div>
+            {guestScore != null && (
+              <div className="mt-3">
+                <RatingBadge rating={guestScore} reviewCount={hotel.reviewCount} />
+              </div>
+            )}
 
             {safetyBadges.length > 0 && (
               <Card className="mt-5 p-5">
@@ -436,10 +443,12 @@ function HotelContent() {
               <Card className="mt-4 p-5">
                 <div className="flex items-baseline justify-between gap-3">
                   <h2 className="font-display text-base font-semibold text-ink">What guests say</h2>
-                  {reviewAvg != null && (
+                  {guestScore != null && (
                     <span className="text-[0.8125rem] text-ink-muted">
-                      <span className="tnum font-semibold text-ink">{reviewAvg.toFixed(1)}/10</span>{" "}
-                      · {reviews.length} review{reviews.length === 1 ? "" : "s"}
+                      <span className="tnum font-semibold text-ink">{guestScore.toFixed(1)}/10</span>
+                      {hotel.reviewCount != null && hotel.reviewCount > 0 && (
+                        <> · {hotel.reviewCount.toLocaleString("en-GB")} reviews</>
+                      )}
                     </span>
                   )}
                 </div>

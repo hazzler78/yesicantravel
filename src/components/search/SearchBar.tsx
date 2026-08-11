@@ -36,6 +36,18 @@ function nextDay(iso: string) {
   return new Date(new Date(iso).getTime() + 86_400_000).toISOString().slice(0, 10);
 }
 
+/** How far ahead properties will quote. Also caps the native date picker's year field. */
+const BOOKING_WINDOW_DAYS = 730;
+
+function isBookableDate(iso: string, earliest: string, latest: string) {
+  const time = new Date(iso).getTime();
+  return (
+    Number.isFinite(time) &&
+    time >= new Date(earliest).getTime() &&
+    time <= new Date(latest).getTime()
+  );
+}
+
 export function SearchBar({
   variant = "hero",
   initialMode = "destination",
@@ -73,6 +85,10 @@ export function SearchBar({
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const minCheckin = isoDaysFromNow(0);
+  const maxDate = isoDaysFromNow(BOOKING_WINDOW_DAYS);
+  const minCheckout = checkin ? nextDay(checkin) : minCheckin;
 
   useEffect(() => () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -140,7 +156,13 @@ export function SearchBar({
       setFormError("Please choose your check-in and check-out dates.");
       return;
     }
-    if (checkout <= checkin) {
+    // Typing straight into a native date field can produce a year like 12026,
+    // which sorts before a four-digit year and would slip past a string compare.
+    if (!isBookableDate(checkin, minCheckin, maxDate) || !isBookableDate(checkout, minCheckin, maxDate)) {
+      setFormError("Please pick dates within the next two years.");
+      return;
+    }
+    if (new Date(checkout).getTime() <= new Date(checkin).getTime()) {
       setFormError("Check-out has to be after check-in.");
       return;
     }
@@ -211,8 +233,6 @@ export function SearchBar({
     "w-full min-w-0 border-0 bg-transparent p-0 text-[0.9375rem] font-medium text-ink placeholder-ink-muted/70 focus:outline-none focus:ring-0";
   const labelClass = "flex items-center gap-1.5 text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-muted";
 
-  const minCheckin = isoDaysFromNow(0);
-  const minCheckout = checkin ? nextDay(checkin) : minCheckin;
 
   return (
     <div ref={containerRef} className={`w-full ${className}`}>
@@ -317,6 +337,7 @@ export function SearchBar({
             type="date"
             value={checkin}
             min={minCheckin}
+            max={maxDate}
             className={`${inputClass} tnum mt-1`}
             onChange={(event) => {
               setCheckin(event.target.value);
@@ -338,6 +359,7 @@ export function SearchBar({
             type="date"
             value={checkout}
             min={minCheckout}
+            max={maxDate}
             className={`${inputClass} tnum mt-1`}
             onChange={(event) => {
               setCheckout(event.target.value);

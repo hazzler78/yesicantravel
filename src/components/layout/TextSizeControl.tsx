@@ -21,26 +21,28 @@ function isTextSize(value: string | undefined): value is TextSize {
  * layout keeps a normal density, and anyone who wants bigger type opts in here.
  */
 export function TextSizeControl({ className = "" }: { className?: string }) {
-  const [size, setSize] = useState<TextSize>("default");
+  // Null until we've read what the bootstrap script applied, so the first
+  // effect pass never clobbers a stored preference.
+  const [size, setSize] = useState<TextSize | null>(null);
 
   useEffect(() => {
-    const current = document.documentElement.dataset.textSize;
-    if (isTextSize(current)) setSize(current);
-  }, []);
-
-  const apply = (next: TextSize) => {
-    setSize(next);
-    if (next === "default") {
-      delete document.documentElement.dataset.textSize;
+    const root = document.documentElement;
+    if (size === null) {
+      const current = root.dataset.textSize;
+      setSize(isTextSize(current) ? current : "default");
+      return;
+    }
+    if (size === "default") {
+      delete root.dataset.textSize;
     } else {
-      document.documentElement.dataset.textSize = next;
+      root.dataset.textSize = size;
     }
     try {
-      window.localStorage.setItem(TEXT_SIZE_STORAGE_KEY, next);
+      window.localStorage.setItem(TEXT_SIZE_STORAGE_KEY, size);
     } catch {
       // Private-mode browsers block storage; the choice just won't persist.
     }
-  };
+  }, [size]);
 
   return (
     <div className={`flex items-center gap-1.5 ${className}`}>
@@ -57,7 +59,7 @@ export function TextSizeControl({ className = "" }: { className?: string }) {
             title={option.title}
             aria-label={option.title}
             aria-pressed={size === option.value}
-            onClick={() => apply(option.value)}
+            onClick={() => setSize(option.value)}
             className={`flex h-7 w-7 items-center justify-center rounded-[0.375rem] font-semibold leading-none transition-colors ${option.className} ${
               size === option.value
                 ? "bg-ink text-ink-inverse"

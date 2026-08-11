@@ -67,7 +67,7 @@ export default async function AdminHomePage() {
   const stats = await getQuickStats();
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10 text-[var(--navy)]">
+    <div className="mx-auto max-w-6xl px-6 py-10 text-[var(--navy)]">
       <h1 className="text-3xl font-bold">Admin Dashboard</h1>
       <p className="mt-2 text-sm text-[var(--navy-light)]">
         Central hub for operations dashboards. This page is intentionally modular so new admin widgets can be added
@@ -104,6 +104,6 @@ export default async function AdminHomePage() {
           </article>
         ))}
       </section>
-    </main>
+    </div>
   );
 }

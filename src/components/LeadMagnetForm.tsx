@@ -49,7 +49,7 @@ export default function LeadMagnetForm() {
   };
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 space-y-3">
+    <form onSubmit={onSubmit} className="mt-4 space-y-3">
       <TextField
         id="lead-first-name"
         label="First name (optional)"
@@ -57,7 +57,6 @@ export default function LeadMagnetForm() {
         value={firstName}
         onChange={(e) => setFirstName(e.target.value)}
         placeholder="First name"
-        className="border-[var(--sand)] text-sm"
       />
       <TextField
         id="lead-email"
@@ -67,13 +66,15 @@ export default function LeadMagnetForm() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
-        className="border-[var(--sand)] text-sm"
       />
-      <PrimaryButton type="submit" disabled={status === "loading"} className="text-sm font-semibold sm:text-sm">
-        {status === "loading" ? "Sending..." : "Get the free safety checklist"}
+      <PrimaryButton type="submit" variant="coral" size="md" disabled={status === "loading"}>
+        {status === "loading" ? "Sending…" : "Send me the checklist"}
       </PrimaryButton>
       {message && (
-        <p className={`text-sm ${status === "success" ? "text-[var(--ocean-teal)]" : "text-[var(--coral)]"}`}>
+        <p
+          role="status"
+          className={`text-[0.8125rem] ${status === "success" ? "text-positive" : "text-coral"}`}
+        >
           {message}
         </p>
       )}

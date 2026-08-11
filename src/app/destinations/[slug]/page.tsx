@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Check, Dot } from "lucide-react";
 import { notFound } from "next/navigation";
 import {
   getDestinationBySlug,
@@ -103,7 +104,7 @@ export default async function DestinationPage({ params }: Props) {
       : null;
 
   return (
-    <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
+    <div className="bg-canvas">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
@@ -118,72 +119,67 @@ export default async function DestinationPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
-      <div className="mx-auto max-w-3xl px-6 py-12 md:py-16">
-        <nav aria-label="Breadcrumb" className="mb-4 text-sm text-[var(--navy-light)]">
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:py-12">
+        <nav aria-label="Breadcrumb" className="mb-4 text-sm text-ink-muted">
           <Link href="/" className="hover:underline">Home</Link>
           <span className="mx-2">/</span>
           <Link href="/popular-cities" className="hover:underline">Destinations</Link>
           <span className="mx-2">/</span>
-          <span className="text-[var(--navy)]">{dest.city}</span>
+          <span className="text-ink">{dest.city}</span>
         </nav>
-        <Link
-          href="/"
-          className="mb-8 inline-block text-[var(--ocean-teal)] font-medium hover:underline"
-        >
-          ← Back to search
-        </Link>
-
-        <header className="mb-10">
-          <p className="mb-2 text-sm font-medium uppercase tracking-wider text-[var(--ocean-teal)]">
+        <header className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
             {dest.city}, {dest.country}
           </p>
-          <h1 className="mb-2 text-4xl font-bold tracking-tight text-[var(--navy)] md:text-5xl">
-            {dest.headline} – {dest.eventDateRange}
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-ink md:text-4xl">
+            {dest.headline}
           </h1>
-          <p className="mb-4 text-2xl font-medium text-[var(--navy)]">in {dest.city}</p>
-          <p className="text-xl text-[var(--navy-light)]">{dest.subheadline}</p>
+          <p className="tnum mt-2 text-lg font-medium text-ink">{dest.eventDateRange}</p>
+          <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted md:text-base">
+            {dest.subheadline}
+          </p>
         </header>
 
-        <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">Why now?</h2>
-          <p className="mb-4 rounded-lg bg-[var(--ocean-teal)]/10 px-4 py-3 text-lg font-bold text-[var(--navy)]">
+        <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+          <h2 className="mb-3 font-display text-lg font-semibold text-ink">Why now?</h2>
+          <p className="mb-4 rounded-control bg-teal-soft px-4 py-2.5 text-[0.9375rem] font-semibold text-ink">
             Event Dates: {dest.eventDateRange}
           </p>
-          <p className="mb-4 text-[var(--navy-light)]">{dest.whyDemand}</p>
-          <p className="text-sm font-medium text-[var(--ocean-teal)]">{dest.events}</p>
+          <p className="mb-4 text-ink-muted">{dest.whyDemand}</p>
+          <p className="text-sm font-medium text-teal">{dest.events}</p>
         </section>
 
-        <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">How we help</h2>
-          <ul className="space-y-2 text-[var(--navy-light)]">
+        <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+          <h2 className="mb-3 font-display text-lg font-semibold text-ink">How we help</h2>
+          <ul className="space-y-2 text-ink-muted">
             <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
+              <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
               Filter for rating, budget and free cancellation; see safety signals on each stay
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
+              <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
               Neighbourhood safety tips and area guidance
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
+              <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
               Free cancellation options so you stay flexible
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
+              <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
               Stays reviewed and rated by women travellers
             </li>
           </ul>
         </section>
 
         {dest.knownFor && dest.knownFor.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">
+          <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-3 font-display text-lg font-semibold text-ink">
               What {dest.city} is known for
             </h2>
-            <ul className="space-y-2 text-[var(--navy-light)]">
+            <ul className="space-y-2 text-ink-muted">
               {dest.knownFor.map((item) => (
                 <li key={item} className="flex items-start gap-2">
-                  <span className="text-[var(--ocean-teal)]">•</span>
+                  <Dot className="mt-0.5 h-4 w-4 shrink-0 text-teal" aria-hidden />
                   {item}
                 </li>
               ))}
@@ -192,28 +188,28 @@ export default async function DestinationPage({ params }: Props) {
         )}
 
         {dest.neighbourhoods && dest.neighbourhoods.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-[var(--navy)]">
+          <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-4 font-display text-lg font-semibold text-ink">
               Where to stay – neighbourhood guide
             </h2>
             <div className="space-y-5">
               {dest.neighbourhoods.map((n) => (
                 <div key={n.name}>
                   <div className="mb-1 flex items-center gap-2">
-                    <h3 className="text-base font-semibold text-[var(--navy)]">
+                    <h3 className="font-display text-base font-semibold text-ink">
                       {n.name}
                     </h3>
                     <span
                       className={
                         n.verdict === "recommended"
-                          ? "rounded-full bg-[var(--ocean-teal)]/10 px-2 py-0.5 text-xs font-medium text-[var(--ocean-teal)]"
-                          : "rounded-full bg-[var(--coral)]/10 px-2 py-0.5 text-xs font-medium text-[var(--coral)]"
+                          ? "rounded-full bg-positive-soft px-2 py-0.5 text-xs font-medium text-positive"
+                          : "rounded-full bg-coral-soft px-2 py-0.5 text-xs font-medium text-coral"
                       }
                     >
                       {n.verdict === "recommended" ? "Recommended" : "Extra awareness"}
                     </span>
                   </div>
-                  <p className="text-sm text-[var(--navy-light)]">{n.description}</p>
+                  <p className="text-sm text-ink-muted">{n.description}</p>
                 </div>
               ))}
             </div>
@@ -221,14 +217,14 @@ export default async function DestinationPage({ params }: Props) {
         )}
 
         {dest.safetyTips && dest.safetyTips.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">
+          <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-3 font-display text-lg font-semibold text-ink">
               Solo female safety tips for {dest.city}
             </h2>
-            <ul className="space-y-2 text-[var(--navy-light)]">
+            <ul className="space-y-2 text-ink-muted">
               {dest.safetyTips.map((tip, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="text-[var(--ocean-teal)]">✓</span>
+                  <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
                   {tip}
                 </li>
               ))}
@@ -237,56 +233,56 @@ export default async function DestinationPage({ params }: Props) {
         )}
 
         {dest.gettingAround && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">
+          <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-3 font-display text-lg font-semibold text-ink">
               Getting around safely
             </h2>
-            <p className="text-sm text-[var(--navy-light)]">{dest.gettingAround}</p>
+            <p className="text-sm text-ink-muted">{dest.gettingAround}</p>
           </section>
         )}
 
         {dest.faqs && dest.faqs.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-[var(--navy)]">
+          <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-4 font-display text-lg font-semibold text-ink">
               Frequently asked questions
             </h2>
             <dl className="space-y-5">
               {dest.faqs.map((f) => (
                 <div key={f.question}>
-                  <dt className="mb-1 font-semibold text-[var(--navy)]">{f.question}</dt>
-                  <dd className="text-sm text-[var(--navy-light)]">{f.answer}</dd>
+                  <dt className="mb-1 font-semibold text-ink">{f.question}</dt>
+                  <dd className="text-sm text-ink-muted">{f.answer}</dd>
                 </div>
               ))}
             </dl>
           </section>
         )}
 
-        <div className="rounded-2xl border-2 border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/5 p-6">
-          <p className="mb-2 text-sm font-medium text-[var(--ocean-teal)]">
+        <div className="rounded-card bg-surface-inverse p-6">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-teal-soft/70">
             Your search is set for {dest.eventShortName}: {dest.eventDateRange}
           </p>
           <p className="mb-2">
-            <Link href="/" className="text-sm text-[var(--navy-light)] hover:underline">
-              Change dates →
+            <Link href="/" className="text-[0.8125rem] text-ink-inverse/70 underline-offset-4 hover:underline">
+              Change dates
             </Link>
           </p>
-          <p className="mb-4 text-lg font-semibold text-[var(--navy)]">
+          <p className="mb-4 font-display text-lg font-semibold text-ink">
             Ready to find your stay in {dest.city}?
           </p>
-          <p className="mb-6 text-[var(--navy-light)]">
+          <p className="mb-5 text-[0.9375rem] text-ink-inverse/70">
             Event dates pre-filled • Edit anytime on the results page
           </p>
           <Link
             href={searchUrl}
-            className="inline-block rounded-lg bg-[var(--ocean-teal)] px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-[var(--ocean-teal-light)]"
+            className="inline-block inline-flex min-h-[52px] items-center justify-center rounded-control bg-coral px-6 text-base font-semibold text-white transition-colors hover:bg-coral-hover"
           >
             Find Safer Stays in {dest.city} – {dest.eventDateRange}
           </Link>
         </div>
 
         {related.length > 0 && (
-          <section className="mt-12 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-[var(--navy)]">
+          <section className="mt-12 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-4 font-display text-lg font-semibold text-ink">
               Other safer stays for solo women
             </h2>
             <ul className="grid gap-3 sm:grid-cols-2">
@@ -294,15 +290,15 @@ export default async function DestinationPage({ params }: Props) {
                 <li key={r.slug}>
                   <Link
                     href={`/destinations/${r.slug}`}
-                    className="block rounded-lg border border-[var(--sand)] p-4 transition-colors hover:border-[var(--ocean-teal)]"
+                    className="block rounded-card border border-border bg-surface p-4 transition-colors hover:border-border-strong"
                   >
-                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--ocean-teal)]">
+                    <p className="text-xs font-medium uppercase tracking-wider text-teal">
                       {r.country}
                     </p>
-                    <p className="mt-1 font-semibold text-[var(--navy)]">
+                    <p className="mt-1 font-semibold text-ink">
                       {r.city} – {r.eventShortName}
                     </p>
-                    <p className="mt-1 text-sm text-[var(--navy-light)]">
+                    <p className="mt-1 text-sm text-ink-muted">
                       {r.eventDateRange}
                     </p>
                   </Link>
@@ -312,12 +308,6 @@ export default async function DestinationPage({ params }: Props) {
           </section>
         )}
 
-        <p className="mt-8 text-center text-sm text-[var(--navy-light)]">
-          <Link href="/" className="text-[var(--ocean-teal)] hover:underline">
-            Yes I Can Travel
-          </Link>{" "}
-          – safety-first booking for women travelling solo.
-        </p>
       </div>
     </div>
   );

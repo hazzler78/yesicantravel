@@ -11,8 +11,6 @@ export interface PopularCity {
   description: string;
   /** Query for results page aiSearch param */
   aiSearch: string;
-  /** Optional image path (public). Omit for placeholder. */
-  image?: string;
 }
 
 export const popularCities: PopularCity[] = [
@@ -22,7 +20,6 @@ export const popularCities: PopularCity[] = [
     country: "France",
     description: "Central, well-lit neighbourhoods and 24/7 reception stays.",
     aiSearch: "central safe hotel Paris France well-lit",
-    image: "/20260309_Paris_Trending_destination.png",
   },
   {
     slug: "berlin",
@@ -30,7 +27,6 @@ export const popularCities: PopularCity[] = [
     country: "Germany",
     description: "Safe solo-friendly hotels near transport and busy areas.",
     aiSearch: "central safe hotel Berlin Germany well-lit",
-    image: "/20260309_Berlin_Trending_destination.png",
   },
   {
     slug: "amsterdam",
@@ -38,7 +34,6 @@ export const popularCities: PopularCity[] = [
     country: "Netherlands",
     description: "Women-rated stays in safe, well-connected areas.",
     aiSearch: "central safe hotel Amsterdam Netherlands well-lit",
-    image: "/20260309_Amsterdam_Trending_destination.png",
   },
   {
     slug: "barcelona",
@@ -46,7 +41,6 @@ export const popularCities: PopularCity[] = [
     country: "Spain",
     description: "24/7 reception and well-lit neighbourhoods.",
     aiSearch: "central safe hotel Barcelona Spain well-lit",
-    image: "/20260309_Barcelona_Trending_destination.png",
   },
   {
     slug: "milan",
@@ -54,7 +48,6 @@ export const popularCities: PopularCity[] = [
     country: "Italy",
     description: "Solo-friendly stays with safety filters.",
     aiSearch: "central safe hotel Milan Italy well-lit",
-    image: "/20260309_Milan_Trending__destination.png",
   },
   {
     slug: "london",
@@ -62,7 +55,6 @@ export const popularCities: PopularCity[] = [
     country: "UK",
     description: "Reviewed by women travellers, central options.",
     aiSearch: "central safe hotel London UK well-lit",
-    image: "/20260309_London_Trending_destination.png",
   },
 ];
 

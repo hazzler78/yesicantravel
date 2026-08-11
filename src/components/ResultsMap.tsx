@@ -65,7 +65,7 @@ export default function ResultsMap({ placeDetails, hotels, className = "" }: Res
         zoom={12}
         scrollWheelZoom={true}
         style={{ height: "100%", width: "100%", minHeight: 280 }}
-        className="rounded-xl z-0"
+        className="z-0"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -77,24 +77,21 @@ export default function ResultsMap({ placeDetails, hotels, className = "" }: Res
         {hotelsWithCoords.map((h) => (
           <Marker key={h.id} position={[h.lat, h.lng]} title={h.name}>
             <Popup>
-              <div className="min-w-[140px]">
-                <p className="font-semibold text-[var(--navy)]">
+              <div className="min-w-[150px]">
+                <p className="font-semibold text-ink">
                   {h.href ? (
-                    <a
-                      href={h.href}
-                      className="text-[var(--ocean-teal)] hover:underline"
-                    >
+                    <a href={h.href} className="text-teal underline-offset-4 hover:underline">
                       {h.name}
                     </a>
                   ) : (
                     h.name
                   )}
                 </p>
-                {h.address && <p className="text-sm text-[var(--navy-light)]">{h.address}</p>}
-                {h.rating != null && <p className="text-[var(--ocean-teal)]">★ {h.rating}</p>}
+                {h.address && <p className="mt-0.5 text-xs text-ink-muted">{h.address}</p>}
                 {h.price != null && (
-                  <p className="text-sm font-medium text-[var(--ocean-teal)]">
-                    {formatStayTotal(h.price, h.currency ?? "USD")} total stay
+                  <p className="tnum mt-1 text-[0.8125rem] font-semibold text-ink">
+                    {formatStayTotal(h.price, h.currency ?? "EUR")}
+                    <span className="font-normal text-ink-muted"> total</span>
                   </p>
                 )}
               </div>

@@ -109,7 +109,7 @@ export default async function SearchAnalyticsPage({
   const data = await getSearchDashboard(days);
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-10 text-[var(--navy)]">
+    <div className="mx-auto max-w-7xl px-6 py-10 text-[var(--navy)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-3xl font-bold">Search Analytics</h1>
@@ -262,6 +262,6 @@ export default async function SearchAnalyticsPage({
           </div>
         </article>
       </section>
-    </main>
+    </div>
   );
 }

@@ -51,21 +51,12 @@ export const metadata: Metadata = {
     title: "Yes I Can Travel – Safe solo travel stays for women in Europe",
     description:
       "Safe solo travel stays for women in Europe & worldwide. Women-reviewed hotels with 24/7 reception, safety filters & expert tips. Book confidently and feel prepared.",
-    images: [
-      {
-        url: "/logo.png",
-        width: 512,
-        height: 512,
-        alt: "Yes I Can Travel logo",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Yes I Can Travel – Safe solo travel stays for women in Europe",
     description:
       "Safe solo travel stays for women in Europe & worldwide. Women-reviewed hotels with 24/7 reception, safety filters & expert tips. Book confidently and feel prepared.",
-    images: ["/logo.png"],
   },
 };
 

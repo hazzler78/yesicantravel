@@ -37,30 +37,48 @@ export default async function BlogIndexPage() {
   }
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10 text-[var(--navy)]">
-      <h1 className="text-3xl font-bold">Solo Travel Safety Blog</h1>
-      <p className="mt-3 text-[var(--navy-light)]">
-        Practical destination guides and booking-safe tips for women traveling solo.
-      </p>
-
-      <div className="mt-8 space-y-4">
-        {dbUnavailable && (
-          <p className="text-sm text-[var(--coral)]">
-            Blog is temporarily unavailable while data connection is being restored.
+    <div className="bg-canvas">
+      <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 md:py-14">
+        <header className="max-w-2xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">Guides</p>
+          <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink md:text-4xl">
+            Solo travel, city by city
+          </h1>
+          <p className="mt-3 text-[0.9375rem] text-ink-muted md:text-base">
+            Practical destination guides and booking tips for women travelling on their own.
           </p>
-        )}
-        {posts.length === 0 && <p className="text-sm text-[var(--navy-light)]">No published guides yet.</p>}
-        {posts.map((post) => (
-          <article key={post.id} className="rounded-xl border border-[var(--sand)] bg-white p-5 shadow-sm">
-            <h2 className="text-xl font-semibold">
-              <Link className="hover:underline" href={`/blog/${post.slug}`}>
-                {post.title}
-              </Link>
-            </h2>
-            {post.excerpt && <p className="mt-2 text-sm text-[var(--navy-light)]">{post.excerpt}</p>}
-          </article>
-        ))}
+        </header>
+
+        <div className="mt-8 space-y-3">
+          {dbUnavailable && (
+            <p className="rounded-card border border-border bg-coral-soft p-4 text-[0.9375rem] text-ink">
+              Guides are temporarily unavailable while we restore the data connection.
+            </p>
+          )}
+          {!dbUnavailable && posts.length === 0 && (
+            <p className="rounded-card border border-border bg-surface p-6 text-[0.9375rem] text-ink-muted">
+              No published guides yet — the first ones are on the way.
+            </p>
+          )}
+          {posts.map((post) => (
+            <article
+              key={post.id}
+              className="rounded-card border border-border bg-surface p-5 shadow-card transition-colors hover:border-border-strong"
+            >
+              <h2 className="font-display text-xl font-semibold text-ink">
+                <Link className="hover:text-teal" href={`/blog/${post.slug}`}>
+                  {post.title}
+                </Link>
+              </h2>
+              {post.excerpt && (
+                <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-muted">
+                  {post.excerpt}
+                </p>
+              )}
+            </article>
+          ))}
+        </div>
       </div>
-    </main>
+    </div>
   );
 }

@@ -531,8 +531,80 @@ export const events: Event[] = [
     endDate: "2026-08-30",
     category: "festival",
     aiSearchTemplate: "safe hotels Paris near Parc de Saint-Cloud Rock en Seine well-lit",
-    venueNotes: "Parc de Saint-Cloud, Paris",
-    whyNow: "Major outdoor festival with strong pop, rock and indie acts; chic Parisian vibe mixed with nature.",
+    placeQuery: "Paris, France",
+    venueNotes: "Domaine national de Saint-Cloud, at the western edge of Paris",
+    whyNow:
+      "Five days at the Domaine national de Saint-Cloud, just outside the Périphérique. The festival schedules every set to finish before the metro stops, so where you stay decides whether the night ends with a twenty-minute ride or a €40 taxi.",
+    knownFor: [
+      "Five days of headliners in the grounds of a former royal estate",
+      "Sets timed to end before the last metro",
+      "Boulogne-Billancourt and the 16th on the doorstep",
+      "Central Paris twenty minutes away on line 10",
+    ],
+    neighbourhoods: [
+      {
+        name: "Along metro line 10 (5th, 6th, 7th, 15th)",
+        description:
+          "Line 10 runs from Gare d'Austerlitz straight to the festival terminus at Boulogne–Pont de Saint-Cloud, so anywhere on it turns the journey into one ride with no changes at midnight. The Latin Quarter and Saint-Germain ends are busy and well lit late; the 15th is quieter and cheaper for the same line.",
+        verdict: "recommended",
+      },
+      {
+        name: "Boulogne-Billancourt",
+        description:
+          "The suburb immediately across the bridge from the festival, residential and unglamorous, with the shortest walk back of anywhere. Fifteen minutes from the entrance on foot and still on the metro for the rest of Paris. The trade-off is that it goes quiet early and it is not where you would spend a non-festival evening.",
+        verdict: "recommended",
+      },
+      {
+        name: "Montmartre and the 9th",
+        description:
+          "A proper Paris base with plenty going on late, but it is across the city from Saint-Cloud and needs at least one change. Fine if the festival is one part of a longer trip; frustrating if you are going out to the site five nights running.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around Gare du Nord and Barbès",
+        description:
+          "The cheapest central beds and the busiest transport links, and the streets immediately around both stations are the ones Parisians most often warn visitors about after dark — crowded, heavily worked by pickpockets, and uncomfortable rather than dangerous. If you book here, take the metro to the door rather than walking the last stretch.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Metro line 10 to its terminus at Boulogne–Pont de Saint-Cloud, then a ten to fifteen minute walk across the bridge, is the simplest way in. Tram T2 to Parc de Saint-Cloud is the alternative and drops you closer.",
+      "Concerts are deliberately scheduled to finish before the metro and tram stop — around 00:30 on Friday and Saturday and 23:30 on the other nights. That only helps if you leave with the crowd rather than after it.",
+      "Leaving fifteen or twenty minutes before the last act finishes turns a slow crush over the bridge into a walk. It is the single most useful thing to know about this festival.",
+      "If you do miss the last metro, Noctilien night buses N12 and N61 stop at Pont de Sèvres, a short distance from the site.",
+      "Parking around the Domaine is very limited and the roads clog after headliners. Do not plan to drive, and if someone is collecting you, arrange it at the metro station rather than at the gates.",
+      "Pickpocketing in Paris concentrates on crowded metro lines and station concourses, not on the festival site. Keep your phone out of an open back pocket on line 10 and at Châtelet.",
+    ],
+    gettingAround:
+      "Charles de Gaulle connects to the centre on the RER B in about 35 minutes; Orly is closer and now on metro line 14, which runs late. For the festival itself, line 10 is the direct route — Boulogne–Pont de Saint-Cloud is the terminus, then you cross the Pont de Saint-Cloud on foot. Tram T2 stops at Parc de Saint-Cloud, a five to twelve minute walk from the entrance, and buses 52, 72 and 126 stop nearby. Transilien trains from Saint-Lazare also reach Saint-Cloud station, about ten minutes from the gates.",
+    faqs: [
+      {
+        question: "When is Rock en Seine 2026?",
+        answer:
+          "Rock en Seine 2026 runs from Wednesday 26 to Sunday 30 August at the Domaine national de Saint-Cloud, on the western edge of Paris. Gates open in the afternoon and headliners close each night.",
+      },
+      {
+        question: "How do I get to the festival from central Paris?",
+        answer:
+          "Take metro line 10 to its terminus, Boulogne–Pont de Saint-Cloud, then walk across the Pont de Saint-Cloud — around ten to fifteen minutes to the main entrance at Place Georges Clemenceau. Tram T2 to Parc de Saint-Cloud is slightly closer to the gates. Driving is a bad idea: parking around the Domaine is very limited.",
+      },
+      {
+        question: "Will I be able to get back after the last set?",
+        answer:
+          "Yes — the festival schedules sets to end before public transport closes, roughly 00:30 on Friday and Saturday and 23:30 on the other nights. The crush is at the bridge and on the platform right after the headliner, so leaving fifteen minutes early makes a real difference. Noctilien buses N12 and N61 at Pont de Sèvres cover you if you miss it.",
+      },
+      {
+        question: "Where should I stay for Rock en Seine?",
+        answer:
+          "Anywhere on metro line 10 keeps the journey to a single ride with no changes late at night, which is the thing that matters most here. Boulogne-Billancourt is the closest base of all. Staying in eastern or northern Paris means at least one change each way, five nights running.",
+      },
+      {
+        question: "Is Paris safe for a woman going to a festival alone?",
+        answer:
+          "The site itself is stewarded and busy, and the realistic Paris risk is pickpocketing on crowded metro lines rather than anything at the festival. The part worth planning is the return journey: know your line, leave before the final crush, and if you are staying near Gare du Nord or Barbès take the metro to the door rather than walking the last few streets.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "nos-alive-lisbon-2026",
@@ -627,6 +699,77 @@ export const events: Event[] = [
     venueNotes: "Theresienwiese, Munich",
     whyNow:
       "The 191st Wiesn runs 16 days and fills Munich's hotels city-wide. Rooms near the Hauptbahnhof and Theresienwiese are the first to go, and prices roughly double against a normal September week.",
+    knownFor: [
+      "Sixteen days of tents on the Theresienwiese, free to enter",
+      "The Oide Wiesn, the quieter traditional corner of the festival",
+      "Marienplatz, the Viktualienmarkt and the English Garden",
+      "Day trips to Neuschwanstein and the Bavarian lakes",
+    ],
+    neighbourhoods: [
+      {
+        name: "Ludwigsvorstadt / Theresienwiese",
+        description:
+          "The streets immediately around the festival grounds. Unbeatable for stumbling home in ten minutes rather than queueing for a U-Bahn, and priced accordingly. Note that a traffic cordon closes the ring of streets around the Theresienwiese for the duration — only residents, staff and hotel guests inside the zone get access, so arrive by train and confirm your hotel's entry instructions.",
+        verdict: "recommended",
+      },
+      {
+        name: "Glockenbachviertel and Isarvorstadt",
+        description:
+          "South of the centre, a walkable district of bars, cafés and Munich's LGBTQ+ scene, with the Isar riverbank on the doorstep. Two U-Bahn stops from the Wiesn on the U3/U6 via Goetheplatz or Poccistraße, and considerably calmer than the festival streets when you want to sleep.",
+        verdict: "recommended",
+      },
+      {
+        name: "Altstadt (Marienplatz and around)",
+        description:
+          "The old town puts you on the U3/U6 with a short ride to Goetheplatz and leaves you somewhere worth being on a non-festival morning. Busy and well-lit late; the trade-off is price and the volume of dirndl-clad groups passing through in the evening.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around the Hauptbahnhof",
+        description:
+          "The cheapest beds within walking distance of the Wiesn, and the most mixed streets in central Munich. The station itself is staffed and busy, but the blocks immediately north and west of it feel transient after dark. If you book here for the price, pick a hotel with a staffed reception and take the short tram or U-Bahn hop rather than walking back at 1am.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "The Wiesn has a free Safe Space for women and girls, run by the Sichere Wiesn campaign since 2003 and staffed by psychologists and social workers. It sits in the Servicezentrum behind the Schottenhamel tent at the \"Erste Hilfe\" entrance, next to the police post. Open daily 18:00–01:00, and from 15:30 on Fridays, Saturdays, Sundays and 2–3 October. They will give you somewhere calm to wait, help you organise a way home, walk you to a taxi, and go with you to the police if you want that.",
+      "Save the Safe Space number before you go: +49 89 890 57 45 188, staffed during the festival. Emergency numbers are 112 for ambulance and 110 for police.",
+      "Skip the Theresienwiese U-Bahn station at peak times — it gets crowded enough that staff sometimes close it. Schwanthalerhöhe (U4/U5), Goetheplatz or Poccistraße (U3/U6) are each about ten minutes' walk and far calmer, as is the S-Bahn to Hackerbrücke.",
+      "Tents stop serving around 22:30 and close about 23:30, which produces one enormous simultaneous exit. Leaving half an hour early is the difference between a walk and a crush.",
+      "A Maß is a full litre of beer at roughly 6% — stronger than most people expect, and served faster than you can pace. Order water between rounds; every tent serves it.",
+      "Since 2023 you can request a fixed fare when booking a Munich taxi by phone or app, which removes the haggling at the ranks.",
+      "Agree a meeting point with anyone you arrive with before you go in. Phone signal on the grounds is unreliable at peak times and tents are far too loud for calls.",
+    ],
+    gettingAround:
+      "Munich Airport (MUC) is 40 kilometres out; the S1 and S8 both run into the centre in about 45 minutes and are the cheapest and most predictable option. Memmingen (FMM), sold as \"Munich West\", is really an hour and a half away by coach. In the city, the U-Bahn runs until roughly 01:30 at ten-minute intervals during the festival, and all lines run through the night at 30-minute intervals from Friday to Sunday. Driving is not worth attempting: a large cordon closes the streets around the Theresienwiese and there is no parking at the grounds.",
+    faqs: [
+      {
+        question: "When is Oktoberfest 2026?",
+        answer:
+          "The 191st Oktoberfest runs from Saturday 19 September to Sunday 4 October 2026 on the Theresienwiese in Munich, sixteen days in total. It opens at noon on the 19th when the Lord Mayor taps the first keg in the Schottenhamel tent; no beer is served before that.",
+      },
+      {
+        question: "Is Oktoberfest safe for a woman on her own?",
+        answer:
+          "Plenty of women go alone and have a good time. The realistic risks are pickpocketing, drinking more than you planned because a Maß is a full litre, and unwanted attention in crowded tents late in the evening. The festival runs a dedicated free Safe Space for women and girls in the Servicezentrum behind the Schottenhamel tent, staffed by trained women who can help you get home safely — worth knowing where it is before you need it.",
+      },
+      {
+        question: "Do I need a tent reservation?",
+        answer:
+          "Entry to the grounds and to the tents is free, and there is no ticket for Oktoberfest itself. Tables are a different matter: much of the seating is reserved, and tents close their doors when they fill, particularly on evenings and weekends. Arriving before noon on a weekday gives you a realistic chance of a table without a booking.",
+      },
+      {
+        question: "Where should I stay for Oktoberfest?",
+        answer:
+          "Anywhere on the U3/U6 or U4/U5 puts you a few minutes from the grounds without paying festival-adjacent prices. Glockenbachviertel and the Altstadt are the easiest bases for a solo trip — central, walkable and lively enough late that you are not the only person on the street. Book early: the whole city fills, not just the streets by the Theresienwiese.",
+      },
+      {
+        question: "How late does public transport run during Oktoberfest?",
+        answer:
+          "The U-Bahn runs until about 01:30 every night at ten-minute intervals, and every line runs right through the night at 30-minute intervals from Friday to Sunday. Since the tents empty around 23:30, you have time — but the platforms are at their worst in the half hour after closing.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "berlin-marathon-2026",
@@ -659,6 +802,76 @@ export const events: Event[] = [
     venueNotes: "300+ venues across the city",
     whyNow:
       "ADE's 30th anniversary turns the whole city into the venue for five days and nights. Because events run until the early hours, a central stay with a staffed reception matters more here than the usual city break.",
+    knownFor: [
+      "Five days of club nights across 300-plus venues",
+      "Paradiso and Melkweg, both a short walk from Leidseplein",
+      "Warehouse programmes at Westergasfabriek and NDSM Wharf",
+      "The canal ring, walkable end to end in under an hour",
+    ],
+    neighbourhoods: [
+      {
+        name: "De Pijp",
+        description:
+          "Dense with restaurants and small bars, dominated by locals rather than stag parties, and on the Noord-Zuidlijn metro. The walk back through residential streets is lit and populated at any hour, which is why it is one of the most commonly recommended bases for women travelling alone. Night buses N81 and N82 serve it from Centraal.",
+        verdict: "recommended",
+      },
+      {
+        name: "Jordaan and the canal ring",
+        description:
+          "The postcard Amsterdam: narrow streets, brown cafés, quiet by midnight. Central enough to walk home from most ADE venues in the centre, calm enough to sleep when you get there. Expensive, and worth it if you want the city rather than the party outside your window.",
+        verdict: "recommended",
+      },
+      {
+        name: "Oud-West",
+        description:
+          "Residential, well connected by tram, and cheaper than the canal ring for the same short distances. De Foodhallen and the Vondelpark are on the doorstep. Night buses N83 and N84 run out this way from Centraal.",
+        verdict: "recommended",
+      },
+      {
+        name: "De Wallen (Red Light District) and around Centraal",
+        description:
+          "Well policed and not dangerous, but between roughly 23:00 and 02:00 the combination of stag groups, narrow bottlenecked streets and heavy drinking makes it the part of central Amsterdam solo travellers most often say they would rather not walk through. The blocks immediately around Centraal Station are the other spot worth avoiding overnight.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Trams and the metro stop around 00:30 — which is roughly when ADE gets going. Plan the way back before you go out: GVB night buses (lines N81 to N93) run from 00:30 to 07:30, all starting and ending at Centraal, hourly on most lines and every 30 minutes on some on Friday and Saturday.",
+      "Night buses are pay-as-you-board by contactless card or phone, tapped at the front of the bus. Drivers do not sell tickets, so don't rely on cash.",
+      "If you are heading to a party at NDSM in Amsterdam Noord, check the ferry: the 906 stops running around 00:30 and doesn't resume until the morning. Getting back means a night bus or a taxi, not the boat you arrived on.",
+      "Pickpocketing is the realistic risk here, not violence — crowded trams, Centraal Station and busy venue entrances. A zipped bag worn in front covers most of it.",
+      "Uber, Bolt and licensed TCA taxis all operate; a central late-night ride is usually in the region of €15 to €25. Book in the app rather than accepting an offer on the street.",
+      "Cycling home at 3am is completely normal here, but only if you are sober and confident in traffic. Amsterdam's junctions are unforgiving of hesitation, and bike theft is the city's highest-volume crime.",
+    ],
+    gettingAround:
+      "Schiphol is fifteen to twenty minutes from Centraal by train, running through the night, which makes a late arrival straightforward. In the city, ADE venues are spread across four clusters: the centre (Paradiso, Melkweg, near Leidseplein), Amsterdam West (Westergasfabriek), Noord (NDSM, reached by ferry from behind Centraal) and Zuidoost (the Arena area, on the metro). Staying central keeps you within walking or night-bus distance of most of it; staying in Noord means depending on a ferry that stops overnight.",
+    faqs: [
+      {
+        question: "When is Amsterdam Dance Event 2026?",
+        answer:
+          "ADE 2026 runs from Wednesday 21 to Sunday 25 October, its 30th anniversary edition. The ADE Pro conference runs Wednesday to Saturday; the festival programme runs across all five days and nights in venues throughout the city.",
+      },
+      {
+        question: "Is there one ticket for ADE?",
+        answer:
+          "No. ADE is not a single festival with one wristband — individual club nights and concerts are ticketed separately by the venues, and many sell out well in advance. The ADE Pro Pass covers the conference plus access to festival and arts events, which is the closest thing to an all-in ticket.",
+      },
+      {
+        question: "Is Amsterdam safe for a solo woman during ADE?",
+        answer:
+          "Amsterdam has low violent crime and comparatively little street harassment, and central neighbourhoods stay populated late. The two things that catch people out during ADE are transport and pace: trams stop at 00:30 when the night is just starting, and events run to 6am. Decide how you are getting back before you go out, and keep an eye on your drink in crowded venues as you would anywhere.",
+      },
+      {
+        question: "Where should I stay for ADE?",
+        answer:
+          "De Pijp, Oud-West and the canal ring are the practical picks: central, residential, well lit, and served by night buses from Centraal. Staying in Noord looks cheap until you realise the ferry stops overnight. If you want to sleep at all, avoid the streets immediately around Leidseplein and Rembrandtplein.",
+      },
+      {
+        question: "How do I get back to my hotel after 1am?",
+        answer:
+          "Night buses cover the whole city from 00:30 to 07:30, all of them running from Centraal, and they are CCTV-equipped and busy with people doing exactly what you are doing. Leidseplein and Rembrandtplein are the two main pick-up points besides Centraal, both with taxi ranks. Uber and Bolt work well and are cheap for central journeys.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "web-summit-lisbon-2026",
@@ -675,6 +888,76 @@ export const events: Event[] = [
     venueNotes: "MEO Arena and FIL, Parque das Nações",
     whyNow:
       "More than 70,000 attendees arrive in one week and Lisbon's hotel stock is small for that. Staying on the red metro line keeps you a direct ride from the venue and out of late-night taxi queues.",
+    knownFor: [
+      "Parque das Nações, the riverfront district built for Expo '98",
+      "Alfama's fado houses and the miradouro viewpoints",
+      "Tram 28 through the old city — iconic and heavily pickpocketed",
+      "Night Summit events spread across bars in the centre",
+    ],
+    neighbourhoods: [
+      {
+        name: "Parque das Nações",
+        description:
+          "The venue district itself: modern, wide, well lit, and two metro stops from the airport. You trade old-Lisbon atmosphere for walking to the conference in ten minutes and never queueing for a taxi. A sensible pick if your days start early and the evenings are the point.",
+        verdict: "recommended",
+      },
+      {
+        name: "Chiado",
+        description:
+          "Central, upmarket and walkable, with cafés that are comfortable to sit in alone and a metro connection that reaches the venue with one change. The most frequently recommended first-time base in Lisbon for women travelling solo, and quiet enough to sleep while still being somewhere.",
+        verdict: "recommended",
+      },
+      {
+        name: "Príncipe Real",
+        description:
+          "Gentrified, leafy and on a hill above Bairro Alto — close enough to walk down into the nightlife, far enough up that the noise doesn't follow you home. One of the calmer central evening neighbourhoods.",
+        verdict: "recommended",
+      },
+      {
+        name: "Bairro Alto and Cais do Sodré",
+        description:
+          "Where Lisbon drinks. The bar grid is busy and policed until around 3am at weekends and the street-drinking culture keeps people moving through it, so it is rarely empty — but it is loud, crowded and full of bar promoters, and the quieter side streets off it are where petty crime concentrates. Good for a night out, difficult for a night's sleep.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Pickpocketing is Lisbon's one real tourist risk, and Tram 28 is the single most targeted route in the city. Ride it early in the day if you ride it at all, and keep your bag zipped and in front of you.",
+      "The metro closes around 01:00. After that, Bolt and Uber are cheap — usually €5 to €10 for a central journey — and both give you a named driver and a fixed fare in the app.",
+      "Lisbon is built on hills and cobbles that turn slippery in November rain. Shoes you can walk down a wet calçada in matter more than they sound like they do.",
+      "Use ATMs inside bank branches rather than standalone machines on quiet streets; card skimming is the more common financial scam here.",
+      "In restaurants, the bread, olives and butter placed on your table are the couvert and will be charged for unless you wave them away. Not a scam, just worth knowing.",
+      "Around Intendente and the deeper end of Martim Moniz, the metro station surroundings are the most commonly reported spots for hassle after dark. Fine by day, worth a Bolt at night.",
+    ],
+    gettingAround:
+      "Humberto Delgado Airport sits inside the city, two red-line metro stops from Oriente and the conference — about ten minutes, step-free at both ends, and the simplest airport transfer of any European capital hosting an event this size. For the historic centre, stay on the red line and change at Alameda for the green line or São Sebastião for the blue. The metro runs until around 01:00; after that Bolt and Uber are cheap and plentiful, which matters because Web Summit's Night Summit programme runs in bars across the centre, well away from the venue.",
+    faqs: [
+      {
+        question: "When is Web Summit Lisbon 2026?",
+        answer:
+          "Web Summit runs from 9 to 12 November 2026 at the MEO Arena and the FIL exhibition centre in Parque das Nações. The 9th is largely a pre-conference day of workshops and networking; the main programme runs from the 10th to the 12th.",
+      },
+      {
+        question: "Where should I stay for Web Summit?",
+        answer:
+          "Parque das Nações puts you within walking distance of the venue and two metro stops from the airport, which is worth a lot during a week when 70,000 other people are trying to get to the same place. If you would rather be in the old city, stay anywhere on the red line or one change from it — Chiado and Príncipe Real are the easiest central bases for a solo trip.",
+      },
+      {
+        question: "Is Lisbon safe for solo female travellers?",
+        answer:
+          "Lisbon consistently ranks among the safer European capitals for women travelling alone, with low violent crime and mild street harassment by regional standards. The genuine risk is pickpocketing in crowded tourist spots, and Tram 28 in particular. Central districts stay busy and lit in the evening; the areas worth more care are the quieter side streets off Bairro Alto and around Intendente late at night.",
+      },
+      {
+        question: "How do I get from the airport to the venue?",
+        answer:
+          "Take the red metro line from Aeroporto to Oriente — two stops, roughly ten minutes, with lifts at both ends. Oriente exits directly into the Vasco da Gama centre and the Parque das Nações esplanade. A taxi or Bolt for the same journey is a few euros and useful with heavy luggage.",
+      },
+      {
+        question: "Do Web Summit hotels sell out?",
+        answer:
+          "Yes, and earlier than people expect. Lisbon's hotel stock is small relative to a 70,000-person conference, and prices in the surrounding week rise sharply. Booking something with free cancellation as soon as your dates are fixed is the cheap insurance here.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "vienna-christmas-markets-2026",
@@ -692,6 +975,76 @@ export const events: Event[] = [
     venueNotes: "Rathausplatz, Spittelberg, Schönbrunn and more",
     whyNow:
       "The Rathausplatz Christkindlmarkt runs from 13 November, with Schönbrunn open into January. Weekends in December are the busiest and priciest — midweek stays inside the Ringstraße are both cheaper and easier to walk home from.",
+    knownFor: [
+      "The Christkindlmarkt on Rathausplatz, one of Europe's largest",
+      "Spittelberg's craft market through the lanes of the 7th district",
+      "The Schönbrunn Palace market, open into January",
+      "Coffee houses built for sitting alone for two hours",
+    ],
+    neighbourhoods: [
+      {
+        name: "Innere Stadt (1st district)",
+        description:
+          "Inside the Ringstraße, walking distance to Rathausplatz, Stephansplatz and the Freyung market. Expensive, and the reason to pay it is that after a market closes you are ten minutes from your room on lit, busy streets rather than working out a tram. Comfortable to walk at any hour.",
+        verdict: "recommended",
+      },
+      {
+        name: "Neubau (7th district)",
+        description:
+          "The Spittelberg market runs through this district's lanes, surrounded by independent shops and small restaurants along Mariahilfer Straße. Central without Innere Stadt prices, well connected on the U3, and residential enough to be quiet by midnight.",
+        verdict: "recommended",
+      },
+      {
+        name: "Wieden and Margareten (4th and 5th)",
+        description:
+          "South of the centre around the Naschmarkt and Karlsplatz, on the U1, U2 and U4. A short ride to every market, cheaper beds, and streets that stay populated in the evening. A good compromise if the first district is beyond budget.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around Praterstern and Westbahnhof",
+        description:
+          "Both are major interchanges with cheap hotels attached, and both have a visible street-drinking and drug scene at the station entrances that has drawn sustained police attention. The trains and the stations themselves are fine; it is the immediate surroundings late at night that most solo travellers would rather skip.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Vienna's U-Bahn is one of Europe's safest and runs all night on Fridays, Saturdays and before public holidays; on other nights it stops around 00:30 and night buses take over. Markets close well before that, so the timing rarely bites.",
+      "Pickpocketing is the one real risk and it concentrates exactly where you are going: crowded market stalls, Stephansplatz, Karlsplatz and the U1 and U3 through the tourist stations. Bag zipped, worn in front, phone out of your back pocket.",
+      "Glühwein is served in a real mug with a deposit of a few euros, refunded when you return it. Nobody is trying to overcharge you — the deposit is standard at every market.",
+      "Validate a paper transit ticket before you board. Vienna runs proof-of-payment with no barriers and the fine for travelling without a validated ticket is around €105.",
+      "Ignore the costumed Mozart ticket sellers outside the Staatsoper and Stephansdom. The concerts are real but overpriced; book directly with the venue if you want to go.",
+      "December afternoons get dark before 16:00 and the markets run into the evening, so most of your visit happens after sunset. Staying inside the Ringstraße or one U-Bahn stop from it turns the walk home into a non-event.",
+    ],
+    gettingAround:
+      "Vienna International (VIE) is 18 kilometres east. The S7 city train takes about 25 minutes to Wien Mitte for a few euros, and the City Airport Train covers the same route faster for several times the price — check ÖBB before you travel, as engineering work has been affecting that corridor. A regulated taxi to the centre runs €40 to €50, and Bolt and Uber are similar. Once you are in the city there is no reason to use anything but the U-Bahn and trams: the network reaches every market, runs every few minutes, and is clean and visibly staffed.",
+    faqs: [
+      {
+        question: "When do Vienna's Christmas markets open in 2026?",
+        answer:
+          "The flagship Christkindlmarkt on Rathausplatz runs from 13 November to 26 December 2026, daily from 10:00 to 22:00. Spittelberg runs 13 November to 23 December, the Freyung market from 14 November, and Schönbrunn Palace opens earliest and stays latest — 6 November 2026 to 6 January 2027.",
+      },
+      {
+        question: "Which market should I go to if I only have one evening?",
+        answer:
+          "Rathausplatz is the big one and the one that photographs, but it is also the most crowded. Spittelberg, threaded through the lanes of the 7th district, is the one people tend to prefer once they have seen both: smaller stalls, more craft than tat, and easier to move through. They are fifteen minutes apart on foot.",
+      },
+      {
+        question: "Is Vienna safe for a solo woman in December?",
+        answer:
+          "Vienna is among the safest large cities in Europe and regularly tops liveability rankings; violent crime against visitors is rare and street harassment is minimal. The realistic risk is pickpocketing in market crowds. Because it gets dark by four, most of a December visit happens after sunset — which is normal here, and the central districts stay busy and well lit.",
+      },
+      {
+        question: "Where should I stay for the Christmas markets?",
+        answer:
+          "Inside the Ringstraße puts every central market within walking distance, which is worth more in December than it sounds. Neubau near Spittelberg is the best-value central alternative. Weekends in December are both the busiest and the most expensive — a midweek stay costs less and lets you actually reach a stall.",
+      },
+      {
+        question: "How much cash should I bring?",
+        answer:
+          "Cards are accepted widely in Vienna, but individual market stalls are more mixed, and the Glühwein mug deposit is usually a cash transaction. Carrying twenty or thirty euros in small notes saves hunting for an ATM in the cold.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "amsterdam-light-festival-2026",
@@ -709,6 +1062,76 @@ export const events: Event[] = [
     venueNotes: "Along the canal ring, free to walk",
     whyNow:
       "The 15th edition lights the canals for 53 nights on a brand-new route. The artworks are free to walk, which makes this one of the few winter city breaks where the main attraction costs nothing.",
+    knownFor: [
+      "Light installations along the canal ring, free to walk",
+      "Canal cruises and guided walks through the route",
+      "The Rijksmuseum, Van Gogh Museum and Anne Frank House",
+      "Brown cafés built for a long evening indoors",
+    ],
+    neighbourhoods: [
+      {
+        name: "Canal ring (Grachtengordel)",
+        description:
+          "The route runs through it, so staying here means the festival is the walk home rather than an outing. Quiet after midnight, lit, and the most central base you can pick. Expensive in the way canal-front Amsterdam always is.",
+        verdict: "recommended",
+      },
+      {
+        name: "Jordaan",
+        description:
+          "A few minutes west of the canal ring and calmer than anywhere else this central. Brown cafés with a fire on, a village feel, and streets that stay comfortable to walk in the evening. Good if you want to see the lights and then be somewhere warm and quiet.",
+        verdict: "recommended",
+      },
+      {
+        name: "De Pijp",
+        description:
+          "Twenty minutes' walk or one metro stop from the southern end of the canal ring, with the city's best concentration of restaurants and a locals-first feel. Well lit and busy on the way back, and cheaper than staying on the water.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around Centraal Station",
+        description:
+          "Convenient for arriving and for the ferries, and the least pleasant part of central Amsterdam to be walking through late at night. If you book here, it is worth knowing that the walk south into the canal ring improves within two or three streets.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "It is dark by half four in December, which is the point — but it also means a whole evening of walking in the cold. Waterproof shoes and gloves matter more than they sound like they do; the canals funnel wind.",
+      "The artworks are free and outdoors, so there is no ticket to lose and no queue. Paid cruises and walking tours go on sale in October and the good slots go early.",
+      "Canal edges in Amsterdam have no railings. That is normal here and fine sober; it is the one genuine hazard of walking the route after a few Glühwein equivalents.",
+      "Trams and the metro stop around 00:30, with GVB night buses from 00:30 to 07:30 running from Centraal. The lights go off well before that, so timing is rarely a problem.",
+      "Pickpocketing is the realistic risk in viewing crowds and on busy trams. Bag zipped and worn in front covers it.",
+      "The lights go out early on New Year's Eve — around 21:00 — and Amsterdam's amateur fireworks that night are genuinely chaotic at street level. Plan somewhere indoors if you are there on the 31st.",
+    ],
+    gettingAround:
+      "Schiphol is fifteen to twenty minutes from Centraal by train, running through the night. Once you are here, the festival route is designed to be walked: the canal ring is compact enough to cross on foot in under an hour, and the lit sections are exactly the streets you would want to be walking anyway. Trams cover the longer hops until about 00:30 and night buses take over after that, all running from Centraal.",
+    faqs: [
+      {
+        question: "When is the Amsterdam Light Festival 2026/27?",
+        answer:
+          "The 15th edition runs from 26 November 2026 to 17 January 2027 — 53 nights, on a brand-new route through the city to mark the anniversary. The lights come on around 17:00 and stay on until 22:00 or 23:00 depending on the night.",
+      },
+      {
+        question: "Is it free?",
+        answer:
+          "The light artworks are free and publicly accessible; you can walk the whole route without paying anything. Canal cruises, bike tours and guided walks are ticketed and are how the non-profit behind the festival funds it. Tickets go on sale in October.",
+      },
+      {
+        question: "Is Amsterdam safe to walk at night in winter?",
+        answer:
+          "Yes — central Amsterdam has low violent crime and streets that stay populated, and walking the canal ring in the evening is a thing thousands of people do every night of this festival. Pickpocketing in crowds is the realistic risk. The one physical hazard worth naming is that Amsterdam's canals have no railings.",
+      },
+      {
+        question: "Where should I stay to walk the route?",
+        answer:
+          "Anywhere in or immediately around the canal ring — Grachtengordel itself, the Jordaan just west of it, or De Pijp to the south. All three put the route on your doorstep and give you a lit, populated walk home afterwards.",
+      },
+      {
+        question: "Is it worth going in January rather than December?",
+        answer:
+          "January is cheaper, quieter and colder. The route is identical and runs to 17 January, so if you would rather see the artworks without December crowds and December hotel prices, the first two weeks of January are the better trip.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "venice-carnival-2027",
@@ -742,6 +1165,76 @@ export const events: Event[] = [
     venueNotes: "Wiener Staatsoper, Kärntner Ring",
     whyNow:
       "The 69th Opera Ball ends at 5am, so a hotel within walking distance of the Staatsoper is worth more than the room itself. It is also the peak of Vienna's ball season, when the whole first district books out.",
+    knownFor: [
+      "The Staatsoper turned into a ballroom for one night",
+      "A season of several hundred Viennese balls from January to March",
+      "Formal dress: floor-length gown or white tie, strictly enforced",
+      "The city's coffee houses and museums the morning after",
+    ],
+    neighbourhoods: [
+      {
+        name: "Innere Stadt, around the Staatsoper",
+        description:
+          "The reason to stay here is the walk home at five in the morning in a floor-length gown and February temperatures. Kärntner Straße, the Ring and the streets behind the opera house are lit and patrolled all night, and you can be in your room in ten minutes rather than negotiating a taxi rank with several hundred other people.",
+        verdict: "recommended",
+      },
+      {
+        name: "Wieden (4th district)",
+        description:
+          "Immediately south of the Ring around Karlsplatz and the Naschmarkt, on the U1, U2 and U4. Ten minutes from the Staatsoper, noticeably cheaper than the first district, and busy enough in the evening to be comfortable.",
+        verdict: "recommended",
+      },
+      {
+        name: "Neubau (7th district)",
+        description:
+          "The Museumsquartier end of the 7th is a short tram ride or twenty-minute walk from the opera house, with independent restaurants and a residential feel. Good value if you want somewhere to be during the day as well as a bed after the ball.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around Westbahnhof",
+        description:
+          "Cheap hotels attached to a major interchange, and a station forecourt with a visible street-drinking scene late at night. The U3 and U6 will get you back at any hour, but the last two hundred metres are the part solo travellers tend to regret booking.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "The ball runs from 20:15 to 05:00 and the dress code is absolute: floor-length gown, or white tie for men. People are turned away. Vienna has a well-established gown rental trade if buying one for a single night makes no sense.",
+      "Tickets are sold through the Vienna State Opera directly. Anything offered elsewhere at short notice is worth treating with suspicion, as is the costumed Mozart ticket seller outside the Staatsoper — that is a different, permanent hustle aimed at tourists.",
+      "The U-Bahn runs all night on Fridays and Saturdays, and 4 February 2027 is a Thursday — so the network stops around 00:30 and night buses take over long before the ball ends. Either walk, or arrange a taxi in advance rather than joining the 5am rank.",
+      "February in Vienna sits around freezing. A gown, a cloakroom and a five-minute walk is manageable; a gown and a twenty-minute wait for a car is not. Cloakroom queues at the end are long.",
+      "Pickpocketing in Vienna concentrates on the U1 and U3 through Stephansplatz and Karlsplatz. It is low by European standards but the tourist stations are where it happens.",
+      "Validate a paper transit ticket before boarding — Vienna runs proof-of-payment with no barriers and the fine is around €105.",
+    ],
+    gettingAround:
+      "Vienna International (VIE) is 18 kilometres east: the S7 city train reaches Wien Mitte in about 25 minutes for a few euros, and the City Airport Train does it faster for several times the price. Check ÖBB before travelling, as engineering work has been affecting that corridor. In the city, the Staatsoper sits on the Ring at Karlsplatz, served by the U1, U2 and U4 and by several tram lines — but on a Thursday night the U-Bahn stops around 00:30, hours before the ball does, so plan the journey back rather than assuming it.",
+    faqs: [
+      {
+        question: "When is the Vienna Opera Ball 2027?",
+        answer:
+          "The 69th Vienna Opera Ball is on Thursday 4 February 2027 at the Wiener Staatsoper. Doors open at 20:15, the opening ceremony begins at 22:00 with the debutantes and the Blue Danube waltz, and the ball officially ends at 05:00.",
+      },
+      {
+        question: "What is the dress code?",
+        answer:
+          "Floor-length evening gown for women, white tie for men. It is enforced at the door, not treated as a suggestion. Renting is completely normal — Vienna has a long-established trade in ball gowns and tails precisely because of this season.",
+      },
+      {
+        question: "Can I go to the Opera Ball alone?",
+        answer:
+          "Yes. It is a ball rather than a paired event, and plenty of people attend solo or in small groups. The practical considerations are the same ones everyone faces: the dress code, the cloakroom queue at the end, and getting home at five in the morning in February — all of which are easier if you are staying within walking distance.",
+      },
+      {
+        question: "Where should I stay for the Opera Ball?",
+        answer:
+          "Inside the Ring, as close to the Staatsoper as your budget allows. The first district is expensive and this is the one night where it pays for itself: a ten-minute walk home beats a taxi rank shared with several thousand people at 5am. Wieden, just south of Karlsplatz, is the best-value alternative.",
+      },
+      {
+        question: "Is Vienna safe to walk in at night?",
+        answer:
+          "Vienna is one of the safest large cities in Europe, and the first district is lit, populated and patrolled at all hours — including at five in the morning during ball season, when you will not be the only person in evening dress on the street. The areas worth avoiding late are the immediate surroundings of Praterstern and Westbahnhof.",
+      },
+    ],
+    contentVerified: false,
   },
   {
     id: "keukenhof-2027",

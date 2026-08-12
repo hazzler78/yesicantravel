@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, FormEvent } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import { MessageCircle, SendHorizonal, X } from "lucide-react";
 
 type ChatMessage = {
   id: string;
@@ -122,24 +123,22 @@ export default function Chatbot() {
       <div className="pointer-events-auto flex w-full max-w-[22rem] flex-col items-stretch gap-3 sm:w-80">
         {isOpen && (
           <div
-            className="flex max-h-[min(28rem,calc(100dvh-6.5rem))] flex-col overflow-hidden rounded-2xl border border-[var(--navy)]/15 bg-[var(--sand)] shadow-xl"
+            className="flex max-h-[min(28rem,calc(100dvh-6.5rem))] flex-col overflow-hidden rounded-card border border-border bg-surface-muted shadow-pop"
             role="dialog"
             aria-label="Yes I Can Travel chat assistant"
           >
-            <div className="flex shrink-0 items-center justify-between rounded-t-2xl bg-[var(--navy)] px-4 py-3 text-sm text-white">
+            <div className="flex shrink-0 items-center justify-between bg-surface-inverse px-4 py-3 text-ink-inverse">
               <div className="min-w-0 flex-col">
-                <span className="block font-semibold">Yes I Can Travel</span>
-                <span className="block text-xs text-[var(--sand)]">
-                  Safer solo stays assistant
-                </span>
+                <span className="block text-[0.9375rem] font-semibold">Atlas</span>
+                <span className="block text-xs text-ink-inverse/60">Travel assistant</span>
               </div>
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-base hover:bg-[var(--navy-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ocean-teal)]"
+                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-inverse/80 hover:bg-white/10 hover:text-ink-inverse"
                 aria-label="Close chat"
               >
-                ✕
+                <X className="h-4 w-4" aria-hidden />
               </button>
             </div>
             <div
@@ -156,12 +155,12 @@ export default function Chatbot() {
                   <div
                     className={`rounded-2xl px-3 py-2 ${
                       message.role === "user"
-                        ? "max-w-[80%] bg-[var(--ocean-teal)] text-white"
-                        : "max-w-[85%] bg-white text-[var(--foreground)]"
+                        ? "max-w-[80%] bg-teal text-white"
+                        : "max-w-[85%] bg-surface text-ink"
                     }`}
                   >
                     {message.role === "assistant" ? (
-                      <div className="chat-markdown max-w-none whitespace-pre-line text-sm leading-snug [&_p]:my-1 [&_strong]:font-semibold [&_a]:text-[var(--ocean-teal)] [&_a]:underline">
+                      <div className="chat-markdown max-w-none whitespace-pre-line text-[0.875rem] leading-snug [&_a]:text-teal [&_a]:underline [&_p]:my-1 [&_strong]:font-semibold">
                         <ReactMarkdown
                           components={{
                             p: ({ children }) => <p className="my-1">{children}</p>,
@@ -173,7 +172,7 @@ export default function Chatbot() {
                                 href={href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-[var(--ocean-teal)] underline"
+                                className="text-teal underline"
                               >
                                 {children}
                               </a>
@@ -193,7 +192,7 @@ export default function Chatbot() {
               ))}
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="rounded-2xl bg-white px-3 py-2 text-xs text-[var(--navy-light)]">
+                  <div className="rounded-card bg-surface px-3 py-2 text-xs text-ink-muted">
                     Thinking…
                   </div>
                 </div>
@@ -201,7 +200,7 @@ export default function Chatbot() {
             </div>
             <form
               onSubmit={handleSubmit}
-              className="shrink-0 border-t border-[var(--navy)]/10 bg-[var(--background)] px-3 py-2.5"
+              className="shrink-0 border-t border-border bg-canvas px-3 py-2.5"
             >
               <div className="flex items-end gap-2">
                 <label className="sr-only" htmlFor="chat-input">
@@ -219,15 +218,16 @@ export default function Chatbot() {
                     }
                   }}
                   rows={1}
-                  className="box-border max-h-24 min-h-[44px] min-w-0 flex-1 resize-none rounded-lg border border-[var(--navy)]/15 bg-white px-3 py-2.5 text-base text-[var(--navy)] shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ocean-teal)]"
+                  className="box-border max-h-24 min-h-[44px] min-w-0 flex-1 resize-none rounded-control border border-border bg-surface px-3 py-2.5 text-[0.9375rem] text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal/30"
                   placeholder="Ask anything, or paste text to translate…"
                 />
                 <button
                   type="submit"
                   disabled={isLoading || !input.trim()}
-                  className="inline-flex min-h-[44px] shrink-0 items-center justify-center rounded-full bg-[var(--ocean-teal)] px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-[var(--ocean-teal-light)] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex min-h-[44px] w-11 shrink-0 items-center justify-center rounded-control bg-teal text-white transition hover:bg-teal-hover disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Send
+                  <SendHorizonal className="h-4 w-4" aria-hidden />
+                  <span className="sr-only">Send</span>
                 </button>
               </div>
             </form>
@@ -236,14 +236,16 @@ export default function Chatbot() {
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
-          className="ml-auto flex min-h-[44px] items-center gap-2 self-end rounded-full bg-[var(--ocean-teal)] px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition hover:bg-[var(--ocean-teal-light)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ocean-teal-light)]"
+          className="ml-auto flex min-h-[44px] items-center gap-2 self-end rounded-full bg-ink px-4 text-[0.9375rem] font-semibold text-ink-inverse shadow-pop transition hover:bg-ink/90"
           aria-expanded={isOpen}
           aria-label={isOpen ? "Hide chat assistant" : "Open chat assistant"}
         >
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--sand)] text-xs font-bold text-[var(--ocean-teal)]">
-            {isOpen ? "✕" : "?"}
-          </span>
-          <span>{isOpen ? "Close" : "Ask about your stay"}</span>
+          {isOpen ? (
+            <X className="h-4 w-4" aria-hidden />
+          ) : (
+            <MessageCircle className="h-4 w-4" aria-hidden />
+          )}
+          <span>{isOpen ? "Close" : "Ask a question"}</span>
         </button>
       </div>
     </div>

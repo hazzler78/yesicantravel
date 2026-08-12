@@ -2,11 +2,16 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { CalendarDays, Check, MapPin } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { pinterestTrack } from "@/lib/pinterest";
+import { formatStayTotal } from "@/lib/formatStayPrice";
+import { BookingSuccess } from "@/components/checkout/BookingSuccess";
+import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
+import { Card } from "@/components/ui/Card";
+import { SecondaryLink } from "@/components/ui/SecondaryButton";
 
 interface Booking {
   bookingId?: string;
@@ -110,85 +115,121 @@ function ConfirmationContent() {
 
   if (!bookingId) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--sand)] text-[var(--navy)]">
-        <p className="text-[var(--coral)]">No booking ID provided.</p>
-        <Link href="/" className="text-[var(--ocean-teal)] font-medium hover:underline">← Back to search</Link>
-      </div>
+      <CheckoutMessage
+        title="No booking reference"
+        body="We need a booking reference to look up your reservation. Check the link in your confirmation email."
+        actionHref="/"
+        actionLabel="Back to search"
+      />
     );
   }
 
+  const refundable = booking?.cancellationPolicies?.refundableTag === "RFN";
+  const cancelBy = booking?.cancellationPolicies?.cancelPolicyInfos?.[0]?.cancelTime;
+
   return (
-    <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-      <div className="mx-auto max-w-2xl px-6 py-10">
-        <Link href="/" className="mb-8 inline-block text-[var(--ocean-teal)] font-medium hover:underline">
-          ← New search
-        </Link>
-
-        <div className="mb-8 rounded-xl border border-[var(--ocean-teal)]/30 bg-[var(--ocean-teal)]/10 p-6">
-          <h1 className="mb-2 text-2xl font-bold text-[var(--ocean-teal)]">You&apos;re all set</h1>
-          <p className="text-[var(--navy)]">
-            Your booking reference: <strong>{booking?.bookingId ?? bookingId}</strong>
-          </p>
-          {booking?.hotelConfirmationCode && (
-            <p className="mt-1 text-[var(--navy-light)]">
-              Hotel confirmation: {booking.hotelConfirmationCode}
-            </p>
-          )}
-          {booking?.status && (
-            <p className="mt-1 text-[var(--navy-light)]">Status: {booking.status}</p>
-          )}
-        </div>
-
+    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+      <BookingSuccess
+        bookingId={booking?.bookingId ?? bookingId}
+        hotelConfirmationCode={booking?.hotelConfirmationCode}
+        actions={<SecondaryLink href="/">Plan another trip</SecondaryLink>}
+      >
         {booking?.hotel && (
-          <div className="overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-white shadow-sm">
-            <h2 className="border-b border-[var(--navy)]/10 p-4 text-xl font-semibold text-[var(--navy)]">Stay details</h2>
-            <div className="p-6">
-              <h3 className="text-lg font-semibold text-[var(--navy)]">{booking.hotel.name}</h3>
-              {hotelDetail?.address && (
-                <p className="mt-2 text-[var(--navy-light)]">{hotelDetail.address}</p>
-              )}
-              {booking.checkin && booking.checkout && (
-                <p className="mt-2 text-[var(--navy)]">
-                  Check-in: {booking.checkin} → Check-out: {booking.checkout}
-                </p>
-              )}
-              {booking.price != null && (
-                <p className="mt-2 font-semibold text-[var(--ocean-teal)]">
-                  {booking.currency ?? "USD"} {booking.price.toFixed(2)} total
-                </p>
-              )}
-              {booking.cancellationPolicies?.refundableTag && (
-                <p className="mt-2 text-[var(--navy-light)]">
-                  Cancellation: {booking.cancellationPolicies.refundableTag}
-                  {booking.cancellationPolicies.cancelPolicyInfos?.[0]?.cancelTime && (
-                    <> — Free cancellation until {booking.cancellationPolicies.cancelPolicyInfos[0].cancelTime}</>
-                  )}
-                </p>
-              )}
+          <div className="mt-6 border-t border-border pt-6">
+            <h2 className="font-display text-base font-semibold text-ink">Your stay</h2>
+
+            <div className="mt-3 flex gap-4">
               {hotelDetail?.main_photo && (
+                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={hotelDetail.main_photo}
-                  alt={booking.hotel.name}
-                  className="mt-4 h-48 w-full rounded-lg object-cover"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  className="h-24 w-24 shrink-0 rounded-control object-cover"
                 />
               )}
-              {hotelDetail?.hotelFacilities && hotelDetail.hotelFacilities.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-base font-medium text-[var(--navy)]">Facilities</h4>
-                  <p className="mt-1 text-[var(--navy-light)]">{hotelDetail.hotelFacilities.join(", ")}</p>
+              <div className="min-w-0">
+                <p className="font-display text-lg font-semibold text-ink">{booking.hotel.name}</p>
+                {hotelDetail?.address && (
+                  <p className="mt-1 flex items-start gap-1.5 text-[0.9375rem] text-ink-muted">
+                    <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                    {hotelDetail.address}
+                  </p>
+                )}
+                {booking.checkin && booking.checkout && (
+                  <p className="tnum mt-1.5 flex items-center gap-1.5 text-[0.9375rem] text-ink">
+                    <CalendarDays className="h-3.5 w-3.5 shrink-0 text-ink-muted" aria-hidden />
+                    {booking.checkin} – {booking.checkout}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <dl className="mt-5 grid gap-3 sm:grid-cols-2">
+              {booking.price != null && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+                    Total paid
+                  </dt>
+                  <dd className="tnum mt-1 font-display text-lg font-semibold text-ink">
+                    {formatStayTotal(booking.price, booking.currency ?? "EUR")}
+                  </dd>
                 </div>
               )}
-            </div>
+              {booking.cancellationPolicies?.refundableTag && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+                    Cancellation
+                  </dt>
+                  <dd className="mt-1 text-[0.9375rem] text-ink">
+                    {refundable ? "Free cancellation" : "Non-refundable"}
+                    {refundable && cancelBy && <> until {cancelBy}</>}
+                  </dd>
+                </div>
+              )}
+            </dl>
+
+            {hotelDetail?.hotelFacilities && hotelDetail.hotelFacilities.length > 0 && (
+              <div className="mt-5">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+                  Facilities
+                </h3>
+                <ul className="mt-2 grid gap-x-6 gap-y-1.5 text-[0.9375rem] text-ink sm:grid-cols-2">
+                  {hotelDetail.hotelFacilities.slice(0, 12).map((facility) => (
+                    <li key={facility} className="flex items-start gap-2">
+                      <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
+                      <span>{facility}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </BookingSuccess>
+
+      <Card className="mt-4 p-5">
+        <h2 className="font-display text-base font-semibold text-ink">Before you travel</h2>
+        <ul className="mt-2 space-y-1.5 text-[0.9375rem] text-ink-muted">
+          <li>Save the booking reference — the property will ask for it at check-in.</li>
+          <li>Message the hotel directly if you&apos;ll arrive late; most desks want a heads-up.</li>
+          <li>Check the cancellation terms above before changing your plans.</li>
+        </ul>
+      </Card>
     </div>
   );
 }
 
 export default function ConfirmationPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[var(--sand)] text-[var(--navy-light)]">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+          <div className="h-64 animate-pulse rounded-card bg-surface-muted" />
+        </div>
+      }
+    >
       <ConfirmationContent />
     </Suspense>
   );

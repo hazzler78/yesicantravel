@@ -41,13 +41,25 @@ export default function EventPriceBadge({ slug, eventShortName, venueNotes }: Ev
   if (error || !data) return null;
   if (data.minPrice == null) return null;
 
-  const symbol = data.currency === "EUR" ? "€" : data.currency === "USD" ? "$" : data.currency + " ";
+  const formatted = (() => {
+    try {
+      return new Intl.NumberFormat("en-GB", {
+        style: "currency",
+        currency: data.currency || "EUR",
+        maximumFractionDigits: 0,
+      }).format(data.minPrice);
+    } catch {
+      return `${data.minPrice} ${data.currency}`;
+    }
+  })();
 
   return (
-    <p className="mb-4 rounded-lg bg-[var(--ocean-teal)]/10 px-4 py-3 text-lg font-bold text-[var(--navy)]">
-      Hotels from {symbol}
-      {data.minPrice.toLocaleString()}/night
-      {venueNotes ? ` near ${venueNotes}` : ""} – limited availability for {eventShortName}!
+    <p className="mt-3 inline-flex items-center gap-2 rounded-control bg-teal-soft px-3 py-2 text-[0.9375rem] text-ink">
+      <span className="tnum font-semibold">From {formatted} per night</span>
+      <span className="text-ink-muted">
+        during {eventShortName}
+        {venueNotes ? ` · near ${venueNotes}` : ""}
+      </span>
     </p>
   );
 }

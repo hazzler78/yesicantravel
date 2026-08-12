@@ -1,3 +1,5 @@
+import { Check } from "lucide-react";
+
 type CheckoutPhase = "details" | "payment" | "confirm";
 
 const STEPS: { id: CheckoutPhase; label: string }[] = [
@@ -7,33 +9,43 @@ const STEPS: { id: CheckoutPhase; label: string }[] = [
 ];
 
 export function CheckoutProgress({ phase }: { phase: CheckoutPhase }) {
-  const idx = STEPS.findIndex((s) => s.id === phase);
-  const current = idx >= 0 ? idx + 1 : 1;
-  const pct = (current / STEPS.length) * 100;
+  const currentIndex = Math.max(0, STEPS.findIndex((step) => step.id === phase));
 
   return (
-    <div className="mb-8">
-      <p className="mb-2 text-center text-sm font-medium text-[var(--navy-light)]">
-        Step {current} of {STEPS.length}
-      </p>
-      <div className="mb-3 h-2 overflow-hidden rounded-full bg-[var(--navy)]/10">
-        <div
-          className="h-full rounded-full bg-[var(--ocean-teal)] transition-[width] duration-300 ease-out"
-          style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
-        />
-      </div>
-      <div className="flex justify-between gap-1 text-[11px] font-medium text-[var(--navy-light)] sm:text-xs">
-        {STEPS.map((s, i) => (
-          <span
-            key={s.id}
-            className={`min-w-0 flex-1 text-center leading-tight ${
-              i <= idx ? "font-semibold text-[var(--ocean-teal)]" : ""
-            }`}
-          >
-            {s.label}
-          </span>
-        ))}
-      </div>
-    </div>
+    <ol className="mb-6 flex items-center gap-2" aria-label="Checkout progress">
+      {STEPS.map((step, index) => {
+        const done = index < currentIndex;
+        const active = index === currentIndex;
+        return (
+          <li key={step.id} className="flex min-w-0 flex-1 items-center gap-2">
+            <span
+              aria-current={active ? "step" : undefined}
+              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                done
+                  ? "bg-teal text-white"
+                  : active
+                    ? "bg-ink text-ink-inverse"
+                    : "bg-surface-muted text-ink-muted"
+              }`}
+            >
+              {done ? <Check className="h-3.5 w-3.5" aria-hidden /> : index + 1}
+            </span>
+            <span
+              className={`truncate text-[0.8125rem] ${
+                active ? "font-semibold text-ink" : "text-ink-muted"
+              }`}
+            >
+              {step.label}
+            </span>
+            {index < STEPS.length - 1 && (
+              <span
+                className={`hidden h-px flex-1 sm:block ${done ? "bg-teal" : "bg-border"}`}
+                aria-hidden
+              />
+            )}
+          </li>
+        );
+      })}
+    </ol>
   );
 }

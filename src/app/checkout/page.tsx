@@ -5,16 +5,20 @@ import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
+import { ArrowLeft, ImageOff } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { pinterestTrack } from "@/lib/pinterest";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { BookingSuccess } from "@/components/checkout/BookingSuccess";
+import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
 import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
 import { TextField } from "@/components/ui/TextField";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
+import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
@@ -614,82 +618,90 @@ function CheckoutContent() {
 
   if (!offerId || !hotelId || !checkin || !checkout) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--sand)] text-[var(--navy)]">
-        <p className="text-[var(--coral)]">Missing checkout parameters.</p>
-        <Link href="/" className="text-[var(--ocean-teal)] font-medium hover:underline">← Back to search</Link>
-      </div>
+      <CheckoutMessage
+        title="This checkout link is incomplete"
+        body="Pick your room again and we'll take you straight back here."
+        actionHref="/"
+        actionLabel="Start a new search"
+      />
     );
   }
 
   if (step === "error") {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--sand)] text-[var(--navy)]">
-        <p className="text-[var(--coral)]">{error}</p>
-        <Link href={`/hotel/${hotelId}?checkin=${checkin}&checkout=${checkout}&adults=${adults}`} className="text-[var(--ocean-teal)] font-medium hover:underline">
-          ← Back to stay
-        </Link>
-      </div>
+      <CheckoutMessage
+        title="We couldn't complete this booking"
+        body={error ?? "Something went wrong on the way to the property."}
+        actionHref={`/hotel/${hotelId}?checkin=${checkin}&checkout=${checkout}&adults=${adults}`}
+        actionLabel="Back to the stay"
+      />
     );
   }
 
   if (step === "done" && booking) {
+    const bookingId = (booking as { bookingId?: string }).bookingId;
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--sand)] text-[var(--navy)]">
-        <div className="mx-auto max-w-lg rounded-xl border border-[var(--navy)]/10 bg-white p-8 text-center shadow-sm">
-          <h1 className="mb-4 text-2xl font-bold text-[var(--ocean-teal)]">You&apos;re all set!</h1>
-          <p className="mb-2">Booking ID: <strong>{(booking as { bookingId?: string }).bookingId}</strong></p>
-          {(booking as { hotelConfirmationCode?: string }).hotelConfirmationCode && (
-            <p className="mb-4 text-[var(--navy-light)]">Hotel confirmation: {(booking as { hotelConfirmationCode: string }).hotelConfirmationCode}</p>
-          )}
-          <Link
-            href={`/confirmation?bookingId=${(booking as { bookingId?: string }).bookingId}`}
-            className="inline-block rounded-lg bg-[var(--ocean-teal)] px-6 py-3 font-medium text-white hover:bg-[var(--ocean-teal-light)]"
-          >
-            View booking details
-          </Link>
-        </div>
+      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
+        <BookingSuccess
+          bookingId={bookingId}
+          hotelConfirmationCode={(booking as { hotelConfirmationCode?: string }).hotelConfirmationCode}
+          email={email || undefined}
+          actions={
+            <>
+              <PrimaryLink
+                href={`/confirmation?bookingId=${bookingId}`}
+                variant="teal"
+                fullWidth={false}
+              >
+                View booking details
+              </PrimaryLink>
+              <SecondaryLink href="/">Plan another trip</SecondaryLink>
+            </>
+          }
+        />
       </div>
     );
   }
 
   if (step === "booking") {
     return (
-      <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-        <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 sm:py-10">
-          <CheckoutTrustBar />
-          <CheckoutProgress phase="confirm" />
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-[var(--navy)]/10 bg-white p-10 text-center shadow-sm">
-            <div className="mb-4 h-10 w-10 animate-spin rounded-full border-2 border-[var(--ocean-teal)] border-t-transparent" aria-hidden />
-            <p className="text-lg font-medium text-[var(--navy)]">Confirming your stay…</p>
-            <p className="mt-2 text-sm text-[var(--navy-light)]">Please don&apos;t close this page.</p>
-          </div>
+      <div className="mx-auto max-w-xl px-4 py-8 sm:px-6 sm:py-10">
+        <CheckoutProgress phase="confirm" />
+        <div className="flex flex-col items-center justify-center rounded-card border border-border bg-surface p-10 text-center shadow-card">
+          <div
+            className="mb-4 h-9 w-9 animate-spin rounded-full border-2 border-teal border-t-transparent"
+            aria-hidden
+          />
+          <p className="font-display text-lg font-semibold text-ink">Confirming your stay…</p>
+          <p className="mt-1.5 text-[0.9375rem] text-ink-muted">Please don&apos;t close this page.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
+    <div className="bg-canvas">
       <Script src="https://payment-wrapper.liteapi.travel/dist/liteAPIPayment.js?v=a1" strategy="afterInteractive" />
       <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 sm:py-10">
-        <CheckoutTrustBar />
+        <Link
+          href={backToHotelsHref}
+          className="mb-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden />
+          Back to the stay
+        </Link>
 
         {(step === "form" || step === "payment") && <CheckoutProgress phase={progressPhase} />}
 
-        <Link
-          href={backToHotelsHref}
-          className="mb-6 flex min-h-[52px] w-full items-center justify-center rounded-xl border-2 border-[var(--navy)]/15 bg-white px-4 text-base font-bold text-[var(--navy)] shadow-sm transition-colors hover:border-[var(--ocean-teal)]/40 hover:bg-[var(--sand)]"
-        >
-          ← Back to hotels
-        </Link>
+        <CheckoutTrustBar />
 
         {step === "form" ? (
-          <form onSubmit={handleGuestSubmit} className="space-y-5 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:space-y-6 sm:p-6">
+          <form onSubmit={handleGuestSubmit} className="space-y-5 rounded-card border border-border bg-surface p-4 shadow-card sm:p-6">
             {(stayInfo?.name || checkin) && (
-              <div className="space-y-3 rounded-xl border border-[var(--navy)]/15 bg-[var(--sand)]/40 p-3">
+              <div className="space-y-3 rounded-control border border-border bg-surface-muted/60 p-3">
                 <div className="flex gap-3">
                   {stayInfo?.mainPhoto ? (
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-[var(--sand)] sm:h-24 sm:w-24">
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-control bg-surface-muted sm:h-24 sm:w-24">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={stayInfo.mainPhoto}
@@ -698,29 +710,27 @@ function CheckoutContent() {
                       />
                     </div>
                   ) : (
-                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-[var(--sand)] text-[var(--navy-light)] sm:h-24 sm:w-24" aria-hidden>
-                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9-9 9 9M4.5 10.5V21h15V10.5" />
-                      </svg>
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-control bg-surface-muted text-ink-muted sm:h-24 sm:w-24" aria-hidden>
+                      <ImageOff className="h-6 w-6" />
                     </div>
                   )}
                   <div className="flex min-w-0 flex-1 flex-col justify-center">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-[var(--navy-light)]">
+                    <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-muted">
                       You&apos;re booking
                     </p>
                     {stayInfo?.name ? (
-                      <p className="truncate text-base font-semibold text-[var(--navy)] sm:text-lg">
+                      <p className="truncate font-display text-base font-semibold text-ink">
                         {stayInfo.name}
                       </p>
                     ) : (
-                      <p className="truncate text-sm text-[var(--navy-light)]">Loading stay details…</p>
+                      <p className="truncate text-[0.8125rem] text-ink-muted">Loading stay details…</p>
                     )}
                     {stayInfo?.address && (
-                      <p className="truncate text-xs text-[var(--navy-light)] sm:text-sm">{stayInfo.address}</p>
+                      <p className="truncate text-xs text-ink-muted">{stayInfo.address}</p>
                     )}
                     {checkin && checkout && (
-                      <p className="mt-1 text-xs text-[var(--navy)] sm:text-sm">
-                        {checkin} → {checkout}
+                      <p className="tnum mt-1 text-[0.8125rem] text-ink">
+                        {checkin} – {checkout}
                         {nights > 0 && <> · {nights} night{nights === 1 ? "" : "s"}</>}
                         {adults && <> · {adults} guest{Number(adults) === 1 ? "" : "s"}</>}
                       </p>
@@ -734,54 +744,62 @@ function CheckoutContent() {
             )}
 
             {quotedTotalValid && quotedTotal && (
-              <div className="rounded-xl border border-[var(--ocean-teal)]/30 bg-[var(--ocean-teal)]/[0.08] px-3 py-3 text-center sm:px-4 sm:text-left">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[var(--navy-light)]">Your price</p>
-                <p className="mt-1 text-2xl font-bold text-[var(--ocean-teal)]">
+              <div className="rounded-control border border-border bg-teal-soft px-4 py-3">
+                <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ink-muted">
+                  Your price
+                </p>
+                <p className="tnum mt-1 font-display text-2xl font-semibold text-ink">
                   {formatStayTotal(quotedTotal.amount, quotedTotal.currency)}
                 </p>
-                <p className="mt-2 text-sm leading-snug text-[var(--navy)]">
-                  Including all taxes, fees, and cleaning fee — nothing hidden.
+                <p className="mt-1 text-[0.8125rem] text-ink-muted">
+                  All taxes, fees and cleaning included — nothing added later.
                 </p>
               </div>
             )}
 
-            <div className="rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)]/50 px-3 py-3 text-sm leading-snug text-[var(--navy-light)] sm:px-4 sm:text-base">
-              Ready when you are — your details confirm the booking with the hotel.
-            </div>
-
             <div>
-              <h1 className="text-xl font-bold text-[var(--navy)] sm:text-2xl">Your details</h1>
-              <p className="mt-1 text-sm text-[var(--navy-light)] sm:text-base">We&apos;ll use this to confirm your booking.</p>
+              <h1 className="font-display text-xl font-semibold tracking-tight text-ink">
+                Your details
+              </h1>
+              <p className="mt-1 text-[0.9375rem] text-ink-muted">
+                These go to the hotel to confirm the reservation.
+              </p>
             </div>
 
             {paymentConfig?.accountPaymentEnabled && (
               <div>
-                <span className="mb-2 block text-sm font-medium text-[var(--navy)] sm:text-base">Payment method</span>
-                <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
-                  <label className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[var(--navy)]/15 px-3 py-2 sm:min-h-0">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={paymentMethod === "account"}
-                      onChange={() => setPaymentMethod("account")}
-                      className="h-5 w-5 shrink-0 accent-[var(--ocean-teal)] sm:h-4 sm:w-4"
-                    />
-                    <span className="text-sm sm:text-base">Charge to account</span>
-                  </label>
-                  <label className="flex min-h-[48px] cursor-pointer items-center gap-3 rounded-lg border border-[var(--navy)]/15 px-3 py-2 sm:min-h-0">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      checked={paymentMethod === "card"}
-                      onChange={() => setPaymentMethod("card")}
-                      className="h-5 w-5 shrink-0 accent-[var(--ocean-teal)] sm:h-4 sm:w-4"
-                    />
-                    <span className="text-sm sm:text-base">Pay with card</span>
-                  </label>
+                <span className="mb-2 block text-[0.8125rem] font-semibold text-ink">
+                  Payment method
+                </span>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(
+                    [
+                      { id: "account", label: "Charge to account" },
+                      { id: "card", label: "Pay with card" },
+                    ] as const
+                  ).map((option) => (
+                    <label
+                      key={option.id}
+                      className={`flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-control border px-3 text-[0.9375rem] transition-colors ${
+                        paymentMethod === option.id
+                          ? "border-teal bg-teal-soft font-semibold text-ink"
+                          : "border-border text-ink-muted hover:border-border-strong"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="paymentMethod"
+                        checked={paymentMethod === option.id}
+                        onChange={() => setPaymentMethod(option.id)}
+                        className="h-4 w-4 shrink-0 accent-[var(--color-teal)]"
+                      />
+                      {option.label}
+                    </label>
+                  ))}
                 </div>
                 {paymentMethod === "account" && paymentConfig?.paymentEnv === "sandbox" && (
-                  <p className="mt-2 text-sm text-[var(--navy-light)]">
-                    In sandbox, no real charge. Easiest option for testing.
+                  <p className="mt-2 text-[0.8125rem] text-ink-muted">
+                    Sandbox mode — no real charge is made.
                   </p>
                 )}
               </div>
@@ -849,8 +867,8 @@ function CheckoutContent() {
             />
             <PrimaryButton
               type="submit"
+              variant="coral"
               disabled={paymentMethod === "card" && paymentConfig === null}
-              className="rounded-xl text-lg font-semibold sm:text-lg"
             >
               {paymentMethod === "card" && paymentConfig === null
                 ? "Loading..."
@@ -858,15 +876,15 @@ function CheckoutContent() {
             </PrimaryButton>
           </form>
         ) : (
-          <div className="space-y-6 rounded-2xl border border-[var(--navy)]/10 bg-white p-4 shadow-sm sm:p-6">
-            <h1 className="text-xl font-bold text-[var(--navy)] sm:text-2xl">Payment</h1>
+          <div className="space-y-6 rounded-card border border-border bg-surface p-4 shadow-card sm:p-6">
+            <h1 className="font-display text-xl font-semibold tracking-tight text-ink">Payment</h1>
             {(prebookData?.sandbox ?? paymentConfig?.paymentEnv === "sandbox") && (
-              <p className="rounded-lg bg-[var(--ocean-teal)]/10 p-4 text-base text-[var(--navy)]">
+              <p className="rounded-control bg-teal-soft p-4 text-[0.9375rem] text-ink">
                 Sandbox: use test card <strong>4242 4242 4242 4242</strong>, any 3 digits for CVV, any future expiration date.
                 {typeof window !== "undefined" &&
                   window.location?.protocol === "http:" &&
                   window.location?.hostname === "localhost" && (
-                    <span className="mt-2 block text-sm text-[var(--navy-light)]">
+                    <span className="mt-2 block text-[0.8125rem] text-ink-muted">
                       Payment may not load on HTTP localhost. Deploy to Vercel (HTTPS) for full payment flow.
                     </span>
                   )}
@@ -874,9 +892,9 @@ function CheckoutContent() {
             )}
             <div id="payment-form" className="min-h-[200px]" />
             {paymentLoadFailed && (
-              <div className="mt-4 rounded-lg border border-[var(--coral)]/50 bg-[var(--coral)]/10 p-4 text-[var(--navy)]">
-                <p className="font-medium">Payment form didn&apos;t load.</p>
-                <p className="mt-1 text-sm text-[var(--navy-light)]">
+              <div className="mt-4 rounded-control border border-border bg-coral-soft p-4 text-ink">
+                <p className="font-semibold">The payment form didn&apos;t load.</p>
+                <p className="mt-1 text-[0.8125rem] text-ink-muted">
                   The payment provider returned an error. Please try again in a moment. If it persists,
                   LiteAPI may need to verify your domain (yesicantravel.com) for their Stripe integration.
                 </p>
@@ -886,7 +904,7 @@ function CheckoutContent() {
                     setPaymentLoadFailed(false);
                     setStep("form");
                   }}
-                  className="mt-3 rounded-lg bg-[var(--ocean-teal)] px-4 py-2 text-sm font-medium text-white hover:bg-[var(--ocean-teal-light)]"
+                  className="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-control bg-teal px-4 text-[0.9375rem] font-semibold text-white hover:bg-teal-hover"
                 >
                   Back to details
                 </button>
@@ -914,7 +932,13 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[var(--sand)] text-[var(--navy-light)]">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-xl px-4 py-10 sm:px-6">
+          <div className="h-72 animate-pulse rounded-card bg-surface-muted" />
+        </div>
+      }
+    >
       <CheckoutContent />
     </Suspense>
   );

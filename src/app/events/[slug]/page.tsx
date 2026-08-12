@@ -7,8 +7,11 @@ import {
   getCheckoutDate,
   getRelatedEvents,
 } from "@/data/events";
+import { ArrowRight, CalendarDays, Check, Dot } from "lucide-react";
 import { searchPlaces } from "@/lib/liteapi";
 import EventPriceBadge from "@/components/EventPriceBadge";
+import { Card } from "@/components/ui/Card";
+import { PrimaryLink } from "@/components/ui/PrimaryButton";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -143,7 +146,7 @@ export default async function EventPage({ params }: Props) {
       : null;
 
   return (
-    <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
+    <div className="bg-canvas">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
@@ -158,202 +161,180 @@ export default async function EventPage({ params }: Props) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
         />
       )}
-      <div className="mx-auto max-w-3xl px-6 py-12 md:py-16">
-        <nav aria-label="Breadcrumb" className="mb-4 text-sm text-[var(--navy-light)]">
-          <Link href="/" className="hover:underline">Home</Link>
-          <span className="mx-2">/</span>
-          <span className="text-[var(--navy-light)]">Events</span>
-          <span className="mx-2">/</span>
-          <span className="text-[var(--navy)]">{event.eventName}</span>
+      <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 md:py-12">
+        <nav aria-label="Breadcrumb" className="mb-5 text-[0.8125rem] text-ink-muted">
+          <Link href="/" className="underline-offset-4 hover:text-ink hover:underline">
+            Home
+          </Link>
+          <span className="mx-1.5">/</span>
+          <span>Events</span>
+          <span className="mx-1.5">/</span>
+          <span className="text-ink">{event.eventName}</span>
         </nav>
-        <Link
-          href="/"
-          className="mb-8 inline-block text-[var(--ocean-teal)] font-medium hover:underline"
-        >
-          ← Back to search
-        </Link>
 
-        <header className="mb-10">
-          <p className="mb-2 text-sm font-medium uppercase tracking-wider text-[var(--ocean-teal)]">
+        <header>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
             {event.city}, {event.country}
           </p>
-          <h1 className="mb-2 text-4xl font-bold tracking-tight text-[var(--navy)] md:text-5xl">
-            {event.eventName} – {event.dateRange}
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-ink md:text-4xl">
+            {event.eventName}
           </h1>
-          <p className="mb-4 text-2xl font-medium text-[var(--navy)]">in {event.city}</p>
-          <p className="text-xl text-[var(--navy-light)]">
-            Safer stays near venues—event dates pre-filled. 24/7 reception, well-lit areas and
-            neighbourhood tips. Change dates anytime on the results page.
+          <p className="tnum mt-2 flex items-center gap-2 text-lg font-medium text-ink">
+            <CalendarDays className="h-4 w-4 text-ink-muted" aria-hidden />
+            {event.dateRange}
           </p>
+          <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted md:text-base">
+            Stays near the venues with the event dates already filled in. Reception hours, location
+            and cancellation terms are shown on every result, and you can change the dates whenever
+            you like.
+          </p>
+          <div className="mt-5">
+            <PrimaryLink href={searchUrl} variant="coral" fullWidth={false}>
+              Search stays in {event.city}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </PrimaryLink>
+          </div>
         </header>
 
-        <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">Why now?</h2>
-          <p className="mb-4 rounded-lg bg-[var(--ocean-teal)]/10 px-4 py-3 text-lg font-bold text-[var(--navy)]">
-            Event Dates: {event.dateRange}
-          </p>
+        <Card className="mt-8 p-5">
+          <h2 className="font-display text-lg font-semibold text-ink">Why book early</h2>
           <EventPriceBadge
             slug={slug}
             eventShortName={event.eventShortName}
             venueNotes={event.venueNotes}
           />
-          <p className="mb-4 text-[var(--navy-light)]">{whyNowBody}</p>
+          <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted">{whyNowBody}</p>
           {event.venueNotes && (
-            <p className="text-sm font-medium text-[var(--ocean-teal)]">{event.venueNotes}</p>
+            <p className="mt-3 text-[0.9375rem] font-medium text-teal">{event.venueNotes}</p>
           )}
-        </section>
-
-        <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">How we help</h2>
-          <ul className="space-y-2 text-[var(--navy-light)]">
-            <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
-              Filter for rating, budget and free cancellation; see safety signals on each stay
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
-              Neighbourhood safety tips and area guidance
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
-              Free cancellation options so you stay flexible
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-[var(--ocean-teal)]">✓</span>
-              Stays reviewed and rated by women travellers
-            </li>
-          </ul>
-        </section>
+        </Card>
 
         {event.knownFor && event.knownFor.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">
+          <Card className="mt-4 p-5">
+            <h2 className="font-display text-lg font-semibold text-ink">
               What {event.city} is known for
             </h2>
-            <ul className="space-y-2 text-[var(--navy-light)]">
+            <ul className="mt-3 space-y-2 text-[0.9375rem] text-ink-muted">
               {event.knownFor.map((item) => (
                 <li key={item} className="flex items-start gap-2">
-                  <span className="text-[var(--ocean-teal)]">•</span>
+                  <Dot className="mt-0.5 h-4 w-4 shrink-0 text-teal" aria-hidden />
                   {item}
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
         )}
 
         {event.neighbourhoods && event.neighbourhoods.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-[var(--navy)]">
-              Where to stay – neighbourhood guide
+          <Card className="mt-4 p-5">
+            <h2 className="font-display text-lg font-semibold text-ink">
+              Where to stay — neighbourhood guide
             </h2>
-            <div className="space-y-5">
+            <div className="mt-4 space-y-4">
               {event.neighbourhoods.map((n) => (
-                <div key={n.name}>
-                  <div className="mb-1 flex items-center gap-2">
-                    <h3 className="text-base font-semibold text-[var(--navy)]">
-                      {n.name}
-                    </h3>
+                <div key={n.name} className="border-t border-border pt-4 first:border-t-0 first:pt-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-display text-base font-semibold text-ink">{n.name}</h3>
                     <span
-                      className={
+                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
                         n.verdict === "recommended"
-                          ? "rounded-full bg-[var(--ocean-teal)]/10 px-2 py-0.5 text-xs font-medium text-[var(--ocean-teal)]"
-                          : "rounded-full bg-[var(--coral)]/10 px-2 py-0.5 text-xs font-medium text-[var(--coral)]"
-                      }
+                          ? "bg-positive-soft text-positive"
+                          : "bg-coral-soft text-coral"
+                      }`}
                     >
                       {n.verdict === "recommended" ? "Recommended" : "Extra awareness"}
                     </span>
                   </div>
-                  <p className="text-sm text-[var(--navy-light)]">{n.description}</p>
+                  <p className="mt-1.5 text-[0.9375rem] leading-relaxed text-ink-muted">
+                    {n.description}
+                  </p>
                 </div>
               ))}
             </div>
-          </section>
+          </Card>
         )}
 
         {event.safetyTips && event.safetyTips.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">
-              Solo female safety tips for {event.eventName}
+          <Card className="mt-4 p-5">
+            <h2 className="font-display text-lg font-semibold text-ink">
+              Practical tips for {event.city}
             </h2>
-            <ul className="space-y-2 text-[var(--navy-light)]">
-              {event.safetyTips.map((tip, idx) => (
-                <li key={idx} className="flex items-start gap-2">
-                  <span className="text-[var(--ocean-teal)]">✓</span>
+            <ul className="mt-3 space-y-2 text-[0.9375rem] text-ink-muted">
+              {event.safetyTips.map((tip, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
                   {tip}
                 </li>
               ))}
             </ul>
-          </section>
+          </Card>
         )}
 
         {event.gettingAround && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">
+          <Card className="mt-4 p-5">
+            <h2 className="font-display text-lg font-semibold text-ink">
               Getting there and around
             </h2>
-            <p className="text-sm text-[var(--navy-light)]">{event.gettingAround}</p>
-          </section>
+            <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-muted">
+              {event.gettingAround}
+            </p>
+          </Card>
         )}
 
         {event.faqs && event.faqs.length > 0 && (
-          <section className="mb-10 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-[var(--navy)]">
+          <Card className="mt-4 p-5">
+            <h2 className="font-display text-lg font-semibold text-ink">
               Frequently asked questions
             </h2>
-            <dl className="space-y-5">
+            <dl className="mt-4 space-y-4">
               {event.faqs.map((f) => (
-                <div key={f.question}>
-                  <dt className="mb-1 font-semibold text-[var(--navy)]">{f.question}</dt>
-                  <dd className="text-sm text-[var(--navy-light)]">{f.answer}</dd>
+                <div key={f.question} className="border-t border-border pt-4 first:border-t-0 first:pt-0">
+                  <dt className="font-semibold text-ink">{f.question}</dt>
+                  <dd className="mt-1 text-[0.9375rem] leading-relaxed text-ink-muted">
+                    {f.answer}
+                  </dd>
                 </div>
               ))}
             </dl>
-          </section>
+          </Card>
         )}
 
-        <div className="rounded-2xl border-2 border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/5 p-6">
-          <p className="mb-2 text-sm font-medium text-[var(--ocean-teal)]">
-            Your search is set for {event.eventShortName}: {event.dateRange}
+        <div className="mt-8 rounded-card bg-surface-inverse p-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal-soft/70">
+            Dates pre-filled · {event.dateRange}
           </p>
-          <p className="mb-2">
-            <Link href="/" className="text-sm text-[var(--navy-light)] hover:underline">
-              Change dates →
-            </Link>
-          </p>
-          <p className="mb-4 text-lg font-semibold text-[var(--navy)]">
+          <h2 className="mt-2 font-display text-xl font-semibold text-ink-inverse md:text-2xl">
             Ready to find your stay in {event.city}?
+          </h2>
+          <p className="mt-2 text-[0.9375rem] text-ink-inverse/70">
+            You can change dates, travellers and filters on the results page.
           </p>
-          <p className="mb-6 text-[var(--navy-light)]">
-            Event dates pre-filled • Edit anytime on the results page
-          </p>
-          <Link
-            href={searchUrl}
-            className="inline-block rounded-lg bg-[var(--ocean-teal)] px-8 py-4 text-lg font-semibold text-white transition-colors hover:bg-[var(--ocean-teal-light)]"
-          >
-            Find Safer Stays in {event.city} – {event.dateRange}
-          </Link>
+          <div className="mt-5">
+            <PrimaryLink href={searchUrl} variant="coral" fullWidth={false}>
+              Search stays for {event.eventShortName}
+              <ArrowRight className="h-4 w-4" aria-hidden />
+            </PrimaryLink>
+          </div>
         </div>
 
         {related.length > 0 && (
-          <section className="mt-12 rounded-2xl border border-[var(--navy)]/10 bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-[var(--navy)]">
-              Related events & safer stays
-            </h2>
-            <ul className="grid gap-3 sm:grid-cols-2">
+          <section className="mt-10">
+            <h2 className="font-display text-lg font-semibold text-ink">Other dated trips</h2>
+            <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {related.map((r) => (
                 <li key={r.slug}>
                   <Link
                     href={`/events/${r.slug}`}
-                    className="block rounded-lg border border-[var(--sand)] p-4 transition-colors hover:border-[var(--ocean-teal)]"
+                    className="block h-full rounded-card border border-border bg-surface p-4 transition-colors hover:border-border-strong"
                   >
-                    <p className="text-xs font-medium uppercase tracking-wider text-[var(--ocean-teal)]">
-                      {r.city}, {r.country}
+                    <p className="tnum text-xs font-semibold uppercase tracking-[0.08em] text-teal">
+                      {r.dateRange}
                     </p>
-                    <p className="mt-1 font-semibold text-[var(--navy)]">
+                    <p className="mt-1.5 font-display text-base font-semibold text-ink">
                       {r.eventName}
                     </p>
-                    <p className="mt-1 text-sm text-[var(--navy-light)]">
-                      {r.dateRange}
+                    <p className="mt-1 text-[0.8125rem] text-ink-muted">
+                      {r.city}, {r.country}
                     </p>
                   </Link>
                 </li>
@@ -361,13 +342,6 @@ export default async function EventPage({ params }: Props) {
             </ul>
           </section>
         )}
-
-        <p className="mt-8 text-center text-sm text-[var(--navy-light)]">
-          <Link href="/" className="text-[var(--ocean-teal)] hover:underline">
-            Yes I Can Travel
-          </Link>{" "}
-          – safety-first booking for women travelling solo.
-        </p>
       </div>
     </div>
   );

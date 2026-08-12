@@ -27,7 +27,7 @@ export default async function RevenueAgentAdminPage({
   const { report, cycle, approval, jobs } = await getData(periodMonth);
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10 text-[var(--navy)]">
+    <div className="mx-auto max-w-5xl px-6 py-10 text-[var(--navy)]">
       <h1 className="text-3xl font-bold">Revenue Growth Agent</h1>
       <p className="mt-2 text-sm text-[var(--navy-light)]">
         Monthly cycle view for content, leads, bookings, revenue, and approval-gated ad reinvestment.
@@ -82,6 +82,6 @@ export default async function RevenueAgentAdminPage({
           {jobs.length === 0 && <p className="text-[var(--navy-light)]">No job runs yet.</p>}
         </div>
       </section>
-    </main>
+    </div>
   );
 }

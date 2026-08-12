@@ -3,6 +3,9 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ContentStatus } from "@prisma/client";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { Card } from "@/components/ui/Card";
+import { PrimaryLink } from "@/components/ui/PrimaryButton";
+import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { prisma } from "@/lib/prisma";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -56,100 +59,113 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     });
   } catch {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-10 text-[var(--navy)]">
-        <p className="text-[var(--coral)]">
-          This blog post is temporarily unavailable while data connection is being restored.
+      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+        <p className="rounded-card border border-border bg-coral-soft p-5 text-[0.9375rem] text-ink">
+          This guide is temporarily unavailable while we restore the data connection.
         </p>
-      </main>
+      </div>
     );
   }
   if (!post || post.status !== ContentStatus.published) notFound();
 
   return (
-    <main className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-      <div className="border-b border-[var(--sand)] bg-white/80">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-semibold text-[var(--navy)]">
-            Yes I Can Travel
-          </Link>
-          <nav className="flex items-center gap-4 text-sm font-medium text-[var(--navy-light)]">
-            <Link href="/" className="hover:text-[var(--ocean-teal)]">Home</Link>
-            <Link href="/blog" className="hover:text-[var(--ocean-teal)]">Blog</Link>
-            <Link href="/lead-magnet" className="hover:text-[var(--ocean-teal)]">Free checklist</Link>
-          </nav>
-        </div>
-      </div>
-
-      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-10 lg:grid-cols-[1fr_320px]">
-        <article className="rounded-2xl border border-[var(--sand)] bg-white p-6 shadow-sm sm:p-8">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[var(--ocean-teal)]">
+    <div className="bg-canvas">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:py-14">
+        <article className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
             Solo travel safety guide
           </p>
-          <h1 className="text-3xl font-bold leading-tight sm:text-4xl">{post.title}</h1>
-          {post.excerpt && <p className="mt-4 text-base text-[var(--navy-light)]">{post.excerpt}</p>}
+          <h1 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
+            {post.title}
+          </h1>
+          {post.excerpt && (
+            <p className="mt-4 text-base leading-relaxed text-ink-muted">{post.excerpt}</p>
+          )}
 
-          <div className="mt-8 space-y-4">
+          <div className="mt-8">
             <ReactMarkdown
               components={{
                 h2: ({ children }) => (
-                  <h2 className="mt-8 text-2xl font-semibold text-[var(--navy)]">{children}</h2>
+                  <h2 className="mt-9 font-display text-2xl font-semibold tracking-tight text-ink">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="mt-6 font-display text-lg font-semibold text-ink">{children}</h3>
                 ),
                 p: ({ children }) => (
-                  <p className="text-[15px] leading-7 text-[var(--navy)]/90">{children}</p>
+                  <p className="mt-4 text-[1.0625rem] leading-[1.75] text-ink">{children}</p>
                 ),
                 ul: ({ children }) => (
-                  <ul className="list-disc space-y-1 pl-6 text-[15px] leading-7 text-[var(--navy)]/90">{children}</ul>
+                  <ul className="mt-4 list-disc space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-ink">
+                    {children}
+                  </ul>
                 ),
                 ol: ({ children }) => (
-                  <ol className="list-decimal space-y-1 pl-6 text-[15px] leading-7 text-[var(--navy)]/90">{children}</ol>
+                  <ol className="mt-4 list-decimal space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-ink">
+                    {children}
+                  </ol>
                 ),
                 li: ({ children }) => <li>{children}</li>,
+                a: ({ children, href }) => (
+                  <a href={href} className="text-teal underline underline-offset-4">
+                    {children}
+                  </a>
+                ),
               }}
             >
               {post.bodyMarkdown}
             </ReactMarkdown>
           </div>
 
-          <div className="mt-10 rounded-xl border border-[var(--ocean-teal)]/30 bg-[var(--ocean-teal)]/10 p-5">
-            <h3 className="text-lg font-semibold">Ready to find a safer stay?</h3>
-            <p className="mt-1 text-sm text-[var(--navy-light)]">
-              Compare safety-first hotel options and use confidence filters built for solo women travelers.
+          <Card className="mt-10 p-5">
+            <h2 className="font-display text-lg font-semibold text-ink">
+              Ready to look at actual rooms?
+            </h2>
+            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
+              Search stays with reception hours, location and cancellation terms shown up front.
             </p>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Link
-                href="/"
-                className="rounded-lg bg-[var(--ocean-teal)] px-4 py-2 text-sm font-semibold text-white"
-              >
-                Start search
-              </Link>
-              <Link
-                href="/lead-magnet"
-                className="rounded-lg border border-[var(--ocean-teal)] px-4 py-2 text-sm font-semibold text-[var(--ocean-teal)]"
-              >
-                Get free checklist
-              </Link>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <PrimaryLink href="/" variant="coral" size="md" fullWidth={false}>
+                Start a search
+              </PrimaryLink>
+              <SecondaryLink href="/lead-magnet">Get the free checklist</SecondaryLink>
             </div>
-          </div>
+          </Card>
         </article>
 
         <aside className="space-y-4">
-          <div className="rounded-2xl border border-[var(--sand)] bg-white p-5 shadow-sm">
-            <h3 className="text-base font-semibold">Get the safety checklist</h3>
-            <p className="mt-1 text-sm text-[var(--navy-light)]">
-              Free practical checklist for choosing safer hotels and arrivals.
+          <Card className="p-5">
+            <h2 className="font-display text-base font-semibold text-ink">
+              Get the safety checklist
+            </h2>
+            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
+              A practical checklist for vetting hotels and planning arrivals.
             </p>
             <LeadMagnetForm />
-          </div>
-          <div className="rounded-2xl border border-[var(--sand)] bg-white p-5 shadow-sm">
-            <h3 className="text-base font-semibold">Explore next</h3>
-            <div className="mt-3 flex flex-col gap-2 text-sm">
-              <Link href="/blog" className="text-[var(--ocean-teal)] hover:underline">All guides</Link>
-              <Link href="/popular-cities" className="text-[var(--ocean-teal)] hover:underline">Popular safe cities</Link>
-              <Link href="/" className="text-[var(--ocean-teal)] hover:underline">Search stays</Link>
-            </div>
-          </div>
+          </Card>
+          <Card className="p-5">
+            <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>
+            <ul className="mt-3 space-y-2 text-[0.9375rem]">
+              <li>
+                <Link href="/blog" className="text-teal underline-offset-4 hover:underline">
+                  All guides
+                </Link>
+              </li>
+              <li>
+                <Link href="/popular-cities" className="text-teal underline-offset-4 hover:underline">
+                  Popular cities
+                </Link>
+              </li>
+              <li>
+                <Link href="/" className="text-teal underline-offset-4 hover:underline">
+                  Search stays
+                </Link>
+              </li>
+            </ul>
+          </Card>
         </aside>
       </div>
-    </main>
+    </div>
   );
 }

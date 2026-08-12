@@ -5,13 +5,16 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
-import { formatStayTotal } from "@/lib/formatStayPrice";
+import { Map as MapIcon, SearchX, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
-import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
+import { SearchBar } from "@/components/search/SearchBar";
+import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
+import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
+import { SecondaryLink } from "@/components/ui/SecondaryButton";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
-  loading: () => <p className="text-center text-[var(--navy-light)]">Loading map…</p>,
+  loading: () => <p className="p-4 text-center text-[0.9375rem] text-ink-muted">Loading map…</p>,
 });
 
 interface HotelBasic {
@@ -20,9 +23,10 @@ interface HotelBasic {
   main_photo?: string;
   address?: string;
   rating?: number;
+  reviewCount?: number;
 }
 
-interface HotelListItem extends HotelBasic {
+interface HotelListItem extends HotelBasic, HotelCardData {
   price?: number;
   currency?: string;
   hasFreeCancellation?: boolean;
@@ -46,6 +50,22 @@ type SearchAnalyticsOutcome = {
 };
 
 const SEARCH_SESSION_STORAGE_KEY = "yict_search_session_id";
+
+const DEFAULT_FILTERS: ResultsFilterState = {
+  minRating: 8,
+  maxPrice: null,
+  onlyFreeCancellation: false,
+};
+
+/**
+ * Guest scores arrive on a 10-point scale, star ratings on a 5-point one.
+ * Normalising to 10 keeps the badge and the rating filter meaning one thing.
+ */
+function normaliseRating(rating?: number, starRating?: number) {
+  if (typeof rating === "number" && rating > 0) return rating;
+  if (typeof starRating === "number" && starRating > 0) return starRating * 2;
+  return undefined;
+}
 
 function getSearchSessionId() {
   if (typeof window === "undefined") return undefined;
@@ -74,34 +94,47 @@ function sendSearchAnalyticsEvent(payload: Record<string, unknown>) {
   });
 }
 
+function nightsBetween(checkin: string | null, checkout: string | null) {
+  if (!checkin || !checkout) return 1;
+  const diff = new Date(checkout).getTime() - new Date(checkin).getTime();
+  return Math.max(1, Math.round(diff / 86_400_000));
+}
+
+function formatDate(iso: string | null) {
+  if (!iso) return "";
+  try {
+    return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+  } catch {
+    return iso;
+  }
+}
+
 function ResultsContent() {
   const searchParams = useSearchParams();
   const [hotels, setHotels] = useState<HotelListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [minRating, setMinRating] = useState<number | null>(4);
-  const [maxPrice, setMaxPrice] = useState<number | null>(null);
-  const [onlyFreeCancellation, setOnlyFreeCancellation] = useState(false);
+  const [filters, setFilters] = useState<ResultsFilterState>(DEFAULT_FILTERS);
   const [sortBy, setSortBy] = useState<"rating" | "price">("rating");
   const [placeDetails, setPlaceDetails] = useState<{
     location: { latitude: number; longitude: number };
     viewport?: { high: { latitude: number; longitude: number }; low: { latitude: number; longitude: number } };
   } | null>(null);
   const [placeDetailsError, setPlaceDetailsError] = useState(false);
-  const [expandedHotelIds, setExpandedHotelIds] = useState<Record<string, boolean>>({});
+  const [placeLabel, setPlaceLabel] = useState("");
   const [searchAnalyticsOutcome, setSearchAnalyticsOutcome] = useState<SearchAnalyticsOutcome | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const lastSearchEventSignature = useRef<string | null>(null);
 
-  const toggleHotelExpanded = useCallback((hotelId: string) => {
-    setExpandedHotelIds((prev) => {
-      const nextOpen = !prev[hotelId];
-      if (nextOpen) {
-        track("Rates Viewed", { hotelId });
-      }
-      return { ...prev, [hotelId]: nextOpen };
-    });
+  const { minRating, maxPrice, onlyFreeCancellation } = filters;
+
+  const updateFilters = useCallback((patch: Partial<ResultsFilterState>) => {
+    setFilters((current) => ({ ...current, ...patch }));
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setFilters({ minRating: null, maxPrice: null, onlyFreeCancellation: false });
   }, []);
 
   useEffect(() => {
@@ -180,15 +213,22 @@ function ResultsContent() {
           );
           const byHotelId: Record<
             string,
-            { address?: string; rating?: number; lat?: number; lng?: number; safetyBadges?: string[] }
+            {
+              address?: string;
+              rating?: number;
+              reviewCount?: number;
+              lat?: number;
+              lng?: number;
+              safetyBadges?: string[];
+            }
           > = {};
           for (const d of details) {
             if (!d?.id) continue;
             const loc = d.location;
             byHotelId[d.id] = {
               address: d.address,
-              // Prefer guest review rating; fall back to star rating.
-              rating: typeof d.rating === "number" ? d.rating : d.starRating,
+              rating: normaliseRating(d.rating, d.starRating),
+              reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : undefined,
               lat: typeof loc?.latitude === "number" ? loc.latitude : undefined,
               lng: typeof loc?.longitude === "number" ? loc.longitude : undefined,
               safetyBadges: safetyBadgesFromHotel(d),
@@ -204,8 +244,8 @@ function ResultsContent() {
             return {
               ...h,
               address: extra.address ?? h.address,
-              // Again, prefer review rating from details, then any rating on the list item.
-              rating: extra.rating ?? h.rating,
+              rating: extra.rating ?? normaliseRating(h.rating),
+              reviewCount: extra.reviewCount,
               price: firstRate?.retailRate?.total?.[0]?.amount,
               currency: firstRate?.retailRate?.total?.[0]?.currency ?? "USD",
               hasFreeCancellation: freeCancellation,
@@ -256,8 +296,8 @@ function ResultsContent() {
             name: h.name,
             main_photo: h.main_photo ?? h.hotelImages?.[0]?.url,
             address: h.address,
-            // Prefer guest review rating if available; fall back to star rating.
-            rating: typeof h.rating === "number" ? h.rating : h.starRating,
+            rating: normaliseRating(h.rating, h.starRating),
+            reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
             price: rateByHotel[h.id]?.amount,
             currency: rateByHotel[h.id]?.currency ?? "USD",
             hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
@@ -308,6 +348,10 @@ function ResultsContent() {
   const placeId = searchParams.get("placeId");
   const aiSearch = searchParams.get("aiSearch");
 
+  const nights = nightsBetween(checkin, checkout);
+  const isFiltered =
+    minRating !== null || maxPrice !== null || onlyFreeCancellation;
+
   const filteredAndSortedHotels = useMemo(() => {
     const filtered = hotels.filter((h) => {
       if (minRating != null && (h.rating ?? 0) < minRating) return false;
@@ -331,6 +375,7 @@ function ResultsContent() {
     if (!placeId?.trim()) {
       setPlaceDetails(null);
       setPlaceDetailsError(false);
+      setPlaceLabel("");
       return;
     }
     setPlaceDetails(null);
@@ -343,6 +388,7 @@ function ResultsContent() {
       .then((json) => {
         const data = json.data ?? json;
         const loc = data?.location;
+        if (typeof data?.displayName === "string") setPlaceLabel(data.displayName);
         if (loc && typeof loc.latitude === "number" && typeof loc.longitude === "number") {
           setPlaceDetails({
             location: { latitude: loc.latitude, longitude: loc.longitude },
@@ -354,6 +400,7 @@ function ResultsContent() {
       })
       .catch(() => setPlaceDetailsError(true));
   }, [placeId]);
+
   const hotelsWithCoords = useMemo(
     () =>
       filteredAndSortedHotels.filter(
@@ -366,12 +413,6 @@ function ResultsContent() {
   useEffect(() => {
     if (!searchAnalyticsOutcome || loading) return;
 
-    const filters = {
-      minRating,
-      maxPrice,
-      onlyFreeCancellation,
-      sortBy,
-    };
     const payload = {
       mode: aiSearch ? "vibe" : "destination",
       placeId,
@@ -384,7 +425,7 @@ function ResultsContent() {
       ...searchAnalyticsOutcome,
       filteredHotelCount: filteredAndSortedHotels.length,
       hotelsWithCoordsCount: hotelsWithCoords.length,
-      filters,
+      filters: { minRating, maxPrice, onlyFreeCancellation, sortBy },
       context: { source: "results_page" },
     };
     const signature = JSON.stringify(payload);
@@ -415,10 +456,8 @@ function ResultsContent() {
     const maxLat = Math.max(...lats);
     const minLng = Math.min(...lngs);
     const maxLng = Math.max(...lngs);
-    const centerLat = (minLat + maxLat) / 2;
-    const centerLng = (minLng + maxLng) / 2;
     return {
-      location: { latitude: centerLat, longitude: centerLng },
+      location: { latitude: (minLat + maxLat) / 2, longitude: (minLng + maxLng) / 2 },
       viewport: {
         high: { latitude: maxLat, longitude: maxLng },
         low: { latitude: minLat, longitude: minLng },
@@ -428,298 +467,195 @@ function ResultsContent() {
 
   const effectivePlaceForMap = placeDetails ?? derivedPlaceFromHotels;
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--sand)]">
-        <div className="text-[var(--navy-light)]">Finding safer stays...</div>
-      </div>
-    );
-  }
+  const hotelHref = (id: string) =>
+    `/hotel/${id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
+      placeId ? `&placeId=${placeId}` : ""
+    }${aiSearch ? `&aiSearch=${encodeURIComponent(aiSearch)}` : ""}`;
 
   if (error) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[var(--sand)] text-[var(--navy)]">
-        <p className="text-[var(--coral)]">{error}</p>
-        <Link href="/" className="text-[var(--ocean-teal)] font-medium hover:underline">← Back to search</Link>
+      <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
+        <div className="rounded-card border border-border bg-surface p-8 text-center shadow-card">
+          <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-coral-soft text-coral">
+            <TriangleAlert className="h-5 w-5" aria-hidden />
+          </span>
+          <h1 className="mt-4 font-display text-xl font-semibold text-ink">
+            We couldn&apos;t load these stays
+          </h1>
+          <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-ink-muted">{error}</p>
+          <div className="mt-6 flex justify-center">
+            <SecondaryLink href="/">Start a new search</SecondaryLink>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[var(--sand)] text-[var(--navy)]">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <Link href="/" className="mb-6 inline-block text-[var(--ocean-teal)] font-medium hover:underline">
-          ← Back to search
-        </Link>
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-baseline sm:justify-between">
+    <div className="bg-canvas">
+      {/* Search stays editable in place — changing dates shouldn't mean going back. */}
+      <div className="sticky top-16 z-30 border-b border-border bg-surface-muted/95 backdrop-blur">
+        <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
+          <SearchBar
+            variant="compact"
+            initialMode={aiSearch ? "vibe" : "destination"}
+            initialDestination={placeLabel}
+            initialPlaceId={placeId ?? ""}
+            initialVibe={aiSearch ?? ""}
+            initialCheckin={checkin ?? undefined}
+            initialCheckout={checkout ?? undefined}
+            initialGuests={Number(adults) || 1}
+          />
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-8">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="mb-1 text-2xl font-bold text-[var(--navy)]">Safer stays for your trip</h1>
-            <p className="text-[var(--navy-light)]">
-              Filter by rating, budget, and free cancellation. Safety signals appear on each stay when hotels list them.
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+              {loading ? "Finding stays…" : `${filteredAndSortedHotels.length} stays for your dates`}
+            </h1>
+            <p className="mt-1 text-[0.9375rem] text-ink-muted">
+              {formatDate(checkin)} – {formatDate(checkout)} · {nights}{" "}
+              {nights === 1 ? "night" : "nights"} · {adults}{" "}
+              {Number(adults) === 1 ? "traveller" : "travellers"}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="text-sm text-[var(--navy-light)]">Sort:</span>
-            <div className="flex rounded-lg border border-[var(--navy)]/15 p-0.5">
-              <button
-                type="button"
-                onClick={() => setSortBy("rating")}
-                className={`min-h-[44px] rounded-md px-3 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:py-1.5 ${
-                  sortBy === "rating"
-                    ? "bg-[var(--ocean-teal)] text-white"
-                    : "text-[var(--navy-light)] hover:bg-[var(--sand)]"
-                }`}
-              >
-                Highest rated
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortBy("price")}
-                className={`min-h-[44px] rounded-md px-3 py-2 text-sm font-medium transition-colors sm:min-h-0 sm:py-1.5 ${
-                  sortBy === "price"
-                    ? "bg-[var(--ocean-teal)] text-white"
-                    : "text-[var(--navy-light)] hover:bg-[var(--sand)]"
-                }`}
-              >
-                Lowest price
-              </button>
-            </div>
-            <p className="text-sm text-[var(--navy-light)]">
-              <span className="font-semibold text-[var(--navy)]">{filteredAndSortedHotels.length}</span>{" "}
-              {filteredAndSortedHotels.length === 1 ? "place" : "places"}
-            </p>
+
+          <div className="flex items-center gap-2">
+            <label htmlFor="sort" className="text-[0.8125rem] text-ink-muted">
+              Sort by
+            </label>
+            <select
+              id="sort"
+              value={sortBy}
+              onChange={(event) => setSortBy(event.target.value as "rating" | "price")}
+              className="min-h-[40px] w-auto rounded-control border border-border bg-surface px-3 text-[0.9375rem] font-medium text-ink"
+            >
+              <option value="rating">Highest rated</option>
+              <option value="price">Lowest price</option>
+            </select>
           </div>
         </div>
 
-        <div className="mb-4 flex gap-2 lg:hidden">
+        <div className="mb-4 grid grid-cols-2 gap-2 lg:hidden">
           <button
             type="button"
-            onClick={() => setFiltersOpen((o) => !o)}
+            onClick={() => setFiltersOpen((open) => !open)}
             aria-expanded={filtersOpen}
-            className="min-h-[44px] flex-1 rounded-lg border border-[var(--navy)]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[var(--navy)] shadow-sm"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-control border border-border bg-surface text-[0.9375rem] font-semibold text-ink"
           >
+            <SlidersHorizontal className="h-4 w-4" aria-hidden />
             {filtersOpen ? "Hide filters" : "Filters"}
           </button>
           <button
             type="button"
-            onClick={() => setMapOpen((o) => !o)}
+            onClick={() => setMapOpen((open) => !open)}
             aria-expanded={mapOpen}
-            className="min-h-[44px] flex-1 rounded-lg border border-[var(--navy)]/15 bg-white px-4 py-2.5 text-sm font-semibold text-[var(--navy)] shadow-sm"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-control border border-border bg-surface text-[0.9375rem] font-semibold text-ink"
           >
-            {mapOpen ? "Hide map" : "Show map"}
+            <MapIcon className="h-4 w-4" aria-hidden />
+            {mapOpen ? "Hide map" : "Map"}
           </button>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,260px)_minmax(0,1.4fr)]">
-          <aside
-            className={`h-fit rounded-xl border border-[var(--navy)]/10 bg-white p-5 shadow-sm ${
-              filtersOpen ? "block" : "hidden lg:block"
-            }`}
-          >
-            <h2 className="mb-3 text-base font-semibold text-[var(--navy)]">Comfort filters</h2>
-            <div className="space-y-4 text-sm">
-              <div>
-                <p className="mb-1 text-[var(--navy)] font-medium">Minimum rating</p>
-                <div className="flex flex-wrap gap-2">
-                  {[null, 3, 4, 4.5].map((value) => (
-                    <button
-                      key={String(value)}
-                      type="button"
-                      onClick={() => setMinRating(value)}
-                      className={`min-h-[36px] rounded-full border px-3 py-1.5 text-xs font-medium ${
-                        minRating === value
-                          ? "border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/10 text-[var(--ocean-teal)]"
-                          : "border-[var(--navy)]/15 text-[var(--navy-light)] hover:border-[var(--ocean-teal)]/40"
-                      }`}
-                    >
-                      {value === null ? "Any" : `★ ${value}+`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="mb-1 text-[var(--navy)] font-medium">Budget (per stay)</p>
-                <div className="flex flex-wrap gap-2">
-                  {[null, 150, 250, 400].map((value) => (
-                    <button
-                      key={String(value)}
-                      type="button"
-                      onClick={() => setMaxPrice(value)}
-                      className={`min-h-[36px] rounded-full border px-3 py-1.5 text-xs font-medium ${
-                        maxPrice === value
-                          ? "border-[var(--ocean-teal)] bg-[var(--ocean-teal)]/10 text-[var(--ocean-teal)]"
-                          : "border-[var(--navy)]/15 text-[var(--navy-light)] hover:border-[var(--ocean-teal)]/40"
-                      }`}
-                    >
-                      {value === null ? "Any" : `Up to ${value}`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-2 border-t border-[var(--navy)]/10 pt-3">
-                <label className="flex cursor-pointer items-start gap-2">
-                  <input
-                    type="checkbox"
-                    checked={onlyFreeCancellation}
-                    onChange={(e) => setOnlyFreeCancellation(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 rounded border-[var(--navy)]/30 text-[var(--ocean-teal)] focus:ring-[var(--ocean-teal)]/40"
-                  />
-                  <span>
-                    <span className="block text-[var(--navy)] font-medium">Free cancellation only</span>
-                    <span className="block text-[var(--navy-light)]">
-                      Prioritise flexibility in case your plans change.
-                    </span>
-                  </span>
-                </label>
-              </div>
-            </div>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,250px)_minmax(0,1fr)] lg:gap-8">
+          <aside className={`lg:sticky lg:top-36 lg:h-fit ${filtersOpen ? "block" : "hidden lg:block"}`}>
+            <ResultsFilters
+              minRating={minRating}
+              maxPrice={maxPrice}
+              onlyFreeCancellation={onlyFreeCancellation}
+              onChange={updateFilters}
+              onReset={resetFilters}
+              isFiltered={isFiltered}
+            />
           </aside>
 
-          <div className="space-y-6">
+          <div className="min-w-0 space-y-4">
             <div
               id="yict-map"
-              className={`h-72 w-full overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-[var(--sand)] ${
+              className={`h-64 w-full overflow-hidden rounded-card border border-border bg-surface-muted ${
                 mapOpen ? "flex items-center justify-center" : "hidden lg:flex lg:items-center lg:justify-center"
               }`}
-              aria-label="Map of safer stays in this area"
+              aria-label="Map of stays in this area"
             >
               {!effectivePlaceForMap && !placeId ? (
-                <p className="text-center text-[var(--navy-light)] px-4">
-                  Map will appear when stays include location data or when you search by destination.
+                <p className="px-4 text-center text-[0.9375rem] text-ink-muted">
+                  The map appears once stays include location data, or when you search by destination.
                 </p>
               ) : placeDetailsError && !derivedPlaceFromHotels ? (
-                <p className="text-center text-[var(--navy-light)] px-4">
-                  Map couldn&apos;t load. You can still browse the list below.
+                <p className="px-4 text-center text-[0.9375rem] text-ink-muted">
+                  The map couldn&apos;t load. You can still browse the list below.
                 </p>
               ) : !effectivePlaceForMap ? (
-                <p className="text-center text-[var(--navy-light)]">Loading map…</p>
+                <p className="text-[0.9375rem] text-ink-muted">Loading map…</p>
               ) : (
                 <ResultsMap
                   placeDetails={effectivePlaceForMap}
-                  hotels={hotelsWithCoords
-                    .map((h) => {
-                      const href = `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
-                        searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""
-                      }${
-                        searchParams.get("aiSearch")
-                          ? `&aiSearch=${encodeURIComponent(searchParams.get("aiSearch")!)}`
-                          : ""
-                      }`;
-                      return {
-                        id: h.id,
-                        name: h.name,
-                        lat: h.lat!,
-                        lng: h.lng!,
-                        address: h.address,
-                        rating: h.rating,
-                        price: h.price,
-                        currency: h.currency,
-                        href,
-                      };
-                    })}
+                  hotels={hotelsWithCoords.map((h) => ({
+                    id: h.id,
+                    name: h.name,
+                    lat: h.lat,
+                    lng: h.lng,
+                    address: h.address,
+                    rating: h.rating,
+                    price: h.price,
+                    currency: h.currency,
+                    href: hotelHref(h.id),
+                  }))}
                   className="h-full w-full"
                 />
               )}
             </div>
-            {filteredAndSortedHotels.map((h) => {
-              const hotelHref = `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
-                searchParams.get("placeId") ? `&placeId=${searchParams.get("placeId")}` : ""
-              }${searchParams.get("aiSearch") ? `&aiSearch=${encodeURIComponent(searchParams.get("aiSearch")!)}` : ""}`;
-              const expanded = Boolean(expandedHotelIds[h.id]);
-              return (
-                <div
-                  key={h.id}
-                  className="overflow-hidden rounded-xl border border-[var(--navy)]/10 bg-white shadow-sm transition-colors hover:border-[var(--ocean-teal)]/40"
-                >
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-stretch">
-                    <Link href={hotelHref} className="block h-48 w-full shrink-0 bg-[var(--sand)] sm:h-40 sm:w-48">
-                      {h.main_photo ? (
-                        <img src={h.main_photo} alt={h.name} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-[var(--navy-light)]">No image</div>
-                      )}
-                    </Link>
-                    <div className="flex min-w-0 flex-1 flex-col gap-3 p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <h2 className="text-lg font-semibold text-[var(--navy)]">
-                            <Link href={hotelHref} className="hover:text-[var(--ocean-teal)]">
-                              {h.name}
-                            </Link>
-                          </h2>
-                          {h.address && <p className="mt-1 text-[var(--navy-light)]">{h.address}</p>}
-                          {h.rating != null && (
-                            <p className="mt-1 text-[var(--ocean-teal)]">★ {h.rating}</p>
-                          )}
-                          <div className="mt-3">
-                            <SafetyBadgeList
-                              badges={h.safetyBadges ?? []}
-                              freeCancellation={Boolean(h.hasFreeCancellation)}
-                              max={4}
-                            />
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => toggleHotelExpanded(h.id)}
-                          aria-expanded={expanded}
-                          className="shrink-0 rounded-lg border border-[var(--navy)]/15 bg-[var(--sand)] px-3 py-2.5 text-xs font-semibold text-[var(--navy)] hover:border-[var(--ocean-teal)]/40 hover:bg-white min-h-[44px] sm:min-h-0 sm:text-sm"
-                        >
-                          {expanded ? "Hide rates" : "Rates & details"}
-                        </button>
-                      </div>
-                      {h.price != null && !expanded && (
-                        <p className="text-base font-semibold text-[var(--ocean-teal)]">
-                          {formatStayTotal(h.price, h.currency ?? "USD")}
-                          <span className="pl-1 text-sm font-normal text-[var(--navy-light)]">total stay</span>
-                        </p>
-                      )}
-                      {h.price == null && !expanded && (
-                        <p className="text-sm text-[var(--navy-light)]">Open rates for pricing.</p>
-                      )}
-                      {expanded && h.price != null && (
-                        <div className="shrink-0 rounded-xl border-2 border-[var(--ocean-teal)]/35 bg-[var(--ocean-teal)]/[0.08] px-4 py-4 shadow-sm">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--navy-light)]">
-                            Total for your stay
-                          </p>
-                          <p className="mt-1 text-2xl font-bold leading-tight text-[var(--ocean-teal)] sm:text-3xl">
-                            {formatStayTotal(h.price, h.currency ?? "USD")}
-                          </p>
-                          <p className="mt-2 text-sm font-medium leading-snug text-[var(--navy)]">
-                            For your entire stay — includes taxes, fees, and cleaning fee
-                          </p>
-                          <p className="mt-1 text-xs text-[var(--navy-light)]">
-                            Choose a room on the next page, then continue to checkout.
-                          </p>
-                          <Link
-                            href={hotelHref}
-                            className="mt-4 inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-[var(--ocean-teal)] px-4 py-3 text-center text-base font-semibold text-white hover:bg-[var(--ocean-teal-light)]"
-                          >
-                            View rooms &amp; book
-                          </Link>
-                        </div>
-                      )}
-                      {expanded && h.price == null && (
-                        <div className="rounded-xl border border-[var(--navy)]/15 bg-[var(--sand)]/80 px-4 py-4">
-                          <p className="text-sm text-[var(--navy)]">See live rates and room types for your dates.</p>
-                          <Link
-                            href={hotelHref}
-                            className="mt-3 inline-flex min-h-[48px] w-full items-center justify-center rounded-lg bg-[var(--ocean-teal)] px-4 py-3 text-center text-base font-semibold text-white hover:bg-[var(--ocean-teal-light)]"
-                          >
-                            View rooms &amp; book
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+
+            {loading &&
+              Array.from({ length: 4 }).map((_, index) => <HotelCardSkeleton key={index} />)}
+
+            {!loading &&
+              filteredAndSortedHotels.map((hotel) => (
+                <HotelCard
+                  key={hotel.id}
+                  hotel={hotel}
+                  href={hotelHref(hotel.id)}
+                  nights={nights}
+                  onSelect={() => track("Rates Viewed", { hotelId: hotel.id })}
+                />
+              ))}
+
+            {!loading && filteredAndSortedHotels.length === 0 && (
+              <div className="rounded-card border border-border bg-surface p-8 text-center">
+                <span className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-surface-muted text-ink-muted">
+                  <SearchX className="h-5 w-5" aria-hidden />
+                </span>
+                <h2 className="mt-4 font-display text-lg font-semibold text-ink">
+                  {hotels.length === 0 ? "No stays for these dates" : "Nothing matches these filters"}
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-ink-muted">
+                  {hotels.length === 0
+                    ? "Try shifting your dates by a day or two, or search a nearby city."
+                    : "Loosen the rating or budget filter to see more of what's available."}
+                </p>
+                <div className="mt-5 flex justify-center gap-2">
+                  {hotels.length > 0 && isFiltered && (
+                    <button
+                      type="button"
+                      onClick={resetFilters}
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-control bg-teal px-4 text-[0.9375rem] font-semibold text-white hover:bg-teal-hover"
+                    >
+                      Clear filters
+                    </button>
+                  )}
+                  <SecondaryLink href="/">New search</SecondaryLink>
                 </div>
-              );
-            })}
-            {filteredAndSortedHotels.length === 0 && (
-              <p className="text-[var(--navy-light)]">
-                No stays match these filters. Try relaxing your rating, budget, or cancellation preferences.
+              </div>
+            )}
+
+            {!loading && filteredAndSortedHotels.length > 0 && (
+              <p className="pt-2 text-center text-[0.8125rem] text-ink-muted">
+                Prices are totals for your dates, including taxes and fees.{" "}
+                <Link href="/popular-cities" className="text-teal underline-offset-4 hover:underline">
+                  Browse other cities
+                </Link>
               </p>
             )}
           </div>
@@ -731,7 +667,17 @@ function ResultsContent() {
 
 export default function ResultsPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-[var(--sand)] text-[var(--navy-light)]">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+          <div className="space-y-4">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <HotelCardSkeleton key={index} />
+            ))}
+          </div>
+        </div>
+      }
+    >
       <ResultsContent />
     </Suspense>
   );

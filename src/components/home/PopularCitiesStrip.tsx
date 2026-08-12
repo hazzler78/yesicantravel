@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
+import { getDestinationBySlug } from "@/data/destinations";
 import type { MinPricesResponse } from "@/app/api/popular-cities/min-prices/route";
 import { SectionHeading } from "@/components/ui/Card";
 import { useCurrency } from "@/components/currency/CurrencyControl";
@@ -82,11 +83,16 @@ export function PopularCitiesStrip() {
                 })}`
               : `/results?${new URLSearchParams({ placeId: city.placeId })}`;
 
+            // The price card points into /results, which robots.txt disallows,
+            // so it carries no crawl signal. The guide link below it is the
+            // homepage's only route to the city pages.
+            const guide = getDestinationBySlug(city.slug);
+
             return (
-              <li key={city.slug}>
+              <li key={city.slug} className="flex flex-col">
                 <Link
                   href={href}
-                  className="group flex h-full items-center justify-between gap-4 rounded-card border border-border bg-surface px-4 py-3.5 transition-colors hover:border-border-strong hover:bg-surface-muted"
+                  className="group flex items-center justify-between gap-4 rounded-card border border-border bg-surface px-4 py-3.5 transition-colors hover:border-border-strong hover:bg-surface-muted"
                 >
                   <span className="min-w-0">
                     <span className="block truncate font-display text-lg font-semibold text-ink">
@@ -111,6 +117,14 @@ export function PopularCitiesStrip() {
                     aria-hidden
                   />
                 </Link>
+                {guide && (
+                  <Link
+                    href={`/destinations/${guide.slug}`}
+                    className="mt-1.5 self-start px-1 text-[0.8125rem] font-medium text-teal underline-offset-4 hover:underline"
+                  >
+                    Is {city.city} safe for solo women?
+                  </Link>
+                )}
               </li>
             );
           })}

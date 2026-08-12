@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
+import { getDestinationBySlug } from "@/data/destinations";
 import { Card } from "@/components/ui/Card";
 
 /** Default check-in 14 days from now, checkout +2 nights for result links */
@@ -31,7 +32,7 @@ export default function PopularCitiesPage() {
             Popular cities
           </h1>
           <p className="mt-3 text-[0.9375rem] text-ink-muted md:text-base">
-            Each link opens a search already pointed at central, well-connected areas, with dates
+            Read the area guide to work out where you want to be, then open a search with dates
             set to a two-night trip a couple of weeks out. Change anything from there.
           </p>
         </header>
@@ -44,26 +45,51 @@ export default function PopularCitiesPage() {
               checkout,
               adults: "1",
             })}`;
+            // The search link lives under /results, which robots.txt disallows.
+            // Without a guide link the card is a dead end for crawlers, and the
+            // city page is what ranks for "safe hotels in <city>" anyway.
+            const guide = getDestinationBySlug(city.slug);
             return (
               <li key={city.slug}>
                 <Card as="article" className="flex h-full flex-col p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
                     {city.country}
                   </p>
-                  <h2 className="mt-1 font-display text-xl font-semibold text-ink">{city.city}</h2>
+                  <h2 className="mt-1 font-display text-xl font-semibold text-ink">
+                    {guide ? (
+                      <Link
+                        href={`/destinations/${guide.slug}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {city.city}
+                      </Link>
+                    ) : (
+                      city.city
+                    )}
+                  </h2>
                   <p className="mt-2 flex-1 text-[0.9375rem] leading-relaxed text-ink-muted">
                     {city.description}
                   </p>
-                  <Link
-                    href={href}
-                    className="group mt-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
-                  >
-                    See stays in {city.city}
-                    <ArrowRight
-                      className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                      aria-hidden
-                    />
-                  </Link>
+                  <div className="mt-4 flex flex-col gap-2">
+                    {guide && (
+                      <Link
+                        href={`/destinations/${guide.slug}`}
+                        className="group inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
+                      >
+                        {city.city} safety guide
+                        <ArrowRight
+                          className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                          aria-hidden
+                        />
+                      </Link>
+                    )}
+                    <Link
+                      href={href}
+                      className="text-[0.9375rem] text-ink-muted underline-offset-4 hover:underline"
+                    >
+                      See stays in {city.city}
+                    </Link>
+                  </div>
                 </Card>
               </li>
             );

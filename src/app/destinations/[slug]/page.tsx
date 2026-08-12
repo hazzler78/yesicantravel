@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, Dot } from "lucide-react";
+import { Check, Dot, LifeBuoy } from "lucide-react";
 import { notFound } from "next/navigation";
 import {
   getDestinationBySlug,
   getAllDestinationSlugs,
   getRelatedDestinations,
 } from "@/data/destinations";
+import { getUpcomingEventsInCity } from "@/data/events";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
 
 const BASE_URL = "https://yesicantravel.com";
@@ -59,6 +60,7 @@ export default async function DestinationPage({ params }: Props) {
 
   const canonicalUrl = `${BASE_URL}/destinations/${slug}`;
   const related = getRelatedDestinations(slug, 3);
+  const cityEvents = getUpcomingEventsInCity(dest.city, 4);
 
   // JSON-LD: BreadcrumbList + TouristDestination. Helps Google understand
   // topical relevance of thin templated pages while we build out richer copy.
@@ -85,7 +87,9 @@ export default async function DestinationPage({ params }: Props) {
   const destinationJsonLd = {
     "@context": "https://schema.org",
     "@type": "TouristDestination",
-    name: `${dest.city} – ${dest.eventShortName}`,
+    name: dest.eventShortName
+      ? `${dest.city} – ${dest.eventShortName}`
+      : `${dest.city} for solo female travellers`,
     description: dest.metaDescription,
     url: canonicalUrl,
     touristType: "Solo female travellers",
@@ -147,12 +151,22 @@ export default async function DestinationPage({ params }: Props) {
         </header>
 
         <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
-          <h2 className="mb-3 font-display text-lg font-semibold text-ink">Why now?</h2>
+          <h2 className="mb-3 font-display text-lg font-semibold text-ink">
+            {dest.whyDemand ? "Why now?" : "Planning your stay"}
+          </h2>
           <p className="mb-4 rounded-control bg-teal-soft px-4 py-2.5 text-[0.9375rem] font-semibold text-ink">
             Dates pre-filled: {formatStayWindow(stay)}
           </p>
-          <p className="mb-4 text-ink-muted">{dest.whyDemand}</p>
-          <p className="text-sm font-medium text-teal">{dest.events}</p>
+          {dest.whyDemand ? (
+            <p className="mb-4 text-ink-muted">{dest.whyDemand}</p>
+          ) : (
+            <p className="mb-4 text-ink-muted">
+              We&apos;ve set a two-night stay a couple of weeks out so you can see real prices
+              straight away. Change the dates, the length and the number of travellers on the
+              results page — nothing here is locked in.
+            </p>
+          )}
+          {dest.events && <p className="text-sm font-medium text-teal">{dest.events}</p>}
         </section>
 
         <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
@@ -247,6 +261,28 @@ export default async function DestinationPage({ params }: Props) {
           </section>
         )}
 
+        {dest.supportLine && (
+          <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-3 font-display text-lg font-semibold text-ink">
+              If you need help in {dest.city}
+            </h2>
+            <p className="mb-4 text-sm text-ink-muted">
+              Worth saving before you travel, not after. In an emergency anywhere in Europe,
+              call <strong className="font-semibold text-ink">112</strong>.
+            </p>
+            <div className="flex items-start gap-3 rounded-control bg-teal-soft px-4 py-3">
+              <LifeBuoy className="mt-0.5 h-4 w-4 shrink-0 text-teal" aria-hidden />
+              <div>
+                <p className="font-semibold text-ink">
+                  {dest.supportLine.name} ·{" "}
+                  <span className="tabular-nums">{dest.supportLine.number}</span>
+                </p>
+                <p className="mt-1 text-sm text-ink-muted">{dest.supportLine.description}</p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {dest.faqs && dest.faqs.length > 0 && (
           <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
             <h2 className="mb-4 font-display text-lg font-semibold text-ink">
@@ -280,6 +316,31 @@ export default async function DestinationPage({ params }: Props) {
             Find safer stays in {dest.city}
           </Link>
         </div>
+
+        {cityEvents.length > 0 && (
+          <section className="mt-12 rounded-card border border-border bg-surface p-5 shadow-card">
+            <h2 className="mb-1 font-display text-lg font-semibold text-ink">
+              What&apos;s on in {dest.city}
+            </h2>
+            <p className="mb-4 text-sm text-ink-muted">
+              Prices and availability change sharply around these dates. Each guide covers
+              getting home late on the nights the event is running.
+            </p>
+            <ul className="space-y-3">
+              {cityEvents.map((event) => (
+                <li key={event.slug}>
+                  <Link
+                    href={`/events/${event.slug}`}
+                    className="block rounded-card border border-border bg-surface p-4 transition-colors hover:border-border-strong"
+                  >
+                    <p className="font-semibold text-ink">{event.eventName}</p>
+                    <p className="mt-1 text-sm text-ink-muted">{event.dateRange}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {related.length > 0 && (
           <section className="mt-12 rounded-card border border-border bg-surface p-5 shadow-card">

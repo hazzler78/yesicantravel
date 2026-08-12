@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useCurrency } from "@/components/currency/CurrencyControl";
-import { localeForCurrency, type CurrencyCode } from "@/lib/currency";
+import { formatHeadlinePrice } from "@/lib/formatStayPrice";
 
 interface EventPriceBadgeProps {
   slug: string;
@@ -46,18 +46,7 @@ export default function EventPriceBadge({ slug, eventShortName, venueNotes }: Ev
   if (error || !data) return null;
   if (data.minPrice == null) return null;
 
-  const formatted = (() => {
-    try {
-      const code = (data.currency || currency) as CurrencyCode;
-      return new Intl.NumberFormat(localeForCurrency(code), {
-        style: "currency",
-        currency: data.currency || currency,
-        maximumFractionDigits: 0,
-      }).format(data.minPrice);
-    } catch {
-      return `${data.minPrice} ${data.currency}`;
-    }
-  })();
+  const formatted = formatHeadlinePrice(data.minPrice, data.currency || currency);
 
   return (
     <p className="mt-3 inline-flex items-center gap-2 rounded-control bg-teal-soft px-3 py-2 text-[0.9375rem] text-ink">

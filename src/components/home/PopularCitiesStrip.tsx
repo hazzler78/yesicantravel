@@ -8,20 +8,7 @@ import { getDestinationBySlug } from "@/data/destinations";
 import type { MinPricesResponse } from "@/app/api/popular-cities/min-prices/route";
 import { SectionHeading } from "@/components/ui/Card";
 import { useCurrency } from "@/components/currency/CurrencyControl";
-import { isCurrencyCode, localeForCurrency } from "@/lib/currency";
-
-function formatPrice(amount: number, currency: string) {
-  try {
-    const locale = isCurrencyCode(currency) ? localeForCurrency(currency) : "en-GB";
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: currency || "EUR",
-      maximumFractionDigits: 0,
-    }).format(amount);
-  } catch {
-    return `${amount} ${currency}`;
-  }
-}
+import { formatHeadlinePrice } from "@/lib/formatStayPrice";
 
 function formatDateRange(checkin: string, checkout: string) {
   try {
@@ -103,7 +90,7 @@ export function PopularCitiesStrip() {
                         <>
                           {city.country} · from{" "}
                           <span className="tnum font-semibold text-ink">
-                            {formatPrice(price.perNight, price.currency)}
+                            {formatHeadlinePrice(price.perNight, price.currency)}
                           </span>{" "}
                           a night
                         </>

@@ -34,7 +34,8 @@ yarn-error.log*
 .env*
 
 # GSC MCP service account key (never commit)
-.cursor/secrets/
+.cursor/secrets/*
+!.cursor/secrets/.gitkeep
 gsc-service-account.json
 
 # vercel

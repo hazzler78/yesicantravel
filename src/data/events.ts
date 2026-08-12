@@ -1407,6 +1407,26 @@ export function getRelatedEvents(
 }
 
 /**
+ * Upcoming events whose host city matches `city`, soonest first.
+ *
+ * Matched loosely because some events sit outside the city they're sold on
+ * ("Ferropolis (near Berlin)", "Roskilde / Copenhagen"). City guides use this
+ * to link event pages, which is currently their only route to a crawler that
+ * has already found the guide.
+ */
+export function getUpcomingEventsInCity(
+  city: string,
+  limit = 4,
+  today = todayIso(),
+): (Event & { dateRange: string })[] {
+  const needle = city.trim().toLowerCase();
+  if (!needle) return [];
+  return getUpcomingEvents(today)
+    .filter((e) => e.city.toLowerCase().includes(needle))
+    .slice(0, limit);
+}
+
+/**
  * For the homepage "Peak dates" block. Only events a visitor can still travel
  * to — a finished event advertises dates the search can't even quote.
  */

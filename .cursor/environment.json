@@ -1,0 +1,4 @@
+{
+  "name": "yesicantravel",
+  "install": "npm install && npx prisma generate && bash .cursor/scripts/write-gsc-credentials.sh"
+}

@@ -8,7 +8,9 @@ import {
   getRelatedDestinations,
 } from "@/data/destinations";
 import { getUpcomingEventsInCity } from "@/data/events";
+import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
+import { FromPriceBadge } from "@/components/FromPriceBadge";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -51,8 +53,11 @@ export default async function DestinationPage({ params }: Props) {
   // The hard-coded checkin/checkout on each destination were March 2026 dates,
   // so every CTA here pointed at a stay in the past.
   const stay = getDefaultStayWindow();
+  // Same placeId (when we have one) as the from-price quote, so the figure
+  // on this page is actually on the results list the CTA opens.
+  const placeId = getPlaceIdForDestinationSlug(slug);
   const searchUrl = `/results?${new URLSearchParams({
-    aiSearch: dest.aiSearch,
+    ...(placeId ? { placeId } : { aiSearch: dest.aiSearch }),
     checkin: stay.checkin,
     checkout: stay.checkout,
     adults: "1",
@@ -154,13 +159,17 @@ export default async function DestinationPage({ params }: Props) {
           <h2 className="mb-3 font-display text-lg font-semibold text-ink">
             {dest.whyDemand ? "Why now?" : "Planning your stay"}
           </h2>
-          <p className="mb-4 rounded-control bg-teal-soft px-4 py-2.5 text-[0.9375rem] font-semibold text-ink">
+          <p className="rounded-control bg-teal-soft px-4 py-2.5 text-[0.9375rem] font-semibold text-ink">
             Dates pre-filled: {formatStayWindow(stay)}
           </p>
+          <FromPriceBadge
+            endpoint={`/api/destinations/${encodeURIComponent(slug)}/min-price`}
+            detail="for these dates · one traveller"
+          />
           {dest.whyDemand ? (
-            <p className="mb-4 text-ink-muted">{dest.whyDemand}</p>
+            <p className="mb-4 mt-4 text-ink-muted">{dest.whyDemand}</p>
           ) : (
-            <p className="mb-4 text-ink-muted">
+            <p className="mb-4 mt-4 text-ink-muted">
               We&apos;ve set a two-night stay a couple of weeks out so you can see real prices
               straight away. Change the dates, the length and the number of travellers on the
               results page — nothing here is locked in.

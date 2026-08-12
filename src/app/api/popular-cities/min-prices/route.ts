@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { searchRates } from "@/lib/liteapi";
 import { popularCities } from "@/data/popularCities";
 import { cheapestVisibleTotal, perNight, type RateOffer } from "@/lib/resultsPricing";
+import { DEFAULT_CURRENCY, resolveRequestCurrency } from "@/lib/currency";
 
 const NIGHTS = 2;
 const ADULTS = 1;
@@ -26,24 +27,25 @@ export type MinPricesResponse = {
   checkout: string;
   nights: number;
   adults: number;
+  currency: string;
   cities: Record<string, CityPrice>;
 };
 
 /**
- * GET /api/popular-cities/min-prices
+ * GET /api/popular-cities/min-prices?currency=SEK
  *
  * The lowest nightly price a visitor will actually find after clicking a city
- * card, for the exact dates that card links to.
+ * card, for the exact dates that card links to, quoted in the requested currency.
  *
- * This deliberately searches by `placeId` and reads rates the same way
- * /results does. The previous version searched by free-text `aiSearch`, which
- * returns a different handful of hotels on every call, so the advertised price
- * matched neither the city's real minimum nor the page it linked to.
- *
- * Cached 1h to limit upstream calls.
+ * Cached 1h per currency to limit upstream calls.
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    const currency = resolveRequestCurrency({
+      queryCurrency: request.nextUrl.searchParams.get("currency"),
+      cookieHeader: request.headers.get("cookie"),
+      fallback: DEFAULT_CURRENCY,
+    });
     const { checkin, checkout } = getDefaultDates();
 
     const results = await Promise.all(
@@ -54,14 +56,14 @@ export async function GET() {
             checkin,
             checkout,
             adults: ADULTS,
-            currency: "EUR",
+            currency,
           });
           const cheapest = cheapestVisibleTotal((data?.data ?? []) as RateOffer[]);
-          if (!cheapest) return { slug: city.slug, perNight: null, currency: "EUR" };
+          if (!cheapest) return { slug: city.slug, perNight: null, currency };
           const nightly = perNight(cheapest, NIGHTS);
           return { slug: city.slug, perNight: nightly.amount, currency: nightly.currency };
         } catch {
-          return { slug: city.slug, perNight: null, currency: "EUR" };
+          return { slug: city.slug, perNight: null, currency };
         }
       })
     );
@@ -76,12 +78,14 @@ export async function GET() {
       checkout,
       nights: NIGHTS,
       adults: ADULTS,
+      currency,
       cities,
     };
 
     return NextResponse.json(body, {
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
+        Vary: "Cookie",
       },
     });
   } catch (e) {

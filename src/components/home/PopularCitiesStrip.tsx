@@ -6,10 +6,13 @@ import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
 import type { MinPricesResponse } from "@/app/api/popular-cities/min-prices/route";
 import { SectionHeading } from "@/components/ui/Card";
+import { useCurrency } from "@/components/currency/CurrencyControl";
+import { isCurrencyCode, localeForCurrency } from "@/lib/currency";
 
 function formatPrice(amount: number, currency: string) {
   try {
-    return new Intl.NumberFormat("en-GB", {
+    const locale = isCurrencyCode(currency) ? localeForCurrency(currency) : "en-GB";
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency: currency || "EUR",
       maximumFractionDigits: 0,
@@ -32,11 +35,13 @@ function formatDateRange(checkin: string, checkout: string) {
 }
 
 export function PopularCitiesStrip() {
+  const currency = useCurrency();
   const [prices, setPrices] = useState<MinPricesResponse | null>(null);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/popular-cities/min-prices")
+    setPrices(null);
+    fetch(`/api/popular-cities/min-prices?currency=${encodeURIComponent(currency)}`)
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("min-prices failed"))))
       .then((data: MinPricesResponse) => {
         if (!cancelled) setPrices(data);
@@ -47,7 +52,7 @@ export function PopularCitiesStrip() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [currency]);
 
   return (
     <section className="bg-canvas">

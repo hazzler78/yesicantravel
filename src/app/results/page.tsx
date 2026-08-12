@@ -17,6 +17,8 @@ import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
+import { useCurrency } from "@/components/currency/CurrencyControl";
+import { guestNationalityForCurrency } from "@/lib/currency";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
@@ -129,6 +131,7 @@ function formatDate(iso: string | null) {
 
 function ResultsContent() {
   const searchParams = useSearchParams();
+  const currency = useCurrency();
   const [hotels, setHotels] = useState<HotelListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -182,11 +185,15 @@ function ResultsContent() {
 
     async function run() {
       try {
+        setLoading(true);
+        setError(null);
         setSearchAnalyticsOutcome(null);
         const body: Record<string, string | number> = {
           checkin: checkin!,
           checkout: checkout!,
           adults: Number(adults),
+          currency,
+          guestNationality: guestNationalityForCurrency(currency),
         };
         if (placeId) body.placeId = placeId;
         if (aiSearch) body.aiSearch = aiSearch;
@@ -369,7 +376,7 @@ function ResultsContent() {
       }
     }
     run();
-  }, [searchParams]);
+  }, [searchParams, currency]);
 
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");

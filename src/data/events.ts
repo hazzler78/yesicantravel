@@ -571,7 +571,7 @@ export const events: Event[] = [
       "Metro line 10 to its terminus at Boulogne–Pont de Saint-Cloud, then a ten to fifteen minute walk across the bridge, is the simplest way in. Tram T2 to Parc de Saint-Cloud is the alternative and drops you closer.",
       "Concerts are deliberately scheduled to finish before the metro and tram stop — around 00:30 on Friday and Saturday and 23:30 on the other nights. That only helps if you leave with the crowd rather than after it.",
       "Leaving fifteen or twenty minutes before the last act finishes turns a slow crush over the bridge into a walk. It is the single most useful thing to know about this festival.",
-      "If you do miss the last metro, Noctilien night buses N12 and N61 stop at Pont de Sèvres, a short distance from the site.",
+      "If you do miss the last metro, Noctilien night buses N12 and N61 stop at Pont de Sèvres, a short distance from the site. All exits are final — if you leave the site, you cannot come back in.",
       "Parking around the Domaine is very limited and the roads clog after headliners. Do not plan to drive, and if someone is collecting you, arrange it at the metro station rather than at the gates.",
       "Pickpocketing in Paris concentrates on crowded metro lines and station concourses, not on the festival site. Keep your phone out of an open back pocket on line 10 and at Châtelet.",
     ],
@@ -581,7 +581,7 @@ export const events: Event[] = [
       {
         question: "When is Rock en Seine 2026?",
         answer:
-          "Rock en Seine 2026 runs from Wednesday 26 to Sunday 30 August at the Domaine national de Saint-Cloud, on the western edge of Paris. Gates open in the afternoon and headliners close each night.",
+          "Rock en Seine 2026 runs from Wednesday 26 to Sunday 30 August at the Domaine national de Saint-Cloud, on the western edge of Paris. Doors open at 16:00 on Wednesday, 15:30 on Thursday, 14:30 on Friday and Saturday, and 13:00 on Sunday; concerts start about 45 minutes later.",
       },
       {
         question: "How do I get to the festival from central Paris?",
@@ -604,7 +604,7 @@ export const events: Event[] = [
           "The site itself is stewarded and busy, and the realistic Paris risk is pickpocketing on crowded metro lines rather than anything at the festival. The part worth planning is the return journey: know your line, leave before the final crush, and if you are staying near Gare du Nord or Barbès take the metro to the door rather than walking the last few streets.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "nos-alive-lisbon-2026",
@@ -732,10 +732,10 @@ export const events: Event[] = [
       },
     ],
     safetyTips: [
-      "The Wiesn has a free Safe Space for women and girls, run by the Sichere Wiesn campaign since 2003 and staffed by psychologists and social workers. It sits in the Servicezentrum behind the Schottenhamel tent at the \"Erste Hilfe\" entrance, next to the police post. Open daily 18:00–01:00, and from 15:30 on Fridays, Saturdays, Sundays and 2–3 October. They will give you somewhere calm to wait, help you organise a way home, walk you to a taxi, and go with you to the police if you want that.",
+      "The Wiesn has a free Safe Space for women and girls, run by the Sichere Wiesn campaign since 2003. It sits in the Servicezentrum behind the Schottenhamel tent at the \"Erste Hilfe\" entrance, next to the police post. Open daily 18:00–01:00, and from 15:30 on Fridays, Saturdays, Sundays and 2–3 October. Staff will give you somewhere calm to wait, help you get home, walk you to a taxi, and go with you to the police if you want that.",
       "Save the Safe Space number before you go: +49 89 890 57 45 188, staffed during the festival. Emergency numbers are 112 for ambulance and 110 for police.",
       "Skip the Theresienwiese U-Bahn station at peak times — it gets crowded enough that staff sometimes close it. Schwanthalerhöhe (U4/U5), Goetheplatz or Poccistraße (U3/U6) are each about ten minutes' walk and far calmer, as is the S-Bahn to Hackerbrücke.",
-      "Tents stop serving around 22:30 and close about 23:30, which produces one enormous simultaneous exit. Leaving half an hour early is the difference between a walk and a crush.",
+      "Tents stop serving around 22:30 and close about 23:30, which produces one enormous simultaneous exit. Leaving half an hour early is the difference between a walk and a crush. (Käfer and the Weinzelt stay open until 01:00, with last orders at 00:30.)",
       "A Maß is a full litre of beer at roughly 6% — stronger than most people expect, and served faster than you can pace. Order water between rounds; every tent serves it.",
       "Since 2023 you can request a fixed fare when booking a Munich taxi by phone or app, which removes the haggling at the ranks.",
       "Agree a meeting point with anyone you arrive with before you go in. Phone signal on the grounds is unreliable at peak times and tents are far too loud for calls.",
@@ -769,7 +769,7 @@ export const events: Event[] = [
           "The U-Bahn runs until about 01:30 every night at ten-minute intervals, and every line runs right through the night at 30-minute intervals from Friday to Sunday. Since the tents empty around 23:30, you have time — but the platforms are at their worst in the half hour after closing.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "berlin-marathon-2026",
@@ -812,7 +812,7 @@ export const events: Event[] = [
       {
         name: "De Pijp",
         description:
-          "Dense with restaurants and small bars, dominated by locals rather than stag parties, and on the Noord-Zuidlijn metro. The walk back through residential streets is lit and populated at any hour, which is why it is one of the most commonly recommended bases for women travelling alone. Night buses N81 and N82 serve it from Centraal.",
+          "Dense with restaurants and small bars, dominated by locals rather than stag parties, and on the Noord-Zuidlijn metro. The walk back through residential streets is lit and populated at any hour, which is why it is one of the most commonly recommended bases for women travelling alone. Night buses from Centraal cover the area after the metro stops.",
         verdict: "recommended",
       },
       {
@@ -824,7 +824,7 @@ export const events: Event[] = [
       {
         name: "Oud-West",
         description:
-          "Residential, well connected by tram, and cheaper than the canal ring for the same short distances. De Foodhallen and the Vondelpark are on the doorstep. Night buses N83 and N84 run out this way from Centraal.",
+          "Residential, well connected by tram, and cheaper than the canal ring for the same short distances. De Foodhallen and the Vondelpark are on the doorstep. Night buses from Centraal run out this way after midnight.",
         verdict: "recommended",
       },
       {
@@ -835,15 +835,15 @@ export const events: Event[] = [
       },
     ],
     safetyTips: [
-      "Trams and the metro stop around 00:30 — which is roughly when ADE gets going. Plan the way back before you go out: GVB night buses (lines N81 to N93) run from 00:30 to 07:30, all starting and ending at Centraal, hourly on most lines and every 30 minutes on some on Friday and Saturday.",
-      "Night buses are pay-as-you-board by contactless card or phone, tapped at the front of the bus. Drivers do not sell tickets, so don't rely on cash.",
-      "If you are heading to a party at NDSM in Amsterdam Noord, check the ferry: the 906 stops running around 00:30 and doesn't resume until the morning. Getting back means a night bus or a taxi, not the boat you arrived on.",
+      "Trams and the metro stop around 00:30 — which is roughly when ADE gets going. Plan the way back before you go out: GVB night buses run from 00:30 to 07:30, all starting and ending at Centraal, roughly hourly. A standard one-hour GVB ticket is not valid on them; tap a contactless card or use a day pass.",
+      "Night buses are pay-as-you-board by contactless card or phone, tapped at the front of the bus. Drivers do not sell the daytime one-hour ticket, so don't rely on cash or on a ticket you already have.",
+      "If you are heading to a party at NDSM in Amsterdam Noord, check the ferry: the NDSM ferry (F4) is not a 24-hour service. Last boats are typically around 02:00 on weeknights and later on Friday and Saturday — confirm in the GVB app before you go out. Missing it means a night bus, a taxi, or the Buiksloterweg ferry (F3), which does run all night but lands you a bike ride or a long walk from NDSM.",
       "Pickpocketing is the realistic risk here, not violence — crowded trams, Centraal Station and busy venue entrances. A zipped bag worn in front covers most of it.",
       "Uber, Bolt and licensed TCA taxis all operate; a central late-night ride is usually in the region of €15 to €25. Book in the app rather than accepting an offer on the street.",
       "Cycling home at 3am is completely normal here, but only if you are sober and confident in traffic. Amsterdam's junctions are unforgiving of hesitation, and bike theft is the city's highest-volume crime.",
     ],
     gettingAround:
-      "Schiphol is fifteen to twenty minutes from Centraal by train, running through the night, which makes a late arrival straightforward. In the city, ADE venues are spread across four clusters: the centre (Paradiso, Melkweg, near Leidseplein), Amsterdam West (Westergasfabriek), Noord (NDSM, reached by ferry from behind Centraal) and Zuidoost (the Arena area, on the metro). Staying central keeps you within walking or night-bus distance of most of it; staying in Noord means depending on a ferry that stops overnight.",
+      "Schiphol is fifteen to twenty minutes from Centraal by train, running through the night, which makes a late arrival straightforward. In the city, ADE venues are spread across four clusters: the centre (Paradiso, Melkweg, near Leidseplein), Amsterdam West (Westergasfabriek), Noord (NDSM, reached by ferry from behind Centraal) and Zuidoost (the Arena area, on the metro). Staying central keeps you within walking or night-bus distance of most of it; staying in Noord means depending on a ferry that does not run all night.",
     faqs: [
       {
         question: "When is Amsterdam Dance Event 2026?",
@@ -863,7 +863,7 @@ export const events: Event[] = [
       {
         question: "Where should I stay for ADE?",
         answer:
-          "De Pijp, Oud-West and the canal ring are the practical picks: central, residential, well lit, and served by night buses from Centraal. Staying in Noord looks cheap until you realise the ferry stops overnight. If you want to sleep at all, avoid the streets immediately around Leidseplein and Rembrandtplein.",
+          "De Pijp, Oud-West and the canal ring are the practical picks: central, residential, well lit, and served by night buses from Centraal. Staying in Noord looks cheap until you realise the NDSM ferry does not run all night. If you want to sleep at all, avoid the streets immediately around Leidseplein and Rembrandtplein.",
       },
       {
         question: "How do I get back to my hotel after 1am?",
@@ -871,7 +871,7 @@ export const events: Event[] = [
           "Night buses cover the whole city from 00:30 to 07:30, all of them running from Centraal, and they are CCTV-equipped and busy with people doing exactly what you are doing. Leidseplein and Rembrandtplein are the two main pick-up points besides Centraal, both with taxi ranks. Uber and Bolt work well and are cheap for central journeys.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "web-summit-lisbon-2026",
@@ -898,7 +898,7 @@ export const events: Event[] = [
       {
         name: "Parque das Nações",
         description:
-          "The venue district itself: modern, wide, well lit, and two metro stops from the airport. You trade old-Lisbon atmosphere for walking to the conference in ten minutes and never queueing for a taxi. A sensible pick if your days start early and the evenings are the point.",
+          "The venue district itself: modern, wide, well lit, and three metro stops from the airport. You trade old-Lisbon atmosphere for walking to the conference in ten minutes and never queueing for a taxi. A sensible pick if your days start early and the evenings are the point.",
         verdict: "recommended",
       },
       {
@@ -929,17 +929,17 @@ export const events: Event[] = [
       "Around Intendente and the deeper end of Martim Moniz, the metro station surroundings are the most commonly reported spots for hassle after dark. Fine by day, worth a Bolt at night.",
     ],
     gettingAround:
-      "Humberto Delgado Airport sits inside the city, two red-line metro stops from Oriente and the conference — about ten minutes, step-free at both ends, and the simplest airport transfer of any European capital hosting an event this size. For the historic centre, stay on the red line and change at Alameda for the green line or São Sebastião for the blue. The metro runs until around 01:00; after that Bolt and Uber are cheap and plentiful, which matters because Web Summit's Night Summit programme runs in bars across the centre, well away from the venue.",
+      "Humberto Delgado Airport sits inside the city, three red-line metro stops from Oriente and the conference — about ten minutes, step-free at both ends, and the simplest airport transfer of any European capital hosting an event this size. For the historic centre, stay on the red line and change at Alameda for the green line or São Sebastião for the blue. The metro runs until around 01:00; after that Bolt and Uber are cheap and plentiful, which matters because Web Summit's Night Summit programme runs in bars across the centre, well away from the venue.",
     faqs: [
       {
         question: "When is Web Summit Lisbon 2026?",
         answer:
-          "Web Summit runs from 9 to 12 November 2026 at the MEO Arena and the FIL exhibition centre in Parque das Nações. The 9th is largely a pre-conference day of workshops and networking; the main programme runs from the 10th to the 12th.",
+          "Web Summit runs from 9 to 12 November 2026 at the MEO Arena and the FIL exhibition centre in Parque das Nações.",
       },
       {
         question: "Where should I stay for Web Summit?",
         answer:
-          "Parque das Nações puts you within walking distance of the venue and two metro stops from the airport, which is worth a lot during a week when 70,000 other people are trying to get to the same place. If you would rather be in the old city, stay anywhere on the red line or one change from it — Chiado and Príncipe Real are the easiest central bases for a solo trip.",
+          "Parque das Nações puts you within walking distance of the venue and three metro stops from the airport, which is worth a lot during a week when 70,000 other people are trying to get to the same place. If you would rather be in the old city, stay anywhere on the red line or one change from it — Chiado and Príncipe Real are the easiest central bases for a solo trip.",
       },
       {
         question: "Is Lisbon safe for solo female travellers?",
@@ -949,7 +949,7 @@ export const events: Event[] = [
       {
         question: "How do I get from the airport to the venue?",
         answer:
-          "Take the red metro line from Aeroporto to Oriente — two stops, roughly ten minutes, with lifts at both ends. Oriente exits directly into the Vasco da Gama centre and the Parque das Nações esplanade. A taxi or Bolt for the same journey is a few euros and useful with heavy luggage.",
+          "Take the red metro line from Aeroporto to Oriente — three stops, roughly ten minutes, with lifts at both ends. Oriente exits directly into the Vasco da Gama centre and the Parque das Nações esplanade. A taxi or Bolt for the same journey is a few euros and useful with heavy luggage.",
       },
       {
         question: "Do Web Summit hotels sell out?",
@@ -957,7 +957,7 @@ export const events: Event[] = [
           "Yes, and earlier than people expect. Lisbon's hotel stock is small relative to a 70,000-person conference, and prices in the surrounding week rise sharply. Booking something with free cancellation as soon as your dates are fixed is the cheap insurance here.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "vienna-christmas-markets-2026",
@@ -1011,17 +1011,17 @@ export const events: Event[] = [
       "Vienna's U-Bahn is one of Europe's safest and runs all night on Fridays, Saturdays and before public holidays; on other nights it stops around 00:30 and night buses take over. Markets close well before that, so the timing rarely bites.",
       "Pickpocketing is the one real risk and it concentrates exactly where you are going: crowded market stalls, Stephansplatz, Karlsplatz and the U1 and U3 through the tourist stations. Bag zipped, worn in front, phone out of your back pocket.",
       "Glühwein is served in a real mug with a deposit of a few euros, refunded when you return it. Nobody is trying to overcharge you — the deposit is standard at every market.",
-      "Validate a paper transit ticket before you board. Vienna runs proof-of-payment with no barriers and the fine for travelling without a validated ticket is around €105.",
+      "Validate a paper transit ticket before you board. Vienna runs proof-of-payment with no barriers and the fine for travelling without a validated ticket is €135 if you pay on the spot.",
       "Ignore the costumed Mozart ticket sellers outside the Staatsoper and Stephansdom. The concerts are real but overpriced; book directly with the venue if you want to go.",
       "December afternoons get dark before 16:00 and the markets run into the evening, so most of your visit happens after sunset. Staying inside the Ringstraße or one U-Bahn stop from it turns the walk home into a non-event.",
     ],
     gettingAround:
-      "Vienna International (VIE) is 18 kilometres east. The S7 city train takes about 25 minutes to Wien Mitte for a few euros, and the City Airport Train covers the same route faster for several times the price — check ÖBB before you travel, as engineering work has been affecting that corridor. A regulated taxi to the centre runs €40 to €50, and Bolt and Uber are similar. Once you are in the city there is no reason to use anything but the U-Bahn and trams: the network reaches every market, runs every few minutes, and is clean and visibly staffed.",
+      "Vienna International (VIE) is 18 kilometres east. The S7 city train takes about 25 minutes to Wien Mitte for a few euros, and the City Airport Train covers the same route faster for several times the price — check ÖBB before you travel. A regulated taxi to the centre runs €40 to €50, and Bolt and Uber are similar. Once you are in the city there is no reason to use anything but the U-Bahn and trams: the network reaches every market, runs every few minutes, and is clean and visibly staffed.",
     faqs: [
       {
         question: "When do Vienna's Christmas markets open in 2026?",
         answer:
-          "The flagship Christkindlmarkt on Rathausplatz runs from 13 November to 26 December 2026, daily from 10:00 to 22:00. Spittelberg runs 13 November to 23 December, the Freyung market from 14 November, and Schönbrunn Palace opens earliest and stays latest — 6 November 2026 to 6 January 2027.",
+          "The flagship Christkindlmarkt on Rathausplatz runs from 13 November to 26 December 2026, daily from 10:00 to 22:00 (until 18:30 on 24 December). Spittelberg runs 13 November to 23 December, the Freyung market 14 November to 23 December, and Schönbrunn Palace opens earliest and stays latest — 6 November 2026 to 6 January 2027.",
       },
       {
         question: "Which market should I go to if I only have one evening?",
@@ -1044,7 +1044,7 @@ export const events: Event[] = [
           "Cards are accepted widely in Vienna, but individual market stalls are more mixed, and the Glühwein mug deposit is usually a cash transaction. Carrying twenty or thirty euros in small notes saves hunting for an ATM in the cold.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "amsterdam-light-festival-2026",
@@ -1100,7 +1100,7 @@ export const events: Event[] = [
       "Canal edges in Amsterdam have no railings. That is normal here and fine sober; it is the one genuine hazard of walking the route after a few Glühwein equivalents.",
       "Trams and the metro stop around 00:30, with GVB night buses from 00:30 to 07:30 running from Centraal. The lights go off well before that, so timing is rarely a problem.",
       "Pickpocketing is the realistic risk in viewing crowds and on busy trams. Bag zipped and worn in front covers it.",
-      "The lights go out early on New Year's Eve — around 21:00 — and Amsterdam's amateur fireworks that night are genuinely chaotic at street level. Plan somewhere indoors if you are there on the 31st.",
+      "The lights are switched off on New Year's Eve, and Amsterdam's amateur fireworks that night are genuinely chaotic at street level. Plan somewhere indoors if you are there on the 31st.",
     ],
     gettingAround:
       "Schiphol is fifteen to twenty minutes from Centraal by train, running through the night. Once you are here, the festival route is designed to be walked: the canal ring is compact enough to cross on foot in under an hour, and the lit sections are exactly the streets you would want to be walking anyway. Trams cover the longer hops until about 00:30 and night buses take over after that, all running from Centraal.",
@@ -1108,12 +1108,12 @@ export const events: Event[] = [
       {
         question: "When is the Amsterdam Light Festival 2026/27?",
         answer:
-          "The 15th edition runs from 26 November 2026 to 17 January 2027 — 53 nights, on a brand-new route through the city to mark the anniversary. The lights come on around 17:00 and stay on until 22:00 or 23:00 depending on the night.",
+          "The 15th edition runs from 26 November 2026 to 17 January 2027 — 53 nights, on a brand-new route through the city to mark the anniversary. The lights typically come on around 17:00 and stay on until 22:00 or 23:00 depending on the night; confirm closer to the date, as the 2026/27 hours have not been published yet.",
       },
       {
         question: "Is it free?",
         answer:
-          "The light artworks are free and publicly accessible; you can walk the whole route without paying anything. Canal cruises, bike tours and guided walks are ticketed and are how the non-profit behind the festival funds it. Tickets go on sale in October.",
+          "The light artworks are free and publicly accessible; you can walk the whole route without paying anything. Canal cruises, bike tours and guided walks are ticketed and are how the non-profit behind the festival funds it. Tickets go on sale on 1 October 2026.",
       },
       {
         question: "Is Amsterdam safe to walk at night in winter?",
@@ -1131,7 +1131,7 @@ export const events: Event[] = [
           "January is cheaper, quieter and colder. The route is identical and runs to 17 January, so if you would rather see the artworks without December crowds and December hotel prices, the first two weeks of January are the better trip.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "venice-carnival-2027",
@@ -1203,10 +1203,10 @@ export const events: Event[] = [
       "The U-Bahn runs all night on Fridays and Saturdays, and 4 February 2027 is a Thursday — so the network stops around 00:30 and night buses take over long before the ball ends. Either walk, or arrange a taxi in advance rather than joining the 5am rank.",
       "February in Vienna sits around freezing. A gown, a cloakroom and a five-minute walk is manageable; a gown and a twenty-minute wait for a car is not. Cloakroom queues at the end are long.",
       "Pickpocketing in Vienna concentrates on the U1 and U3 through Stephansplatz and Karlsplatz. It is low by European standards but the tourist stations are where it happens.",
-      "Validate a paper transit ticket before boarding — Vienna runs proof-of-payment with no barriers and the fine is around €105.",
+      "Validate a paper transit ticket before boarding — Vienna runs proof-of-payment with no barriers and the fine is €135 if you pay on the spot.",
     ],
     gettingAround:
-      "Vienna International (VIE) is 18 kilometres east: the S7 city train reaches Wien Mitte in about 25 minutes for a few euros, and the City Airport Train does it faster for several times the price. Check ÖBB before travelling, as engineering work has been affecting that corridor. In the city, the Staatsoper sits on the Ring at Karlsplatz, served by the U1, U2 and U4 and by several tram lines — but on a Thursday night the U-Bahn stops around 00:30, hours before the ball does, so plan the journey back rather than assuming it.",
+      "Vienna International (VIE) is 18 kilometres east: the S7 city train reaches Wien Mitte in about 25 minutes for a few euros, and the City Airport Train does it faster for several times the price. Check ÖBB before travelling. In the city, the Staatsoper sits on the Ring at Karlsplatz, served by the U1, U2 and U4 and by several tram lines — but on a Thursday night the U-Bahn stops around 00:30, hours before the ball does, so plan the journey back rather than assuming it.",
     faqs: [
       {
         question: "When is the Vienna Opera Ball 2027?",
@@ -1234,7 +1234,7 @@ export const events: Event[] = [
           "Vienna is one of the safest large cities in Europe, and the first district is lit, populated and patrolled at all hours — including at five in the morning during ball season, when you will not be the only person in evening dress on the street. The areas worth avoiding late are the immediate surroundings of Praterstern and Westbahnhof.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "keukenhof-2027",

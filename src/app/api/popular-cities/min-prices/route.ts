@@ -1,96 +1,91 @@
 import { NextResponse } from "next/server";
 import { searchRates } from "@/lib/liteapi";
 import { popularCities } from "@/data/popularCities";
+import { cheapestVisibleTotal, perNight, type RateOffer } from "@/lib/resultsPricing";
 
-/** Default check-in 14 days from now, checkout +2 nights – same as homepage links */
+const NIGHTS = 2;
+const ADULTS = 1;
+const DAYS_AHEAD = 14;
+
+/** Default check-in 14 days from now – identical to the links on the city cards. */
 function getDefaultDates() {
   const checkin = new Date();
-  checkin.setDate(checkin.getDate() + 14);
+  checkin.setDate(checkin.getDate() + DAYS_AHEAD);
   const checkout = new Date(checkin);
-  checkout.setDate(checkout.getDate() + 2);
+  checkout.setDate(checkout.getDate() + NIGHTS);
   return {
     checkin: checkin.toISOString().slice(0, 10),
     checkout: checkout.toISOString().slice(0, 10),
   };
 }
 
-export type MinPriceEntry = { minPrice: number | null; currency: string };
+export type CityPrice = { perNight: number | null; currency: string };
+
+export type MinPricesResponse = {
+  checkin: string;
+  checkout: string;
+  nights: number;
+  adults: number;
+  cities: Record<string, CityPrice>;
+};
 
 /**
  * GET /api/popular-cities/min-prices
- * Returns lowest price per night per popular city for default dates.
- * Cached 1h to limit LiteAPI calls.
+ *
+ * The lowest nightly price a visitor will actually find after clicking a city
+ * card, for the exact dates that card links to.
+ *
+ * This deliberately searches by `placeId` and reads rates the same way
+ * /results does. The previous version searched by free-text `aiSearch`, which
+ * returns a different handful of hotels on every call, so the advertised price
+ * matched neither the city's real minimum nor the page it linked to.
+ *
+ * Cached 1h to limit upstream calls.
  */
 export async function GET() {
   try {
     const { checkin, checkout } = getDefaultDates();
-    const nights = 2;
 
     const results = await Promise.all(
-      popularCities.map(async (city): Promise<{ slug: string } & MinPriceEntry> => {
+      popularCities.map(async (city): Promise<{ slug: string } & CityPrice> => {
         try {
           const data = await searchRates({
-            aiSearch: city.aiSearch,
+            placeId: city.placeId,
             checkin,
             checkout,
-            adults: 1,
+            adults: ADULTS,
             currency: "EUR",
-            maxRatesPerHotel: 3,
           });
-
-          const rateData = (data?.data ?? []) as Array<{
-            roomTypes?: Array<{
-              rates?: Array<{
-                retailRate?: { total?: Array<{ amount: number; currency?: string }> };
-              }>;
-            }>;
-          }>;
-
-          let minAmount: number | null = null;
-          let currency = "EUR";
-
-          for (const hotel of rateData) {
-            const allRates = hotel.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
-            for (const rate of allRates) {
-              const total = rate.retailRate?.total?.[0];
-              if (total?.amount != null) {
-                if (minAmount === null || total.amount < minAmount) {
-                  minAmount = total.amount;
-                  currency = total.currency ?? "EUR";
-                }
-              }
-            }
-          }
-
-          const minPerNight =
-            minAmount != null ? Math.round(minAmount / nights) : null;
-
-          return {
-            slug: city.slug,
-            minPrice: minPerNight,
-            currency,
-          };
+          const cheapest = cheapestVisibleTotal((data?.data ?? []) as RateOffer[]);
+          if (!cheapest) return { slug: city.slug, perNight: null, currency: "EUR" };
+          const nightly = perNight(cheapest, NIGHTS);
+          return { slug: city.slug, perNight: nightly.amount, currency: nightly.currency };
         } catch {
-          return { slug: city.slug, minPrice: null, currency: "EUR" };
+          return { slug: city.slug, perNight: null, currency: "EUR" };
         }
       })
     );
 
-    const bySlug: Record<string, MinPriceEntry> = {};
-    for (const r of results) {
-      bySlug[r.slug] = { minPrice: r.minPrice, currency: r.currency };
+    const cities: Record<string, CityPrice> = {};
+    for (const result of results) {
+      cities[result.slug] = { perNight: result.perNight, currency: result.currency };
     }
 
-    return NextResponse.json(bySlug, {
+    const body: MinPricesResponse = {
+      checkin,
+      checkout,
+      nights: NIGHTS,
+      adults: ADULTS,
+      cities,
+    };
+
+    return NextResponse.json(body, {
       headers: {
         "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
       },
     });
   } catch (e) {
     console.error("[popular-cities/min-prices]", e);
-    return NextResponse.json(
-      { error: (e as Error).message },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: (e as Error).message }, { status: 500 });
   }
 }

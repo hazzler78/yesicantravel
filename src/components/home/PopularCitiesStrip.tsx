@@ -4,53 +4,50 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
+import type { MinPricesResponse } from "@/app/api/popular-cities/min-prices/route";
 import { SectionHeading } from "@/components/ui/Card";
 
-type MinPrice = { minPrice: number | null; currency: string };
-
-function defaultSearchParams() {
-  const checkin = new Date();
-  checkin.setDate(checkin.getDate() + 14);
-  const checkout = new Date(checkin);
-  checkout.setDate(checkout.getDate() + 2);
-  return {
-    checkin: checkin.toISOString().slice(0, 10),
-    checkout: checkout.toISOString().slice(0, 10),
-  };
-}
-
-function formatPrice(price: MinPrice | undefined) {
-  if (!price || price.minPrice == null) return null;
+function formatPrice(amount: number, currency: string) {
   try {
     return new Intl.NumberFormat("en-GB", {
       style: "currency",
-      currency: price.currency || "EUR",
+      currency: currency || "EUR",
       maximumFractionDigits: 0,
-    }).format(price.minPrice);
+    }).format(amount);
   } catch {
-    return `${price.minPrice} ${price.currency}`;
+    return `${amount} ${currency}`;
+  }
+}
+
+function formatDateRange(checkin: string, checkout: string) {
+  try {
+    const from = new Date(checkin);
+    const to = new Date(checkout);
+    const day = (date: Date) =>
+      date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+    return `${day(from)} – ${day(to)}`;
+  } catch {
+    return `${checkin} – ${checkout}`;
   }
 }
 
 export function PopularCitiesStrip() {
-  const [minPrices, setMinPrices] = useState<Record<string, MinPrice> | null>(null);
+  const [prices, setPrices] = useState<MinPricesResponse | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/popular-cities/min-prices")
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error("min-prices failed"))))
-      .then((data: Record<string, MinPrice>) => {
-        if (!cancelled) setMinPrices(data);
+      .then((data: MinPricesResponse) => {
+        if (!cancelled) setPrices(data);
       })
       .catch(() => {
-        if (!cancelled) setMinPrices({});
+        // Prices are optional; the cards still work as destination links.
       });
     return () => {
       cancelled = true;
     };
   }, []);
-
-  const { checkin, checkout } = defaultSearchParams();
 
   return (
     <section className="bg-canvas">
@@ -58,18 +55,27 @@ export function PopularCitiesStrip() {
         <SectionHeading
           eyebrow="Start here"
           title="Cities women ask us about most"
-          description="Pre-filtered searches for well-connected, central areas. Dates default to a two-night trip a couple of weeks out — change them any time."
+          description={
+            prices
+              ? `Lowest nightly price we can currently find for ${formatDateRange(
+                  prices.checkin,
+                  prices.checkout
+                )}, one traveller. Change the dates on the next page.`
+              : "Each card opens a search of the whole city. Change the dates on the next page."
+          }
         />
 
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {popularCities.map((city) => {
-            const href = `/results?${new URLSearchParams({
-              aiSearch: city.aiSearch,
-              checkin,
-              checkout,
-              adults: "1",
-            })}`;
-            const price = formatPrice(minPrices?.[city.slug]);
+            const price = prices?.cities?.[city.slug];
+            const href = prices
+              ? `/results?${new URLSearchParams({
+                  placeId: city.placeId,
+                  checkin: prices.checkin,
+                  checkout: prices.checkout,
+                  adults: String(prices.adults),
+                })}`
+              : `/results?${new URLSearchParams({ placeId: city.placeId })}`;
 
             return (
               <li key={city.slug}>
@@ -82,9 +88,13 @@ export function PopularCitiesStrip() {
                       {city.city}
                     </span>
                     <span className="mt-0.5 block truncate text-[0.8125rem] text-ink-muted">
-                      {price ? (
+                      {price?.perNight != null ? (
                         <>
-                          {city.country} · from <span className="tnum font-semibold text-ink">{price}</span> per night
+                          {city.country} · from{" "}
+                          <span className="tnum font-semibold text-ink">
+                            {formatPrice(price.perNight, price.currency)}
+                          </span>{" "}
+                          a night
                         </>
                       ) : (
                         city.country

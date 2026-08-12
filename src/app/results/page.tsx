@@ -8,7 +8,12 @@ import { track } from "@vercel/analytics";
 import { Map as MapIcon, SearchX, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
 import { deriveStaySignals, type StayFilterId, type StaySignals } from "@/lib/staySignals";
-import { SearchBar } from "@/components/search/SearchBar";
+import {
+  firstRateTotalByHotel,
+  RESULTS_HOTEL_LIMIT,
+  type RateOffer,
+} from "@/lib/resultsPricing";
+import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
@@ -54,7 +59,10 @@ type SearchAnalyticsOutcome = {
 const SEARCH_SESSION_STORAGE_KEY = "yict_search_session_id";
 
 const DEFAULT_FILTERS: ResultsFilterState = {
-  minRating: 8,
+  // Deliberately no rating floor. Sorting already puts the best-reviewed stays
+  // first, and a hidden floor made the "from" price on the homepage
+  // unreachable when the cheapest stay scored below it.
+  minRating: null,
   maxPrice: null,
   onlyFreeCancellation: false,
   signals: [],
@@ -221,7 +229,7 @@ function ResultsContent() {
         if (aiSearch && hotelsFromApi.length > 0) {
           // For vibe/AI search, enrich basic hotel data with full details (including coordinates)
           const details = await Promise.all(
-            hotelsFromApi.slice(0, 20).map(async (h) => {
+            hotelsFromApi.slice(0, RESULTS_HOTEL_LIMIT).map(async (h) => {
               try {
                 const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(h.id)}`);
                 const j = await r.json();
@@ -297,25 +305,19 @@ function ResultsContent() {
         } else {
           const ids: string[] = [...new Set(data.map((d) => d.hotelId))];
           const details = await Promise.all(
-            ids.slice(0, 20).map(async (id) => {
+            ids.slice(0, RESULTS_HOTEL_LIMIT).map(async (id) => {
               const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(id)}`);
               const j = await r.json();
               return j.data ?? j;
             })
           );
-          const rateByHotel: Record<string, { amount: number; currency?: string; hasFreeCancellation: boolean }> = {};
+          const totalByHotel = firstRateTotalByHotel(data as RateOffer[]);
+          const freeCancellationByHotel: Record<string, boolean> = {};
           for (const d of data) {
-            const allRates = d.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
-            const firstRate = allRates[0];
-            const total = firstRate?.retailRate?.total?.[0];
-            const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
-            if (total && !rateByHotel[d.hotelId]) {
-              rateByHotel[d.hotelId] = {
-                amount: total.amount,
-                currency: total.currency ?? "USD",
-                hasFreeCancellation: freeCancellation,
-              };
-            }
+            if (freeCancellationByHotel[d.hotelId]) continue;
+            freeCancellationByHotel[d.hotelId] = (d.roomTypes ?? [])
+              .flatMap((rt) => rt.rates ?? [])
+              .some((r) => r.cancellationPolicies?.refundableTag === "RFN");
           }
           const merged = details.filter(Boolean).map((h) => ({
             id: h.id,
@@ -324,9 +326,9 @@ function ResultsContent() {
             address: h.address,
             rating: normaliseRating(h.rating, h.starRating),
             reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
-            price: rateByHotel[h.id]?.amount,
-            currency: rateByHotel[h.id]?.currency ?? "USD",
-            hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
+            price: totalByHotel[h.id]?.amount,
+            currency: totalByHotel[h.id]?.currency ?? "EUR",
+            hasFreeCancellation: freeCancellationByHotel[h.id] ?? false,
             lat: h.location?.latitude,
             lng: h.location?.longitude,
             safetyBadges: safetyBadgesFromHotel(h),
@@ -516,6 +518,12 @@ function ResultsContent() {
 
   const effectivePlaceForMap = placeDetails ?? derivedPlaceFromHotels;
 
+  const searchSummary = [
+    placeLabel || aiSearch || "Your search",
+    `${formatDate(checkin)} – ${formatDate(checkout)}`,
+    `${adults} ${Number(adults) === 1 ? "traveller" : "travellers"}`,
+  ].join(" · ");
+
   const hotelHref = (id: string) =>
     `/hotel/${id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
       placeId ? `&placeId=${placeId}` : ""
@@ -545,7 +553,8 @@ function ResultsContent() {
       {/* Search stays editable in place — changing dates shouldn't mean going back. */}
       <div className="sticky top-16 z-30 border-b border-border bg-surface-muted/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-          <SearchBar
+          <ResultsSearchBar
+            summary={searchSummary}
             variant="compact"
             initialMode={aiSearch ? "vibe" : "destination"}
             initialDestination={placeLabel}

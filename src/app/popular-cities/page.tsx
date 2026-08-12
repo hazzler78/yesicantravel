@@ -39,7 +39,7 @@ export default function PopularCitiesPage() {
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {popularCities.map((city) => {
             const href = `/results?${new URLSearchParams({
-              aiSearch: city.aiSearch,
+              placeId: city.placeId,
               checkin,
               checkout,
               adults: "1",

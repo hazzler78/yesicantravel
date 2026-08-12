@@ -729,153 +729,165 @@ export const destinations: Destination[] = [
     slug: "las-vegas",
     city: "Las Vegas",
     country: "Nevada",
-    headline: "Vegas 2026",
+    headline: "Las Vegas for solo female travellers",
     subheadline:
-      "Limited spring rates. Amex Trending Destinations—safer stays with 24/7 staff, well-lit access and neighbourhood tips. Dates pre-filled.",
-    eventDateRange: "March 14–21, 2026",
-    eventShortName: "Spring 2026",
-    whyDemand: "Amex Trending Destinations. Year-round high demand, steady occupancy.",
-    events: "Steady high demand (no major event spike)",
-    metaTitle: "Las Vegas 2026 – Safer Luxury Stays for Women Solo Travellers",
+      "The Strip is staffed, lit and watched around the clock — and the Deuce bus runs all night, so you are never depending on a 3am taxi. Here's where to stay and how airport rideshare actually works.",
+    metaTitle: "Safe Hotels in Las Vegas for Solo Female Travellers | Area Guide",
     metaDescription:
-      "Safer luxury hotels in Las Vegas 2026. Filter by 24/7 reception, well-lit areas and neighbourhood safety. Limited spring rates available.",
-    aiSearch: "strip safe luxury hotel Las Vegas Nevada well-lit",
-    checkin: "2026-03-14",
-    checkout: "2026-03-21",
+      "Where to stay in Las Vegas as a solo woman: mid-Strip vs downtown, the 24-hour Deuce bus, Monorail hours, and the official airport rideshare pickup.",
+    aiSearch: "strip safe hotel Las Vegas Nevada well-lit 24-hour reception",
     knownFor: [
-      "Las Vegas Strip resort-casinos",
-      "Fremont Street Experience downtown",
-      "Major residencies and live shows",
+      "The Strip's resort-casinos, shows and pedestrian bridges",
+      "The Fremont Street canopy downtown",
+      "Residencies and live entertainment most nights of the year",
       "Day trips to Red Rock Canyon and Hoover Dam",
     ],
     neighbourhoods: [
       {
-        name: "Las Vegas Strip (mid-Strip)",
-        description:
-          "Mid-Strip between Bellagio and Park MGM is the densest cluster of large resorts with 24/7 staffed lobbies, well-lit pedestrian bridges and heavy foot traffic. For solo travellers, staying mid-Strip means short, well-lit walks between dinner, shows and your hotel instead of long rideshare trips.",
+        name: "Mid-Strip",
         verdict: "recommended",
+        description:
+          "The stretch roughly between Bellagio and Park MGM is the densest cluster of large resorts with 24/7 staffed lobbies, well-lit pedestrian bridges and heavy foot traffic. For a first solo trip this is the practical base: short, lit walks between dinner, a show and your room, rather than long rideshare hops.",
       },
       {
         name: "Summerlin",
-        description:
-          "About 20 minutes west of the Strip, Summerlin is a quieter, residential-feel area with newer resorts and easy access to Red Rock Canyon. Good pick if you want a calmer base and plan to rideshare into the Strip for evenings.",
         verdict: "recommended",
+        description:
+          "About 20 minutes west of the Strip, a quieter planned area with newer resorts and easy access to Red Rock Canyon. A good pick if you want a calmer base and plan to rideshare in for evenings.",
       },
       {
         name: "Fremont Street / Downtown",
-        description:
-          "Historic downtown is lively with vintage casinos and the Fremont Street canopy. The core is well-policed and busy, but blocks immediately off Fremont can feel sparse at night. Stay on Fremont Street itself and take a rideshare back to your hotel rather than walking side streets.",
         verdict: "caution",
+        description:
+          "The Fremont Street canopy itself is busy, lit and policed. The blocks immediately off it thin out fast after dark. Stay on Fremont Street proper and rideshare the last stretch rather than walking side streets.",
       },
     ],
     safetyTips: [
-      "Use Uber, Lyft or the official hotel taxi stand — do not accept rides from people soliciting you on the sidewalk.",
-      "Drinks at clubs and pool parties are often strong; keep your drink in sight or order bottled water in between.",
-      "Hotel room-key doors and elevators typically require a tap — if someone follows you toward an elevator bank, wait for the next one.",
-      "The Strip has long blocks; what looks like a 5-minute walk on a map is often 15–20 minutes. Rideshare short hops at night.",
-      "Use the hotel safe for your passport and keep a photo of your ID on your phone.",
+      "The Deuce bus on Las Vegas Boulevard runs 24 hours a day, every day — roughly every 10–15 minutes until 01:00, then every 20 minutes through the night. It is the all-night option the Monorail is not.",
+      "The Monorail runs the east side of the Strip only (MGM Grand to Sahara): 07:00–midnight on Mondays, until 02:00 Tuesday–Thursday, and until 03:00 Friday–Sunday. It does not serve the west-side resorts.",
+      "Use Uber, Lyft or the official hotel taxi stand. Confirm the name, the car and the plate before you get in — never a car that approaches you on the sidewalk.",
+      "Hotel lifts and room floors typically need a keycard. If someone follows you toward an elevator bank, wait for the next one.",
+      "Strip blocks are longer than they look. What maps as a five-minute walk is often 15–20. After midnight, or after drinking, rideshare even short hops.",
+      "SafeNest on 702-646-4981 is the local 24/7 line for domestic violence, sexual assault and trafficking, in English and Spanish. 911 is the emergency number.",
     ],
     gettingAround:
-      "Harry Reid International Airport (LAS) is 10–20 minutes from most Strip resorts. The official taxi queue and major rideshare pickup zones are signposted at Terminal 1 and Terminal 3; avoid unmarked drivers offering rides at the curb. The Strip itself is walkable mid-day — pedestrian bridges keep you out of traffic — but use rideshare after dark for anything more than a block or two.",
+      "Harry Reid International (LAS) is 10–20 minutes from most Strip resorts. Taxis wait outside baggage claim. Uber and Lyft are authorised but do not pick up at the arrivals curb: Terminal 1 pickup is Level 2 of the parking garage (elevator near Door 2, then the pedestrian bridge); Terminal 3 pickup is the Valet Level of its garage. Follow the Ride Share signs rather than anyone offering a ride in the terminal.",
+    supportLine: {
+      name: "SafeNest",
+      number: "702-646-4981",
+      description:
+        "Las Vegas 24/7 hotline for domestic violence, sexual assault and human trafficking. Free, confidential, English and Spanish. Call or text. 911 if you need the police immediately.",
+    },
     faqs: [
       {
         question: "Is Las Vegas safe for solo female travellers?",
         answer:
-          "The Strip and major resort casinos are heavily staffed, brightly lit and monitored around the clock, which makes them one of the more controlled environments for solo travellers in the US. Standard city-awareness rules apply: use rideshare after dark, don't carry more cash than you need, and stick to the Strip or inside Fremont Street's pedestrian core at night.",
+          "The Strip and the big resort casinos are among the more controlled environments for solo travellers in the US: staffed, brightly lit and monitored around the clock. The realistic risks are drink spiking in clubs, fake rideshares, and walking into empty parking structures. Stay on the main sidewalks and bridges, use the app for cars, and you will rarely be the only woman out.",
       },
       {
         question: "Where should a solo woman stay in Vegas?",
         answer:
-          "Mid-Strip resorts (roughly between Bellagio and Park MGM) are the safest pick for a first solo trip: 24/7 front desk, short well-lit walks to shows and restaurants, and plenty of staff around. Summerlin is a good quieter alternative if you have a reason to be west of the city.",
+          "Mid-Strip resorts, roughly between Bellagio and Park MGM, are the straightforward first-time pick: 24/7 front desk, short lit walks, and the Deuce on the doorstep. Summerlin is quieter if you have a reason to be west of the city. Downtown is fine on Fremont Street itself; it is a different proposition a block off it.",
       },
       {
         question: "Is it safe to walk the Strip at night?",
         answer:
-          "Yes, the main Strip sidewalks and pedestrian bridges are generally safe well into the evening — they're crowded, brightly lit and have visible police and private security. Avoid cutting through parking garages and side streets. After midnight, or if you've been drinking, rideshare even short distances.",
+          "The main sidewalks and pedestrian bridges stay crowded and lit well into the evening, with visible police and private security. Avoid cutting through parking garages and the streets behind the resorts. After midnight, or if you have been drinking, rideshare even a couple of blocks — the Deuce is the public-transport backup.",
       },
       {
-        question: "How do I handle taxis and rideshare safely?",
+        question: "How do I get from the airport without a fake Uber?",
         answer:
-          "Use Uber, Lyft, or official taxi stands at hotels. Confirm the driver's name and plate before getting in, share your ride with a friend through the app, and never get into a car that approaches you on the sidewalk. At the airport, follow signs to the rideshare pickup — don't accept offers from drivers in the terminal.",
+          "Taxis are at the curb outside baggage claim. For Uber or Lyft, ignore anyone who approaches you in the terminal and follow signs to the official Ride Share pickup in the parking garage — Level 2 at Terminal 1, Valet Level at Terminal 3. Confirm the driver's name and the plate before you get in.",
+      },
+      {
+        question: "Does the Monorail run all night?",
+        answer:
+          "No. It starts at 07:00 and finishes between midnight and 03:00 depending on the day, and it only covers the east side of the Strip. The Deuce bus is the 24-hour option, running the length of Las Vegas Boulevard including downtown.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "okinawa",
     city: "Okinawa",
     country: "Japan",
-    headline: "Okinawa 2026",
+    headline: "Okinawa for solo female travellers",
     subheadline:
-      "Early sakura season. Japan's best-kept secret—safer stays with 24/7 reception, well-lit areas and neighbourhood guidance. Dates pre-filled.",
-    eventDateRange: "March 1–8, 2026",
-    eventShortName: "Early Sakura",
-    whyDemand: "Amex & Expedia top trending destination. Early sakura planning, quiet luxury.",
-    events: "Early sakura planning, trending luxury escapes",
-    metaTitle: "Okinawa 2026 – Safer Luxury Stays for Women Solo Travellers",
+      "Japan's southern islands are among the easier places in Asia to travel alone — as long as you know the monorail stops around 23:30 and a car is what the rest of the island actually runs on.",
+    metaTitle: "Safe Hotels in Okinawa for Solo Female Travellers | Area Guide",
     metaDescription:
-      "Safer luxury hotels in Okinawa 2026. Japan's trending escape—filter by 24/7 reception, well-lit areas and neighbourhood safety. Book at real prices.",
-    aiSearch: "safe luxury hotel Okinawa Japan beach well-lit",
-    checkin: "2026-03-01",
-    checkout: "2026-03-08",
+      "Where to stay in Okinawa as a solo woman: Naha vs the west-coast resorts, Yui Rail hours, airport arrival, and when you actually need a car.",
+    aiSearch: "safe hotel Naha Okinawa Japan well-lit near monorail",
     knownFor: [
-      "Early cherry-blossom (kanhizakura) season in late January–February",
-      "Subtropical beaches in the Kerama Islands and northern Okinawa",
-      "Ryukyuan castles and UNESCO sites around Naha",
-      "Okinawan cuisine and Awamori distilleries",
+      "Kanhizakura cherry blossom, typically late January through February — weeks before the mainland",
+      "Kerama Islands beaches and the west-coast resort strip",
+      "Shuri Castle and the Ryukyuan sites around Naha",
+      "Okinawan food and awamori",
     ],
     neighbourhoods: [
       {
-        name: "Naha (Kokusai-dori & Omoromachi)",
-        description:
-          "Naha is Okinawa's capital and the island's main base for solo travellers. Kokusai-dori (the main shopping street) and the adjacent Omoromachi district are well-lit, busy into the evening and close to the monorail, which makes getting around simple without a car.",
+        name: "Naha (Kokusai-dori and Omoromachi)",
         verdict: "recommended",
+        description:
+          "The capital and the only part of the island you can do without a car. Kokusai-dori and Omoromachi stay busy into the evening, are well lit, and sit on the Yui Rail. Prefectural Office and Makishi stations put you on the shopping street; Omoromachi is a quieter modern grid a few stops north.",
       },
       {
-        name: "Onna Village / West Coast Resort Strip",
-        description:
-          "The West Coast between Yomitan and Onna is the resort belt — large beachfront properties with 24/7 reception, private beaches and shuttle services. A strong pick for a quieter, safer stay if you're comfortable using a taxi or rental car to reach restaurants outside the resort.",
+        name: "Onna / west-coast resort strip",
         verdict: "recommended",
+        description:
+          "Large beachfront properties between Yomitan and Onna, with 24/7 reception, private beaches and hotel shuttles. The practical pick if you want the sea and a locked door, and you are comfortable taking a taxi or the hotel bus for anything off-property.",
       },
       {
         name: "American Village (Chatan)",
+        verdict: "caution",
         description:
-          "Chatan's American Village is a walkable waterfront area with shops, cafés and a younger crowd. It's well-lit and lively in the evenings, but sits next to US military bases — awareness of the mixed nightlife scene is worth keeping in mind on weekend nights.",
-        verdict: "recommended",
+          "A walkable waterfront of shops and cafés next to US bases, lively on weekend nights. Fine for an evening out; a mixed nightlife scene is the reason to know your way back rather than to sleep here on a first trip.",
       },
     ],
     safetyTips: [
-      "Japan is widely regarded as one of the safer countries for solo female travellers, but standard precautions (eyes on your drink, share your plans with someone) still apply — especially in bar districts.",
-      "English signage is common in Naha and resorts, but less so in rural areas. Download offline maps and a translation app before you leave the hotel.",
-      "Typhoon season runs summer to early autumn — for March trips this is not a concern, but check ferry status to outer islands if weather shifts.",
-      "Use official taxis or the Yui Rail monorail in Naha. Renting a car requires an International Driving Permit arranged before you leave home.",
-      "ATMs at 7-Eleven and Japan Post accept most foreign cards and are available 24/7 in Naha.",
+      "Violent crime against visitors is rare. The realistic things to plan are transport after 23:30 and drinks in bar districts — Kokusai-dori, Matsuyama and American Village on weekend nights.",
+      "The Yui Rail runs from about 06:00 to 23:30, Naha Airport to Tedako-Uranishi. After that you need a taxi. Official taxis are metered and wait at ranks; do not accept a ride from someone who approaches you.",
+      "Japan only accepts the 1949-format International Driving Permit. The 1968 version that some countries issue will not be valid here — arrange the right one before you fly.",
+      "Typhoon season is roughly June to October. Ferries to the Keramas and other outer islands cancel; check the morning of.",
+      "Seven Bank ATMs (7-Eleven) and Japan Post accept most foreign cards. 7-Eleven machines in Naha run through the night.",
+      "Yorisoi Hotline 0120-279-338 is free; press 2 after the Japanese prompt for English, daily 10:00–22:00. 110 is the police emergency number.",
     ],
     gettingAround:
-      "Naha Airport (OKA) is a 15–20 minute monorail ride from central Naha. For the West Coast resorts, a hotel transfer or taxi is typically 60–90 minutes. Public buses connect major towns but are infrequent; most visitors heading beyond Naha either rent a car (with an International Driving Permit) or arrange hotel transfers in advance.",
+      "Naha Airport (OKA) is on the Yui Rail: about 15 minutes to Prefectural Office / Kokusai-dori, under 40 minutes to the end of the line. For west-coast resorts, a hotel transfer or taxi is typically 60–90 minutes. Buses exist but are infrequent outside Naha; most people heading north rent a car or book the hotel's airport shuttle in advance.",
+    supportLine: {
+      name: "Yorisoi Hotline",
+      number: "0120-279-338",
+      description:
+        "Free nationwide line. Press 2 after the Japanese prompt for English and other languages, daily 10:00–22:00. Covers domestic violence, sexual violence and everyday problems. 110 is the emergency number.",
+    },
     faqs: [
       {
         question: "Is Okinawa safe for solo female travellers?",
         answer:
-          "Okinawa is considered one of the safer destinations in an already-safe country. Violent crime is rare, the monorail and taxis are reliable, and hotels (especially the West Coast resort strip) are used to international solo travellers. Standard solo-travel awareness still applies in nightlife areas around American Village and Matsuyama.",
+          "Yes, by most measures — violent crime against visitors is rare, the monorail and taxis are reliable, and hotels are used to international guests travelling alone. The two things that actually catch people out are the monorail stopping at 23:30 and bar streets on weekend nights. Neither requires you to change your plans, only to know about them.",
       },
       {
         question: "Where should a solo woman stay in Okinawa?",
         answer:
-          "Naha (around Kokusai-dori or Omoromachi) is the easiest first-time base: monorail access, walkable streets, plenty of restaurants. If you prefer quieter days at the beach, choose a West Coast resort in Onna or Yomitan with 24/7 reception and shuttle services.",
+          "Naha around Kokusai-dori or Omoromachi is the easiest first-time base: monorail, restaurants, a walkable evening. If you would rather wake up at the beach, pick a west-coast resort in Onna or Yomitan with 24/7 reception and a shuttle — you will need that shuttle or a taxi for anything off the grounds.",
       },
       {
         question: "When is cherry blossom season in Okinawa?",
         answer:
-          "Okinawa's cherry blossoms (kanhizakura) bloom earlier than mainland Japan — typically late January through February, well before the mainland sakura season. March is post-peak for blossoms but still pleasant, warm, and quieter than spring break crowds elsewhere.",
+          "Kanhizakura blooms earlier than mainland Japan, typically late January through February. March is post-peak: still warm, quieter, and not the reason to time the trip unless you specifically want the blossoms.",
       },
       {
         question: "Do I need to rent a car in Okinawa?",
         answer:
-          "Not if you're staying in Naha — the monorail and taxis cover most of what you'll want to see. If you plan to visit the northern half of the island (Churaumi Aquarium, Kouri Island, remote beaches), a rental car is the most practical option. You'll need an International Driving Permit issued in your home country before you travel.",
+          "Not if you stay in Naha — the Yui Rail and taxis cover the capital. For the north of the island (Churaumi Aquarium, Kouri, remote beaches) a car is the practical option, and you need a 1949-format International Driving Permit issued before you travel. Japan will not accept the 1968 permit.",
+      },
+      {
+        question: "How late does the monorail run?",
+        answer:
+          "Until about 23:30, from Naha Airport through the city to Tedako-Uranishi. After that, taxis from a rank. There is no night-bus network comparable to a European capital, which is why a Naha hotel near a station matters if you are out late.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
 ];
 

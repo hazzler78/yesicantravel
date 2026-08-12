@@ -34,6 +34,11 @@ export interface Event {
   displayDateRange?: string;
   /** Optional: use destination search instead of aiSearch (e.g. "Brussels, Belgium") when aiSearch returns no hotels. */
   placeQuery?: string;
+  /**
+   * Slug of the next edition. Once this one is over, the page points here
+   * instead of quietly advertising dates that have already passed.
+   */
+  supersededBy?: string;
 
   // ---- Optional rich-content fields (see Destination for rationale). ----
 
@@ -56,12 +61,15 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-/** Format ISO dates as "March 6–15, 2026". */
+/** Format ISO dates as "March 6–15, 2026", or "September 27, 2026" for one-day events. */
 export function formatEventDateRange(startDate: string, endDate: string): string {
   const [sy, sm, sd] = startDate.split("-").map(Number);
   const [ey, em, ed] = endDate.split("-").map(Number);
   const smonth = MONTHS[sm - 1];
   const emonth = MONTHS[em - 1];
+  if (startDate === endDate) {
+    return `${smonth} ${sd}, ${sy}`;
+  }
   if (sy === ey && sm === em) {
     return `${smonth} ${sd}–${ed}, ${sy}`;
   }
@@ -69,13 +77,6 @@ export function formatEventDateRange(startDate: string, endDate: string): string
     return `${smonth} ${sd} – ${emonth} ${ed}, ${sy}`;
   }
   return `${smonth} ${sd}, ${sy} – ${emonth} ${ed}, ${ey}`;
-}
-
-/** Add one day to ISO date (for checkout = day after event end). */
-function addDay(iso: string): string {
-  const d = new Date(iso + "T12:00:00Z");
-  d.setUTCDate(d.getUTCDate() + 1);
-  return d.toISOString().slice(0, 10);
 }
 
 export const events: Event[] = [
@@ -486,6 +487,7 @@ export const events: Event[] = [
     aiSearchTemplate: "safe central hotels Barcelona near Primavera Sound Parc del Forum beach city well-lit",
     venueNotes: "Parc del Fòrum, Barcelona",
     whyNow: "Indie, electronic and pop giants with a huge international crowd; sells out months in advance.",
+    supersededBy: "barcelona-primavera-sound-2027",
   },
   {
     id: "melt-festival-2026",
@@ -568,6 +570,7 @@ export const events: Event[] = [
     aiSearchTemplate: "safe hotels Roskilde and Copenhagen near Roskilde Festival well-lit",
     venueNotes: "Roskilde, Denmark (short train from Copenhagen)",
     whyNow: "One of Europe’s biggest festivals with strong lineups and an activist side; mega but safe, with city and camping options.",
+    supersededBy: "roskilde-festival-2027",
   },
   {
     id: "lollapalooza-berlin-2026",
@@ -599,7 +602,296 @@ export const events: Event[] = [
     venueNotes: "Boom, Belgium (stay in Brussels or Antwerp – shuttles to festival)",
     whyNow: "EDM mega-festival with 400k+ visitors; two weekends. Most visitors stay in Brussels or Antwerp – safe stays there fill fast.",
   },
+
+  // ---------------------------------------------------------------------
+  // Europe, September 2026 onwards. Dates below were each checked against
+  // the organiser's own site; anything only "expected" (Tomorrowland 2027,
+  // for one) is deliberately left out until the organiser publishes it.
+  // ---------------------------------------------------------------------
+  {
+    id: "oktoberfest-munich-2026",
+    slug: "munich-oktoberfest-2026",
+    city: "Munich",
+    country: "Germany",
+    eventName: "Oktoberfest",
+    eventShortName: "Oktoberfest",
+    startDate: "2026-09-19",
+    endDate: "2026-10-04",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Munich near Theresienwiese well-lit",
+    placeQuery: "Munich, Germany",
+    venueNotes: "Theresienwiese, Munich",
+    whyNow:
+      "The 191st Wiesn runs 16 days and fills Munich's hotels city-wide. Rooms near the Hauptbahnhof and Theresienwiese are the first to go, and prices roughly double against a normal September week.",
+  },
+  {
+    id: "berlin-marathon-2026",
+    slug: "berlin-marathon-2026",
+    city: "Berlin",
+    country: "Germany",
+    eventName: "BMW Berlin Marathon",
+    eventShortName: "Berlin Marathon",
+    startDate: "2026-09-27",
+    endDate: "2026-09-27",
+    category: "sports",
+    aiSearchTemplate: "safe hotels Berlin near Brandenburg Gate well-lit central",
+    placeQuery: "Berlin, Germany",
+    venueNotes: "Start and finish at Straße des 17. Juni, Brandenburg Gate",
+    whyNow:
+      "Around 45,000 runners plus supporters, with an early start time — staying inside the S-Bahn ring near the Tiergarten saves a stressful pre-dawn journey.",
+  },
+  {
+    id: "amsterdam-dance-event-2026",
+    slug: "amsterdam-dance-event-2026",
+    city: "Amsterdam",
+    country: "Netherlands",
+    eventName: "Amsterdam Dance Event",
+    eventShortName: "ADE",
+    startDate: "2026-10-21",
+    endDate: "2026-10-25",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Amsterdam near canal ring well-lit 24 hour reception",
+    placeQuery: "Amsterdam, Netherlands",
+    venueNotes: "300+ venues across the city",
+    whyNow:
+      "ADE's 30th anniversary turns the whole city into the venue for five days and nights. Because events run until the early hours, a central stay with a staffed reception matters more here than the usual city break.",
+  },
+  {
+    id: "web-summit-lisbon-2026",
+    slug: "lisbon-web-summit-2026",
+    city: "Lisbon",
+    country: "Portugal",
+    eventName: "Web Summit",
+    eventShortName: "Web Summit",
+    startDate: "2026-11-09",
+    endDate: "2026-11-12",
+    category: "other",
+    aiSearchTemplate: "safe hotels Lisbon near Parque das Nacoes well-lit metro",
+    placeQuery: "Lisbon, Portugal",
+    venueNotes: "MEO Arena and FIL, Parque das Nações",
+    whyNow:
+      "More than 70,000 attendees arrive in one week and Lisbon's hotel stock is small for that. Staying on the red metro line keeps you a direct ride from the venue and out of late-night taxi queues.",
+  },
+  {
+    id: "vienna-christmas-markets-2026",
+    slug: "vienna-christmas-markets-2026",
+    city: "Vienna",
+    country: "Austria",
+    eventName: "Vienna Christmas Markets",
+    eventShortName: "Vienna Christmas",
+    startDate: "2026-11-13",
+    endDate: "2026-12-26",
+    displayDateRange: "November 13 – December 26, 2026",
+    category: "season",
+    aiSearchTemplate: "safe central hotels Vienna near Rathausplatz well-lit",
+    placeQuery: "Vienna, Austria",
+    venueNotes: "Rathausplatz, Spittelberg, Schönbrunn and more",
+    whyNow:
+      "The Rathausplatz Christkindlmarkt runs from 13 November, with Schönbrunn open into January. Weekends in December are the busiest and priciest — midweek stays inside the Ringstraße are both cheaper and easier to walk home from.",
+  },
+  {
+    id: "amsterdam-light-festival-2026",
+    slug: "amsterdam-light-festival-2026",
+    city: "Amsterdam",
+    country: "Netherlands",
+    eventName: "Amsterdam Light Festival",
+    eventShortName: "Light Festival",
+    startDate: "2026-11-26",
+    endDate: "2027-01-17",
+    displayDateRange: "November 26, 2026 – January 17, 2027",
+    category: "season",
+    aiSearchTemplate: "safe central hotels Amsterdam canal ring well-lit",
+    placeQuery: "Amsterdam, Netherlands",
+    venueNotes: "Along the canal ring, free to walk",
+    whyNow:
+      "The 15th edition lights the canals for 53 nights on a brand-new route. The artworks are free to walk, which makes this one of the few winter city breaks where the main attraction costs nothing.",
+  },
+  {
+    id: "venice-carnival-2027",
+    slug: "venice-carnival-2027",
+    city: "Venice",
+    country: "Italy",
+    eventName: "Carnevale di Venezia",
+    eventShortName: "Venice Carnival",
+    startDate: "2027-01-23",
+    endDate: "2027-02-09",
+    displayDateRange: "January 23 – February 9, 2027",
+    category: "festival",
+    aiSearchTemplate: "safe hotels Venice near San Marco well-lit central",
+    placeQuery: "Venice, Italy",
+    venueNotes: "Piazza San Marco and across the sestieri",
+    whyNow:
+      "Carnival runs for two and a half weeks, and the final weekend before Shrove Tuesday is the most crowded of the Venetian year. Booking a stay on the main islands avoids the last vaporetto problem after evening events.",
+  },
+  {
+    id: "vienna-opera-ball-2027",
+    slug: "vienna-opera-ball-2027",
+    city: "Vienna",
+    country: "Austria",
+    eventName: "Vienna Opera Ball",
+    eventShortName: "Opera Ball",
+    startDate: "2027-02-04",
+    endDate: "2027-02-04",
+    category: "other",
+    aiSearchTemplate: "safe hotels Vienna near Staatsoper Kärntner Ring well-lit",
+    placeQuery: "Vienna, Austria",
+    venueNotes: "Wiener Staatsoper, Kärntner Ring",
+    whyNow:
+      "The 69th Opera Ball ends at 5am, so a hotel within walking distance of the Staatsoper is worth more than the room itself. It is also the peak of Vienna's ball season, when the whole first district books out.",
+  },
+  {
+    id: "keukenhof-2027",
+    slug: "keukenhof-tulips-2027",
+    city: "Amsterdam",
+    country: "Netherlands",
+    eventName: "Keukenhof Tulip Season",
+    eventShortName: "Keukenhof tulips",
+    startDate: "2027-03-18",
+    endDate: "2027-05-09",
+    displayDateRange: "March 18 – May 9, 2027",
+    category: "season",
+    aiSearchTemplate: "safe hotels Amsterdam and Leiden near tulip fields well-lit central",
+    placeQuery: "Amsterdam, Netherlands",
+    venueNotes: "Keukenhof, Lisse — around 40 minutes from Amsterdam",
+    whyNow:
+      "The gardens open for only 53 days and mid-April is peak bloom, which is also when Amsterdam hotel prices spike. Timed tickets sell out on the busiest dates, so fix the room and the entry slot together.",
+  },
+  {
+    id: "feria-de-abril-seville-2027",
+    slug: "seville-feria-de-abril-2027",
+    city: "Seville",
+    country: "Spain",
+    eventName: "Feria de Abril",
+    eventShortName: "Feria de Abril",
+    startDate: "2027-04-12",
+    endDate: "2027-04-18",
+    category: "festival",
+    aiSearchTemplate: "safe hotels Seville near Los Remedios and city centre well-lit",
+    placeQuery: "Seville, Spain",
+    venueNotes: "Real de la Feria, Los Remedios",
+    whyNow:
+      "The 2027 fair falls early, from Lunes de Pescaíto on 12 April to the closing fireworks on the 18th. Seville sells out for the week, and the fairground runs late into the night — staying across the river in Triana or the centre keeps the walk home short.",
+  },
+  {
+    id: "milan-design-week-2027",
+    slug: "milan-design-week-2027",
+    city: "Milan",
+    country: "Italy",
+    eventName: "Milan Design Week (Salone del Mobile)",
+    eventShortName: "Milan Design Week",
+    startDate: "2027-04-13",
+    endDate: "2027-04-18",
+    category: "other",
+    aiSearchTemplate: "safe central hotels Milan near Brera and Porta Nuova well-lit",
+    placeQuery: "Milan, Italy",
+    venueNotes: "Fiera Milano Rho plus Fuorisalone across the city",
+    whyNow:
+      "The 65th Salone plus the city-wide Fuorisalone is Milan's most expensive hotel week of the year. Booking early, and near an M1 or M5 stop, is the difference between a 20-minute ride to Rho and an hour each way.",
+  },
+  {
+    id: "primavera-sound-barcelona-2027",
+    slug: "barcelona-primavera-sound-2027",
+    city: "Barcelona",
+    country: "Spain",
+    eventName: "Primavera Sound Barcelona",
+    eventShortName: "Primavera Barcelona",
+    startDate: "2027-06-03",
+    endDate: "2027-06-05",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Barcelona near Parc del Forum beach well-lit",
+    placeQuery: "Barcelona, Spain",
+    venueNotes: "Parc del Fòrum, Barcelona",
+    whyNow:
+      "The 25th edition, with sets running past 3am. Staying on the yellow metro line or in Poblenou means you are not depending on a night bus at the end of it.",
+  },
+  {
+    id: "roskilde-festival-2027",
+    slug: "roskilde-festival-2027",
+    city: "Copenhagen",
+    country: "Denmark",
+    eventName: "Roskilde Festival",
+    eventShortName: "Roskilde",
+    startDate: "2027-06-26",
+    endDate: "2027-07-03",
+    category: "festival",
+    aiSearchTemplate: "safe hotels Copenhagen and Roskilde near festival well-lit central",
+    placeQuery: "Copenhagen, Denmark",
+    venueNotes: "Roskilde, a 25-minute train from Copenhagen",
+    whyNow:
+      "A week-long festival where plenty of people skip the campsite and commute in by train. Copenhagen hotels near the Hovedbanegården make that realistic — and give you a locked door at the end of the night.",
+  },
+  {
+    id: "way-out-west-gothenburg-2026",
+    slug: "gothenburg-way-out-west-2026",
+    city: "Gothenburg",
+    country: "Sweden",
+    eventName: "Way Out West",
+    eventShortName: "Way Out West",
+    startDate: "2026-08-13",
+    endDate: "2026-08-15",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Gothenburg near Slottsskogen Linne well-lit",
+    placeQuery: "Gothenburg, Sweden",
+    venueNotes: "Slottsskogen, with Stay Out West club nights across the city",
+    whyNow:
+      "Three days in Slottsskogen followed by club nights around the centre. Staying near Linnéplatsen or Järntorget puts you within walking distance of both, which beats waiting for a night tram.",
+  },
 ];
+
+/** Events whose last day has passed are hidden from the site automatically. */
+const MAX_PREFILLED_NIGHTS = 3;
+const DEFAULT_LEAD_DAYS = 14;
+
+function todayIso(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function addDays(iso: string, days: number): string {
+  const d = new Date(iso + "T12:00:00Z");
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+function nightsBetween(from: string, to: string): number {
+  const diff = new Date(to + "T12:00:00Z").getTime() - new Date(from + "T12:00:00Z").getTime();
+  return Math.max(0, Math.round(diff / 86_400_000));
+}
+
+export function isEventPast(event: Pick<Event, "endDate">, today = todayIso()): boolean {
+  return event.endDate < today;
+}
+
+export type StayWindow = { checkin: string; checkout: string; nights: number };
+
+/**
+ * Dates to pre-fill for a given event.
+ *
+ * Two things this has to get right that plain start/end dates don't:
+ * seasons that run for weeks (Keukenhof is 53 days — nobody books 53 nights),
+ * and seasons already under way, where the start date is in the past and the
+ * rates API can't quote it.
+ */
+export function getEventStayWindow(
+  event: Pick<Event, "startDate" | "endDate">,
+  today = todayIso(),
+): StayWindow | null {
+  if (isEventPast(event, today)) return null;
+
+  const earliest = addDays(today, 1);
+  const checkin = event.startDate > earliest ? event.startDate : earliest;
+  const lastCheckout = addDays(event.endDate, 1);
+  const available = nightsBetween(checkin, lastCheckout);
+  if (available < 1) return null;
+
+  const nights = Math.min(available, MAX_PREFILLED_NIGHTS);
+  return { checkin, checkout: addDays(checkin, nights), nights };
+}
+
+/** Fallback dates for a city search when the event itself is over. */
+export function getDefaultStayWindow(today = todayIso()): StayWindow {
+  const checkin = addDays(today, DEFAULT_LEAD_DAYS);
+  return { checkin, checkout: addDays(checkin, 2), nights: 2 };
+}
 
 export function getEventBySlug(slug: string): (Event & { dateRange: string }) | undefined {
   const event = events.find((e) => e.slug === slug);
@@ -610,41 +902,57 @@ export function getEventBySlug(slug: string): (Event & { dateRange: string }) | 
   };
 }
 
+/** Every slug, including finished editions — their pages still resolve. */
 export function getAllEventSlugs(): string[] {
   return events.map((e) => e.slug);
 }
 
+/** Slugs worth submitting to Google: the ones a visitor can still book for. */
+export function getIndexableEventSlugs(today = todayIso()): string[] {
+  return events.filter((e) => !isEventPast(e, today)).map((e) => e.slug);
+}
+
+function withDateRange(event: Event): Event & { dateRange: string } {
+  return {
+    ...event,
+    dateRange: event.displayDateRange ?? formatEventDateRange(event.startDate, event.endDate),
+  };
+}
+
+/** Upcoming events, soonest first. */
+export function getUpcomingEvents(today = todayIso()): (Event & { dateRange: string })[] {
+  return events
+    .filter((e) => !isEventPast(e, today))
+    .sort((a, b) => a.startDate.localeCompare(b.startDate))
+    .map(withDateRange);
+}
+
 /**
- * Return up to `limit` events other than `slug`, as a list of (Event & { dateRange }).
- * Priority order: same city first, then same category, then everything else.
+ * Return up to `limit` upcoming events other than `slug`.
+ * Priority order: same city first, then same category, then soonest.
  */
 export function getRelatedEvents(
   slug: string,
   limit = 3,
+  today = todayIso(),
 ): (Event & { dateRange: string })[] {
   const current = events.find((e) => e.slug === slug);
-  const others = events.filter((e) => e.slug !== slug);
+  const others = getUpcomingEvents(today).filter((e) => e.slug !== slug);
   const scored = others.map((e) => {
     let score = 0;
     if (current && e.city === current.city) score += 2;
     if (current && e.category === current.category) score += 1;
     return { e, score };
   });
-  scored.sort((a, b) => b.score - a.score);
-  return scored.slice(0, limit).map(({ e }) => ({
-    ...e,
-    dateRange: e.displayDateRange ?? formatEventDateRange(e.startDate, e.endDate),
-  }));
+  scored.sort((a, b) => b.score - a.score || a.e.startDate.localeCompare(b.e.startDate));
+  return scored.slice(0, limit).map(({ e }) => e);
 }
 
-/** For homepage Trending Events block. Returns first N events (e.g. 8). */
-export function getEventsForHomepage(limit = 8): (Event & { dateRange: string })[] {
-  return events.slice(0, limit).map((e) => ({
-    ...e,
-    dateRange: e.displayDateRange ?? formatEventDateRange(e.startDate, e.endDate),
-  }));
+/**
+ * For the homepage "Peak dates" block. Only events a visitor can still travel
+ * to — a finished event advertises dates the search can't even quote.
+ */
+export function getEventsForHomepage(limit = 8, today = todayIso()): (Event & { dateRange: string })[] {
+  return getUpcomingEvents(today).slice(0, limit);
 }
 
-export function getCheckoutDate(endDate: string): string {
-  return addDay(endDate);
-}

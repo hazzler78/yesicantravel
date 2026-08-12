@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchRates, searchPlaces } from "@/lib/liteapi";
-import { getEventBySlug, getCheckoutDate } from "@/data/events";
+import { getEventBySlug, getEventStayWindow } from "@/data/events";
 import { DEFAULT_CURRENCY, resolveRequestCurrency } from "@/lib/currency";
 
 /**
@@ -24,7 +24,12 @@ export async function GET(
       fallback: DEFAULT_CURRENCY,
     });
 
-    const checkout = getCheckoutDate(event.endDate);
+    // A finished event has no bookable dates to quote.
+    const stay = getEventStayWindow(event);
+    if (!stay) {
+      return NextResponse.json({ minPrice: null, currency });
+    }
+
     let placeId: string | undefined;
     if (event.placeQuery) {
       try {
@@ -38,8 +43,8 @@ export async function GET(
 
     const data = await searchRates({
       ...(placeId ? { placeId } : { aiSearch: event.aiSearchTemplate }),
-      checkin: event.startDate,
-      checkout,
+      checkin: stay.checkin,
+      checkout: stay.checkout,
       adults: 1,
       currency,
       maxRatesPerHotel: 3,
@@ -73,14 +78,10 @@ export async function GET(
       return NextResponse.json({ minPrice: null, currency });
     }
 
-    const nights = Math.max(
-      1,
-      Math.ceil((new Date(checkout).getTime() - new Date(event.startDate).getTime()) / 86400000)
-    );
-    const minPerNight = Math.round(minAmount / nights);
+    const minPerNight = Math.round(minAmount / stay.nights);
 
     return NextResponse.json(
-      { minPrice: minPerNight, minTotal: minAmount, currency: quoteCurrency, nights },
+      { minPrice: minPerNight, minTotal: minAmount, currency: quoteCurrency, nights: stay.nights },
       {
         headers: {
           "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",

@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   },
 };
 
+// Peak dates drop off the list the day after they end, so the page can't be
+// built once and left to advertise a festival that finished months ago.
+export const revalidate = 3600;
+
 export default function HomePage() {
   return (
     <>

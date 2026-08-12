@@ -9,7 +9,8 @@
  * If you add a new destination→event redirect, add it here only.
  */
 export const destinationToEventRedirects: Record<string, string> = {
-  milan: "milan-paralympics-2026",
+  // Point at a current edition — the Paralympics page is a finished event now.
+  milan: "milan-design-week-2027",
   cancun: "cancun-spring-break-2026",
   austin: "austin-sxsw-2026",
   miami: "miami-spring-break-2026",

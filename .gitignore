@@ -33,6 +33,11 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# GSC MCP service account key (never commit)
+.cursor/secrets/*
+!.cursor/secrets/.gitkeep
+gsc-service-account.json
+
 # vercel
 .vercel
 

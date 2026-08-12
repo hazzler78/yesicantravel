@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "search-console": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "search-console-mcp"],
+      "env": {
+        "GOOGLE_APPLICATION_CREDENTIALS": "${workspaceFolder}/.cursor/secrets/gsc-service-account.json"
+      }
+    }
+  }
+}

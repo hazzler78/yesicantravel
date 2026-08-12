@@ -4,7 +4,8 @@ import { SOCIAL_LINKS } from "@/components/brand/SocialIcons";
 
 const EXPLORE_LINKS = [
   { href: "/popular-cities", label: "Popular cities" },
-  { href: "/#trending-events", label: "Trending events" },
+  { href: "/events", label: "Peak travel dates" },
+  { href: "/destinations", label: "City guides" },
   { href: "/blog", label: "Solo travel guides" },
   { href: "/lead-magnet", label: "Free safety checklist" },
 ];

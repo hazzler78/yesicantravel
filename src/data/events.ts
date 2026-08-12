@@ -4,6 +4,10 @@
  * Sitemap and /events/[slug] are generated from this array.
  */
 
+import { getSeasonStayWindow, todayIso, type StayWindow } from "@/lib/stayDates";
+
+export { getDefaultStayWindow, type StayWindow } from "@/lib/stayDates";
+
 /** See comment on Destination.neighbourhoods for editorial policy. */
 export interface EventNeighbourhood {
   name: string;
@@ -839,58 +843,19 @@ export const events: Event[] = [
 ];
 
 /** Events whose last day has passed are hidden from the site automatically. */
-const MAX_PREFILLED_NIGHTS = 3;
-const DEFAULT_LEAD_DAYS = 14;
-
-function todayIso(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function addDays(iso: string, days: number): string {
-  const d = new Date(iso + "T12:00:00Z");
-  d.setUTCDate(d.getUTCDate() + days);
-  return d.toISOString().slice(0, 10);
-}
-
-function nightsBetween(from: string, to: string): number {
-  const diff = new Date(to + "T12:00:00Z").getTime() - new Date(from + "T12:00:00Z").getTime();
-  return Math.max(0, Math.round(diff / 86_400_000));
-}
-
 export function isEventPast(event: Pick<Event, "endDate">, today = todayIso()): boolean {
   return event.endDate < today;
 }
 
-export type StayWindow = { checkin: string; checkout: string; nights: number };
-
 /**
- * Dates to pre-fill for a given event.
- *
- * Two things this has to get right that plain start/end dates don't:
- * seasons that run for weeks (Keukenhof is 53 days — nobody books 53 nights),
- * and seasons already under way, where the start date is in the past and the
- * rates API can't quote it.
+ * Dates to pre-fill for a given event: a representative stay rather than the
+ * whole run, and never a check-in the rates API can't quote.
  */
 export function getEventStayWindow(
   event: Pick<Event, "startDate" | "endDate">,
   today = todayIso(),
 ): StayWindow | null {
-  if (isEventPast(event, today)) return null;
-
-  const earliest = addDays(today, 1);
-  const checkin = event.startDate > earliest ? event.startDate : earliest;
-  const lastCheckout = addDays(event.endDate, 1);
-  const available = nightsBetween(checkin, lastCheckout);
-  if (available < 1) return null;
-
-  const nights = Math.min(available, MAX_PREFILLED_NIGHTS);
-  return { checkin, checkout: addDays(checkin, nights), nights };
-}
-
-/** Fallback dates for a city search when the event itself is over. */
-export function getDefaultStayWindow(today = todayIso()): StayWindow {
-  const checkin = addDays(today, DEFAULT_LEAD_DAYS);
-  return { checkin, checkout: addDays(checkin, 2), nights: 2 };
+  return getSeasonStayWindow(event.startDate, event.endDate, today);
 }
 
 export function getEventBySlug(slug: string): (Event & { dateRange: string }) | undefined {

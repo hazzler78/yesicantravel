@@ -38,7 +38,14 @@ export function TrendingEvents() {
           ))}
         </ul>
 
-        <p className="mt-6">
+        <p className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+          <Link
+            href="/events"
+            className="inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
+          >
+            See all peak dates
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
           <Link
             href="/popular-cities"
             className="inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"

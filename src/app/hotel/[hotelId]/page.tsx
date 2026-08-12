@@ -5,7 +5,6 @@ import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import {
-  ArrowLeft,
   Check,
   Clock,
   ImageOff,
@@ -24,6 +23,7 @@ import { normalizeFacilityNames, deriveSafetyBadges } from "@/lib/safetyBadges";
 import { deriveStaySignals, formatDistance } from "@/lib/staySignals";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { HotelGallery } from "@/components/hotel/HotelGallery";
+import { BackToResultsLink } from "@/components/hotel/BackToResultsLink";
 import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
@@ -396,13 +396,10 @@ function HotelContent() {
   return (
     <div className="bg-canvas">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-8">
-        <Link
+        <BackToResultsLink
           href={backHref}
-          className="mb-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-medium text-ink-muted underline-offset-4 hover:text-ink hover:underline"
-        >
-          <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to {searchParams.get("placeId") || searchParams.get("aiSearch") ? "results" : "search"}
-        </Link>
+          label={`Back to ${searchParams.get("placeId") || searchParams.get("aiSearch") ? "results" : "search"}`}
+        />
 
         <HotelGallery name={hotel.name} images={galleryImages} />
 
@@ -486,6 +483,93 @@ function HotelContent() {
                 </p>
               </Card>
             )}
+
+            <h2 id="rooms" className="mt-8 font-display text-xl font-semibold tracking-tight text-ink">
+              Choose your room
+            </h2>
+            <div className="mt-4 space-y-4">
+              {roomGroups.map((group) => (
+                <Card key={group.mappedRoomId} className="overflow-hidden">
+                  <div className="flex flex-col sm:flex-row">
+                    <div className="aspect-[4/3] w-full shrink-0 bg-surface-muted sm:aspect-auto sm:w-44">
+                      {group.firstImage ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={group.firstImage}
+                          alt=""
+                          loading="lazy"
+                          decoding="async"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-ink-muted">
+                          <ImageOff className="h-5 w-5" aria-hidden />
+                        </div>
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1 p-4">
+                      <h3 className="font-display text-base font-semibold text-ink">
+                        {group.roomName}
+                      </h3>
+                      <div className="mt-3 space-y-2">
+                        {group.rates.map((rate, index) => {
+                          const total = rate.retailRate?.total?.[0];
+                          const amount = total?.amount ?? 0;
+                          const currency = total?.currency ?? "EUR";
+                          const refundable = rate.cancellationPolicies?.refundableTag === "RFN";
+                          return (
+                            <div
+                              key={index}
+                              className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-surface-muted/60 p-3"
+                            >
+                              <div className="min-w-0">
+                                <p className="text-[0.9375rem] font-medium text-ink">
+                                  {rate.boardName}
+                                </p>
+                                {rate.cancellationPolicies?.refundableTag && (
+                                  <p
+                                    className={`mt-0.5 text-[0.8125rem] font-medium ${
+                                      refundable ? "text-positive" : "text-ink-muted"
+                                    }`}
+                                  >
+                                    {refundable ? "Free cancellation" : "Non-refundable"}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <div className="text-right">
+                                  <p className="tnum font-display text-lg font-semibold text-ink">
+                                    {formatStayTotal(amount, currency)}
+                                  </p>
+                                  <p className="text-xs text-ink-muted">
+                                    total · {nights} {nights === 1 ? "night" : "nights"}
+                                  </p>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => handleBook(rate.offerId)}
+                                  className="inline-flex min-h-[44px] items-center justify-center rounded-control bg-coral px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-coral-hover"
+                                >
+                                  Reserve
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+
+              {roomGroups.length === 0 && (
+                <Card className="p-6 text-center">
+                  <p className="text-[0.9375rem] text-ink-muted">
+                    No rooms available for these dates. Try shifting your stay by a night.
+                  </p>
+                </Card>
+              )}
+            </div>
 
             {(sentiment?.pros?.length || sentiment?.cons?.length || reviewsToShow.length > 0 || reviewsLoading) && (
               <Card className="mt-4 p-5">
@@ -608,92 +692,6 @@ function HotelContent() {
               </Card>
             )}
 
-            <h2 id="rooms" className="mt-8 font-display text-xl font-semibold tracking-tight text-ink">
-              Choose your room
-            </h2>
-            <div className="mt-4 space-y-4">
-              {roomGroups.map((group) => (
-                <Card key={group.mappedRoomId} className="overflow-hidden">
-                  <div className="flex flex-col sm:flex-row">
-                    <div className="aspect-[4/3] w-full shrink-0 bg-surface-muted sm:aspect-auto sm:w-44">
-                      {group.firstImage ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={group.firstImage}
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-ink-muted">
-                          <ImageOff className="h-5 w-5" aria-hidden />
-                        </div>
-                      )}
-                    </div>
-                    <div className="min-w-0 flex-1 p-4">
-                      <h3 className="font-display text-base font-semibold text-ink">
-                        {group.roomName}
-                      </h3>
-                      <div className="mt-3 space-y-2">
-                        {group.rates.map((rate, index) => {
-                          const total = rate.retailRate?.total?.[0];
-                          const amount = total?.amount ?? 0;
-                          const currency = total?.currency ?? "EUR";
-                          const refundable = rate.cancellationPolicies?.refundableTag === "RFN";
-                          return (
-                            <div
-                              key={index}
-                              className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-surface-muted/60 p-3"
-                            >
-                              <div className="min-w-0">
-                                <p className="text-[0.9375rem] font-medium text-ink">
-                                  {rate.boardName}
-                                </p>
-                                {rate.cancellationPolicies?.refundableTag && (
-                                  <p
-                                    className={`mt-0.5 text-[0.8125rem] font-medium ${
-                                      refundable ? "text-positive" : "text-ink-muted"
-                                    }`}
-                                  >
-                                    {refundable ? "Free cancellation" : "Non-refundable"}
-                                  </p>
-                                )}
-                              </div>
-                              <div className="flex items-center gap-3">
-                                <div className="text-right">
-                                  <p className="tnum font-display text-lg font-semibold text-ink">
-                                    {formatStayTotal(amount, currency)}
-                                  </p>
-                                  <p className="text-xs text-ink-muted">
-                                    total · {nights} {nights === 1 ? "night" : "nights"}
-                                  </p>
-                                </div>
-                                <button
-                                  type="button"
-                                  onClick={() => handleBook(rate.offerId)}
-                                  className="inline-flex min-h-[44px] items-center justify-center rounded-control bg-coral px-4 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-coral-hover"
-                                >
-                                  Reserve
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-
-              {roomGroups.length === 0 && (
-                <Card className="p-6 text-center">
-                  <p className="text-[0.9375rem] text-ink-muted">
-                    No rooms available for these dates. Try shifting your stay by a night.
-                  </p>
-                </Card>
-              )}
-            </div>
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:h-fit">

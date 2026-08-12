@@ -115,8 +115,8 @@ export default async function EventPage({ params }: Props) {
       {
         "@type": "ListItem",
         position: 2,
-        name: "Events",
-        item: `${BASE_URL}/`,
+        name: "Peak dates",
+        item: `${BASE_URL}/events`,
       },
       {
         "@type": "ListItem",
@@ -183,7 +183,9 @@ export default async function EventPage({ params }: Props) {
             Home
           </Link>
           <span className="mx-1.5">/</span>
-          <span>Events</span>
+          <Link href="/events" className="underline-offset-4 hover:text-ink hover:underline">
+            Peak dates
+          </Link>
           <span className="mx-1.5">/</span>
           <span className="text-ink">{event.eventName}</span>
         </nav>

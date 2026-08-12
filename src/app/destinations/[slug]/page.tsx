@@ -7,6 +7,7 @@ import {
   getAllDestinationSlugs,
   getRelatedDestinations,
 } from "@/data/destinations";
+import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -38,15 +39,21 @@ export function generateStaticParams() {
   return getAllDestinationSlugs().map((slug) => ({ slug }));
 }
 
+// Pre-filled dates roll forward with the calendar, so this can't be built once.
+export const revalidate = 3600;
+
 export default async function DestinationPage({ params }: Props) {
   const { slug } = await params;
   const dest = getDestinationBySlug(slug);
   if (!dest) notFound();
 
+  // The hard-coded checkin/checkout on each destination were March 2026 dates,
+  // so every CTA here pointed at a stay in the past.
+  const stay = getDefaultStayWindow();
   const searchUrl = `/results?${new URLSearchParams({
     aiSearch: dest.aiSearch,
-    checkin: dest.checkin,
-    checkout: dest.checkout,
+    checkin: stay.checkin,
+    checkout: stay.checkout,
     adults: "1",
   })}`;
 
@@ -123,7 +130,7 @@ export default async function DestinationPage({ params }: Props) {
         <nav aria-label="Breadcrumb" className="mb-4 text-sm text-ink-muted">
           <Link href="/" className="hover:underline">Home</Link>
           <span className="mx-2">/</span>
-          <Link href="/popular-cities" className="hover:underline">Destinations</Link>
+          <Link href="/destinations" className="hover:underline">Destinations</Link>
           <span className="mx-2">/</span>
           <span className="text-ink">{dest.city}</span>
         </nav>
@@ -134,7 +141,6 @@ export default async function DestinationPage({ params }: Props) {
           <h1 className="mt-2 font-display text-3xl font-semibold leading-tight tracking-tight text-ink md:text-4xl">
             {dest.headline}
           </h1>
-          <p className="tnum mt-2 text-lg font-medium text-ink">{dest.eventDateRange}</p>
           <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted md:text-base">
             {dest.subheadline}
           </p>
@@ -143,7 +149,7 @@ export default async function DestinationPage({ params }: Props) {
         <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
           <h2 className="mb-3 font-display text-lg font-semibold text-ink">Why now?</h2>
           <p className="mb-4 rounded-control bg-teal-soft px-4 py-2.5 text-[0.9375rem] font-semibold text-ink">
-            Event Dates: {dest.eventDateRange}
+            Dates pre-filled: {formatStayWindow(stay)}
           </p>
           <p className="mb-4 text-ink-muted">{dest.whyDemand}</p>
           <p className="text-sm font-medium text-teal">{dest.events}</p>
@@ -259,24 +265,19 @@ export default async function DestinationPage({ params }: Props) {
 
         <div className="rounded-card bg-surface-inverse p-6">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-teal-soft/70">
-            Your search is set for {dest.eventShortName}: {dest.eventDateRange}
+            Dates pre-filled · {formatStayWindow(stay)}
           </p>
-          <p className="mb-2">
-            <Link href="/" className="text-[0.8125rem] text-ink-inverse/70 underline-offset-4 hover:underline">
-              Change dates
-            </Link>
-          </p>
-          <p className="mb-4 font-display text-lg font-semibold text-ink">
+          <p className="mb-4 font-display text-lg font-semibold text-ink-inverse">
             Ready to find your stay in {dest.city}?
           </p>
           <p className="mb-5 text-[0.9375rem] text-ink-inverse/70">
-            Event dates pre-filled • Edit anytime on the results page
+            You can change dates, travellers and filters on the results page.
           </p>
           <Link
             href={searchUrl}
-            className="inline-block inline-flex min-h-[52px] items-center justify-center rounded-control bg-coral px-6 text-base font-semibold text-white transition-colors hover:bg-coral-hover"
+            className="inline-flex min-h-[52px] items-center justify-center rounded-control bg-coral px-6 text-base font-semibold text-white transition-colors hover:bg-coral-hover"
           >
-            Find Safer Stays in {dest.city} – {dest.eventDateRange}
+            Find safer stays in {dest.city}
           </Link>
         </div>
 
@@ -295,12 +296,8 @@ export default async function DestinationPage({ params }: Props) {
                     <p className="text-xs font-medium uppercase tracking-wider text-teal">
                       {r.country}
                     </p>
-                    <p className="mt-1 font-semibold text-ink">
-                      {r.city} – {r.eventShortName}
-                    </p>
-                    <p className="mt-1 text-sm text-ink-muted">
-                      {r.eventDateRange}
-                    </p>
+                    <p className="mt-1 font-semibold text-ink">{r.city}</p>
+                    <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{r.subheadline}</p>
                   </Link>
                 </li>
               ))}

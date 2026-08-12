@@ -10,7 +10,8 @@ import { TextSizeControl } from "./TextSizeControl";
 
 const NAV_LINKS = [
   { href: "/popular-cities", label: "Popular cities" },
-  { href: "/#trending-events", label: "Events" },
+  { href: "/events", label: "Peak dates" },
+  { href: "/destinations", label: "City guides" },
   { href: "/blog", label: "Guides" },
 ];
 

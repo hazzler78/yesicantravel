@@ -1,3 +1,5 @@
+import { redirectedDestinationSlugs } from "@/lib/legacyRedirects";
+
 /**
  * A neighbourhood we can recommend (or caution about) for solo female travellers.
  * Copy MUST be fact-checked by a human editor before publishing — generic template
@@ -306,6 +308,14 @@ export function getDestinationBySlug(slug: string): Destination | undefined {
 
 export function getAllDestinationSlugs(): string[] {
   return destinations.map((d) => d.slug);
+}
+
+/**
+ * Destinations that render their own page. The rest 301 to an event page, so
+ * linking to them from a hub would just send crawlers through a redirect.
+ */
+export function getLinkableDestinations(): Destination[] {
+  return destinations.filter((d) => !redirectedDestinationSlugs.has(d.slug));
 }
 
 /**

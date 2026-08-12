@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchRates, searchPlaces } from "@/lib/liteapi";
 import { getEventBySlug, getCheckoutDate } from "@/data/events";
+import { DEFAULT_CURRENCY, resolveRequestCurrency } from "@/lib/currency";
 
 /**
- * GET /api/events/[slug]/min-price
- * Returns lowest rate for the event's dates (placeId or aiSearch + startDate/checkout).
- * Used by event pages for "From X €/night" urgency. Cached by client; consider
- * adding response cache (e.g. revalidate 3600) if you want server-side caching.
+ * GET /api/events/[slug]/min-price?currency=SEK
+ * Returns lowest rate for the event's dates in the visitor's currency.
  */
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
@@ -18,6 +17,12 @@ export async function GET(
     if (!event) {
       return NextResponse.json({ error: "Event not found" }, { status: 404 });
     }
+
+    const currency = resolveRequestCurrency({
+      queryCurrency: request.nextUrl.searchParams.get("currency"),
+      cookieHeader: request.headers.get("cookie"),
+      fallback: DEFAULT_CURRENCY,
+    });
 
     const checkout = getCheckoutDate(event.endDate);
     let placeId: string | undefined;
@@ -36,7 +41,7 @@ export async function GET(
       checkin: event.startDate,
       checkout,
       adults: 1,
-      currency: "EUR",
+      currency,
       maxRatesPerHotel: 3,
     });
 
@@ -49,7 +54,7 @@ export async function GET(
     }>;
 
     let minAmount: number | null = null;
-    let currency = "EUR";
+    let quoteCurrency: string = currency;
 
     for (const hotel of rateData) {
       const allRates = hotel.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
@@ -58,17 +63,16 @@ export async function GET(
         if (total?.amount != null) {
           if (minAmount === null || total.amount < minAmount) {
             minAmount = total.amount;
-            currency = total.currency ?? "EUR";
+            quoteCurrency = total.currency ?? currency;
           }
         }
       }
     }
 
     if (minAmount === null) {
-      return NextResponse.json({ minPrice: null, currency: "EUR" });
+      return NextResponse.json({ minPrice: null, currency });
     }
 
-    // Per-night estimate: total stay / nights (rough; API returns total stay)
     const nights = Math.max(
       1,
       Math.ceil((new Date(checkout).getTime() - new Date(event.startDate).getTime()) / 86400000)
@@ -76,8 +80,13 @@ export async function GET(
     const minPerNight = Math.round(minAmount / nights);
 
     return NextResponse.json(
-      { minPrice: minPerNight, minTotal: minAmount, currency, nights },
-      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200" } }
+      { minPrice: minPerNight, minTotal: minAmount, currency: quoteCurrency, nights },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200",
+          Vary: "Cookie",
+        },
+      }
     );
   } catch (e) {
     console.error("[events/min-price]", e);

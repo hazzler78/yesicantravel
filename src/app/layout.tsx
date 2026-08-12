@@ -10,6 +10,7 @@ import AttributionBootstrap from "../components/AttributionBootstrap";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { textSizeBootstrapScript } from "@/components/layout/TextSizeControl";
+import { currencyBootstrapScript } from "@/components/currency/CurrencyControl";
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "948121024567031";
 const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
@@ -68,8 +69,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${fraunces.variable} flex min-h-screen flex-col`}>
-        {/* Runs before the page paints so a stored text-size choice doesn't flash. */}
+        {/* Runs before the page paints so stored text-size / currency don't flash. */}
         <script dangerouslySetInnerHTML={{ __html: textSizeBootstrapScript }} />
+        <script dangerouslySetInnerHTML={{ __html: currencyBootstrapScript }} />
         <Script id="pinterest-tag" strategy="afterInteractive">
           {`!function(e){if(!window.pintrk){window.pintrk=function(){window.pintrk.queue.push(Array.prototype.slice.call(arguments))};var
 n=window.pintrk;n.queue=[],n.version="3.0";var

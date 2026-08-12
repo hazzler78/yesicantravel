@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useCurrency } from "@/components/currency/CurrencyControl";
+import { localeForCurrency, type CurrencyCode } from "@/lib/currency";
 
 interface EventPriceBadgeProps {
   slug: string;
@@ -9,6 +11,7 @@ interface EventPriceBadgeProps {
 }
 
 export default function EventPriceBadge({ slug, eventShortName, venueNotes }: EventPriceBadgeProps) {
+  const currency = useCurrency();
   const [data, setData] = useState<{
     minPrice: number | null;
     currency: string;
@@ -17,7 +20,9 @@ export default function EventPriceBadge({ slug, eventShortName, venueNotes }: Ev
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/events/${encodeURIComponent(slug)}/min-price`)
+    setData(null);
+    setError(false);
+    fetch(`/api/events/${encodeURIComponent(slug)}/min-price?currency=${encodeURIComponent(currency)}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return;
@@ -27,7 +32,7 @@ export default function EventPriceBadge({ slug, eventShortName, venueNotes }: Ev
         }
         setData({
           minPrice: json.minPrice ?? null,
-          currency: json.currency ?? "EUR",
+          currency: json.currency ?? currency,
         });
       })
       .catch(() => {
@@ -36,16 +41,17 @@ export default function EventPriceBadge({ slug, eventShortName, venueNotes }: Ev
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, currency]);
 
   if (error || !data) return null;
   if (data.minPrice == null) return null;
 
   const formatted = (() => {
     try {
-      return new Intl.NumberFormat("en-GB", {
+      const code = (data.currency || currency) as CurrencyCode;
+      return new Intl.NumberFormat(localeForCurrency(code), {
         style: "currency",
-        currency: data.currency || "EUR",
+        currency: data.currency || currency,
         maximumFractionDigits: 0,
       }).format(data.minPrice);
     } catch {

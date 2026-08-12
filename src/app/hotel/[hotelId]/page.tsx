@@ -28,6 +28,8 @@ import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
+import { useCurrency } from "@/components/currency/CurrencyControl";
+import { guestNationalityForCurrency } from "@/lib/currency";
 
 interface Rate {
   name: string;
@@ -124,6 +126,7 @@ function formatStayDate(iso: string | null) {
 function HotelContent() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const currency = useCurrency();
   const hotelId = params.hotelId as string;
   const [hotel, setHotel] = useState<HotelDetail | null>(null);
   const [roomGroups, setRoomGroups] = useState<RoomGroup[]>([]);
@@ -184,6 +187,8 @@ function HotelContent() {
 
     async function run() {
       try {
+        setLoading(true);
+        setError(null);
         const [hotelRes, ratesRes] = await Promise.all([
           fetch(`/api/hotel?hotelId=${encodeURIComponent(hotelId)}`),
           fetch("/api/rates", {
@@ -195,6 +200,8 @@ function HotelContent() {
               checkout,
               adults: Number(adults),
               maxRatesPerHotel: 50,
+              currency,
+              guestNationality: guestNationalityForCurrency(currency),
             }),
           }),
         ]);
@@ -258,7 +265,7 @@ function HotelContent() {
       }
     }
     run();
-  }, [hotelId, checkin, checkout, adults]);
+  }, [hotelId, checkin, checkout, adults, currency]);
 
   const handleBook = (offerId: string) => {
     const total = roomGroups

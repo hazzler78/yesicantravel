@@ -1,3 +1,5 @@
+import { guestNationalityForCurrency, normalizeCurrency } from "@/lib/currency";
+
 const LITEAPI_KEY = process.env.LITEAPI_KEY!;
 const API_BASE = "https://api.liteapi.travel/v3.0";
 const BOOK_BASE = "https://book.liteapi.travel/v3.0";
@@ -62,10 +64,12 @@ export async function searchRates(params: {
   guestNationality?: string;
   maxRatesPerHotel?: number;
 }) {
+  const currency = normalizeCurrency(params.currency);
   const body: Record<string, unknown> = {
     occupancies: [{ adults: params.adults }],
-    currency: params.currency ?? "EUR",
-    guestNationality: params.guestNationality ?? "US",
+    currency,
+    guestNationality:
+      params.guestNationality ?? guestNationalityForCurrency(currency),
     checkin: params.checkin,
     checkout: params.checkout,
     roomMapping: true,

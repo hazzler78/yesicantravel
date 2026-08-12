@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
+import { CurrencyControl } from "@/components/currency/CurrencyControl";
 import { TextSizeControl } from "./TextSizeControl";
 
 const NAV_LINKS = [
@@ -47,6 +48,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <CurrencyControl className="hidden sm:flex" />
           <TextSizeControl className="hidden lg:flex" />
           <button
             type="button"
@@ -77,7 +79,8 @@ export function SiteHeader() {
                 </li>
               ))}
             </ul>
-            <div className="mt-3 border-t border-border pt-3">
+            <div className="mt-3 space-y-3 border-t border-border pt-3">
+              <CurrencyControl />
               <TextSizeControl />
             </div>
           </nav>

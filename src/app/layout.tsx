@@ -34,10 +34,8 @@ export const metadata: Metadata = {
     "p:domain_verify": "3e1e4ae20aa959e7498943dfcd7a909e",
   },
   icons: {
-    icon: [
-      { url: "/logo.svg", type: "image/svg+xml" },
-      { url: "/logo.png", type: "image/png" },
-    ],
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    apple: [{ url: "/logo.png", type: "image/png" }],
   },
   title: {
     default: "Yes I Can Travel – Safe solo travel stays for women in Europe",

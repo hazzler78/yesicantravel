@@ -883,6 +883,13 @@ export function getDestinationBySlug(slug: string): Destination | undefined {
   return destinations.find((d) => d.slug === slug);
 }
 
+/** Year-round city guide for a host city, if we have one that actually renders. */
+export function getDestinationByCity(city: string): Destination | undefined {
+  const needle = city.trim().toLowerCase();
+  if (!needle) return undefined;
+  return getLinkableDestinations().find((d) => d.city.toLowerCase() === needle);
+}
+
 export function getAllDestinationSlugs(): string[] {
   return destinations.map((d) => d.slug);
 }

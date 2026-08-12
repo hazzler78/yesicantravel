@@ -95,9 +95,10 @@ export const events: Event[] = [
     endDate: "2026-03-15",
     category: "sports",
     aiSearchTemplate: "safe hotels near Paralympic venues in Milan well-lit central",
-    venueNotes: "Venues in Milan, Cortina, Verona",
+    venueNotes: "PalaItalia Santa Giulia in Milan; opening ceremony at Arena di Verona; mountain events in Cortina and Val di Fiemme",
+    placeQuery: "Milan, Italy",
     whyNow:
-      "Post-Winter Olympics buzz; Italy is a top luxury booking destination for 2026 and Milan accommodation demand is well up year-on-year as the Paralympic Winter Games arrive in the city for the first time.",
+      "Ice hockey was at PalaItalia Santa Giulia, a new arena in the south-east. The opening ceremony was in Verona, not Milan — so a central Milan stay only helps the ice events, not the first night.",
     knownFor: [
       "The Duomo and Galleria Vittorio Emanuele II",
       "La Scala opera house",
@@ -108,65 +109,66 @@ export const events: Event[] = [
       {
         name: "Brera",
         description:
-          "Brera is central, walkable and full of galleries, boutiques and cafés that stay lively into the evening. Streets are narrow but well-lit, police patrol visible, and the district is one of the most comfortable bases for solo female travellers on a first Milan trip.",
+          "Just north of the centre, with narrow streets, galleries and restaurants that stay busy through the evening. One of the more pleasant parts of Milan to walk after dinner. M2 stops at Lanza, and it is a ten-minute walk to the Duomo.",
         verdict: "recommended",
       },
       {
         name: "Porta Nuova / Isola",
         description:
-          "The modern skyscraper district around Piazza Gae Aulenti, linked to Isola. Pedestrianised, very well-lit and frequented by locals after work. Easy metro access on M5 (Garibaldi / Isola), which connects directly to the Paralympic venues at the PalaItalia in Santa Giulia.",
+          "The modern district around Porta Garibaldi: wide pavements, bright lighting, and a major interchange on M2 and M5. For PalaItalia Santa Giulia you change at Zara onto M3 (yellow) south to Rogoredo — it is not a direct M5 ride.",
         verdict: "recommended",
       },
       {
         name: "Navigli",
         description:
-          "The canal district is iconic for evenings out, with bars and restaurants lining Naviglio Grande. The main canal strip is busy and fine for solo travellers, but side streets a few blocks inland can feel quiet late — stick to the canal or rideshare home.",
-        verdict: "recommended",
+          "The canal district and the centre of Milan's evening drinking. Excellent for an aperitivo, crowded and loud late, and a fair distance from Santa Giulia. Worth visiting; consider whether you want to sleep there.",
+        verdict: "caution",
       },
       {
-        name: "Milano Centrale (Central Station area)",
+        name: "Around Stazione Centrale",
         description:
-          "Milan's main rail hub is convenient for arrivals but the immediate streets east and north of the station feel transient and less comfortable at night. If you stay here for logistics, pick a hotel on the station's south side (Piazza Duca d'Aosta) or one block toward Porta Nuova.",
+          "Convenient for trains and well supplied with cheap hotels, but the station and the streets immediately east of it are busy at all hours in a way that many solo travellers find uncomfortable late at night. If you book here, favour a hotel on the main avenues with a staffed lobby.",
         verdict: "caution",
       },
     ],
     safetyTips: [
-      "Pickpocketing is the most common issue for tourists — especially on Metro line M1/M3 and around the Duomo. Use a zipped crossbody bag worn in front in crowds.",
-      "Use FreeNow, itTaxi, or the official white taxis with meters. Do not accept rides from drivers soliciting at Milano Centrale.",
-      "For the Paralympic venues, buy ATM transit passes in advance via the ATM Milano app — avoid ticket-machine queues where scammers sometimes operate.",
-      "Restaurants: a 10% coperto/service charge is often already included — check the bill before adding a tip.",
-      "March evenings are cold (5–10°C). Well-lit routes are fine, but empty side streets feel colder and quieter — rideshare after 10pm.",
+      "Pickpocketing concentrates on M1 and M3 around the Duomo, at Stazione Centrale, and on the historic tram 1. A zipped bag worn in front covers most of it.",
+      "The metro closes early by European standards: last trains from the terminals around 00:30 on M1–M4, and closer to midnight on M5. NM1–NM4 night buses then follow the metro routes; the standard €2.20 urban ticket is valid on them.",
+      "Use FreeNow, itTaxi, or the official white taxis at ranks. Do not accept rides from drivers soliciting at Milano Centrale.",
+      "Buy ATM tickets in the app or at a machine before you board — an unvalidated ticket counts as no ticket, and inspectors check regularly.",
+      "A coperto (cover charge) of a few euros is often already on the bill. Check before adding a tip.",
+      "Italy's 1522 anti-violence and stalking line is free, staffed 24/7 and answers in several languages. 112 is the emergency number.",
     ],
     gettingAround:
-      "Milan has two main airports: Malpensa (MXP, 50 min from centre) and Linate (LIN, 15 min from centre). The Malpensa Express train runs every 30 minutes to Cadorna and Centrale stations and is the safest low-cost option. Linate is now connected to the metro via line M4, which runs directly to the city centre. Within the city, the ATM metro is clean, reliable and the safest way to reach Paralympic venues in Santa Giulia (M3 to Rogoredo or M5 to San Donato, then shuttle).",
+      "From Malpensa, the Malpensa Express runs every 30 minutes to Milano Cadorna (about 40 minutes) and Milano Centrale (about 50 minutes). From Linate, metro line M4 runs into the centre in about 15 minutes on a standard urban ticket. PalaItalia Santa Giulia is in the south-east: take M3 (yellow) to Rogoredo, then the venue shuttle or a 25-minute walk. M5 does not go there — it runs from Bignami to San Siro.",
     faqs: [
       {
-        question: "When is the Milan Paralympics 2026?",
+        question: "When were the Milan Paralympics 2026?",
         answer:
-          "The Milano Cortina 2026 Paralympic Winter Games run from March 6 to March 15, 2026, with events split between Milan (opening ceremony, ice sports at PalaItalia Santa Giulia) and the Cortina / Valtellina mountain venues. If you want to see both the opening and the mountain events, plan on a full week.",
+          "The Milano Cortina 2026 Paralympic Winter Games ran from 6 to 15 March 2026. The opening ceremony was at the Arena di Verona, Para ice hockey was at PalaItalia Santa Giulia in Milan, mountain events were in Cortina d'Ampezzo and Val di Fiemme, and the closing ceremony was in Cortina.",
       },
       {
-        question: "Is Milan safe for solo female travellers during the Paralympics?",
+        question: "Is Milan safe for solo female travellers?",
         answer:
-          "Milan is generally safe for solo women — the bigger risk during major events is pickpocketing in crowded areas, not violent crime. Stay central (Brera, Porta Nuova, Duomo area), use zipped bags, buy transit passes in advance, and stick to the metro or official taxis for late returns from venues.",
+          "Milan is a large working city: busy and businesslike by day, quieter in the centre at night than Rome or Naples. Violent crime against visitors is rare; pickpocketing on the metro and around the Duomo is common. Stay central (Brera, Porta Nuova, Duomo), use a zipped bag, and plan the last metro — it stops around 00:30.",
       },
       {
-        question: "Where should I stay for the Paralympics?",
+        question: "Where should I stay for PalaItalia Santa Giulia?",
         answer:
-          "For ice events at PalaItalia Santa Giulia, staying along the M3 (yellow) or M5 (lilac) metro lines — Porta Nuova, Brera, or central Duomo — puts you 20–30 minutes from the venue with reliable late-night metro service during the Games. If you're attending opening ceremony at San Siro, hotels near the M5 (Lilla line) are faster.",
+          "Anywhere on the M3 (yellow) line keeps the journey to a single ride to Rogoredo, which is the station for the arena. Duomo, Repubblica (Porta Nuova) and Centrale are all on it. Brera is a short walk from Lanza on M2. The opening ceremony was in Verona, not at San Siro, so an M5 hotel only helps if you also want San Siro itself.",
       },
       {
         question: "How do I get from Malpensa Airport to central Milan safely?",
         answer:
-          "Use the Malpensa Express train, which runs every 30 minutes between Malpensa Terminal 1 and both Milano Cadorna and Milano Centrale stations. Journey time is around 50 minutes, trains are well-lit and staffed, and tickets cost a fraction of airport taxi fares. Avoid unofficial drivers offering rides in arrivals.",
+          "Take the Malpensa Express. It runs every 30 minutes from Terminal 1 and Terminal 2: about 40 minutes to Cadorna, about 50 minutes to Centrale, both staffed stations with taxi ranks outside. Avoid unofficial drivers offering rides in arrivals.",
       },
       {
         question: "Do I need to speak Italian?",
         answer:
-          "English is widely spoken at Milan hotels, major restaurants and transit information counters, and all Paralympic venues will have multilingual signage and staff. Learning a few basics (buongiorno, grazie, scusi) is appreciated but not required.",
+          "English is widely spoken at Milan hotels, major restaurants and transit information counters. Learning a few basics (buongiorno, grazie, scusi) is appreciated but not required.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "sxsw-austin-2026",
@@ -299,8 +301,9 @@ export const events: Event[] = [
     endDate: "2026-03-14",
     category: "season",
     aiSearchTemplate: "safe beachfront hotel Puerto Vallarta Mexico well-lit",
+    placeQuery: "Puerto Vallarta, Mexico",
     whyNow:
-      "Popular international spring-break spot with some of the best beaches on Mexico's Pacific coast and a well-developed tourism infrastructure — a safer pick than cartel-affected Mexican destinations further inland.",
+      "A long-standing Pacific-coast favourite for solo women and LGBTQ+ travellers, with a walkable old town and staffed resort strip. Jalisco as a whole carries a US 'reconsider travel' advisory; Puerto Vallarta itself is listed with no travel restrictions — check the current advisory before you book.",
     knownFor: [
       "The Malecón boardwalk and old-town Zona Romántica",
       "LGBTQ+-welcoming atmosphere (one of Mexico's most inclusive beach towns)",
@@ -323,7 +326,7 @@ export const events: Event[] = [
       {
         name: "Hotel Zone (Zona Hotelera)",
         description:
-          "The stretch of mid-to-high-rise beach resorts north of downtown. All-inclusives here have 24/7 reception, bracelet-access beaches and shuttle services. Nightlife happens on-property or in the old town — stay inside the resort grounds after dark or take an Uber into Zona Romántica.",
+          "The stretch of mid-to-high-rise beach resorts north of downtown. All-inclusives here have 24/7 reception, bracelet-access beaches and shuttle services. Nightlife happens on-property or in the old town — stay inside the resort grounds after dark or take Uber or DiDi into Zona Romántica.",
         verdict: "recommended",
       },
       {
@@ -334,35 +337,36 @@ export const events: Event[] = [
       },
     ],
     safetyTips: [
-      "Check the US State Department travel advisory for Jalisco before you book — Puerto Vallarta itself is in a lower-risk coastal pocket, but advisory levels can change.",
-      "Use Uber or DiDi for rides — both operate reliably in Vallarta and give you a named driver and fare in-app. For airport pickup, buy an authorised taxi voucher inside the terminal before leaving (do not accept curb offers).",
-      "Drink only bottled or filtered water; avoid ice in small street stalls. Resorts typically filter their own.",
+      "The US State Department currently advises reconsidering travel to Jalisco as a whole, while listing no restrictions on Puerto Vallarta itself (including neighbouring Riviera Nayarit). Check the advisory before you book — levels change.",
+      "Use Uber or DiDi in the city — both are authorised in Puerto Vallarta. Confirm the plate and the photo before you get in. Do not hail a taxi on the street.",
+      "For the airport, buy an authorised taxi voucher inside the terminal before you exit. App pickups are on the public road outside airport property, not at the curb, which is a worse arrival with bags.",
+      "Drink bottled or filtered water; avoid ice in small street stalls. Resorts typically filter their own.",
       "Stick to busy, lit beach stretches (Los Muertos, Hotel Zone) for daytime solo sun. Don't leave valuables on the sand; use a hotel beach locker.",
-      "If you join spring-break pool or boat parties, pre-agree with a friend or your hotel reception about a check-in text — and never leave a drink unattended.",
-      "ATMs inside bank lobbies (BBVA, Banorte, Santander) are the safest; avoid standalone machines on the Malecón.",
+      "If you join spring-break pool or boat parties, pre-agree a check-in text with a friend or your hotel reception — and never leave a drink unattended.",
+      "ATMs inside bank lobbies (BBVA, Banorte, Santander) are the safer option; avoid standalone machines on the Malecón.",
     ],
     gettingAround:
-      "Licenciado Gustavo Díaz Ordaz International Airport (PVR) is 10–25 minutes from most hotels. Inside the terminal, buy an authorised taxi voucher or use Uber — Uber drivers meet you at the designated rideshare zone outside the terminal. Local city buses are cheap (around 10 pesos) and generally safe during the day, but can get very crowded at spring-break peak; most solo travellers use Uber at night.",
+      "Licenciado Gustavo Díaz Ordaz International Airport (PVR) is 10–25 minutes from most hotels. Inside the terminal, buy an authorised taxi voucher — prices are fixed by zone and you pay upfront. Uber and DiDi operate in the city, but airport pickups are on the public road outside the terminal, not at the curb. City buses cost around 11 to 14 pesos and are generally fine during the day; most solo travellers use Uber or DiDi at night.",
     faqs: [
       {
         question: "Is Puerto Vallarta safe for solo female travellers during spring break?",
         answer:
-          "Puerto Vallarta is considered one of the safer Mexican beach destinations and is a long-standing favourite for solo women and LGBTQ+ travellers. The Zona Romántica and Hotel Zone are busy, staffed and well-lit. Standard precautions apply: use Uber or DiDi at night, stay on populated beach stretches, and keep an eye on your drink at spring-break parties.",
+          "Puerto Vallarta's tourist zone is a long-standing favourite for solo women and LGBTQ+ travellers, and the US government lists no travel restrictions on the town itself. Jalisco as a state is a different picture — currently 'reconsider travel' — so read the current advisory rather than treating the whole state as interchangeable. In town, the Zona Romántica and Hotel Zone are busy, staffed and well-lit; use Uber or DiDi at night and keep an eye on your drink at parties.",
       },
       {
         question: "Where should a solo woman stay in Puerto Vallarta?",
         answer:
-          "Zona Romántica (old town) is the top pick for a walkable, welcoming base with boutique hotels, cafés and the beach within blocks. If you prefer a resort experience with 24/7 security and controlled grounds, the Hotel Zone or Marina Vallarta are strong alternatives — pair them with Uber trips into Zona Romántica for dinner and live music.",
+          "Zona Romántica (old town) is the top pick for a walkable, welcoming base with boutique hotels, cafés and the beach within blocks. If you prefer a resort with 24/7 security and controlled grounds, the Hotel Zone or Marina Vallarta are strong alternatives — pair them with Uber or DiDi into Zona Romántica for dinner and live music.",
       },
       {
         question: "Is it safe to go out at night in Puerto Vallarta?",
         answer:
-          "The Malecón, Playa Los Muertos pier area and the main bar streets in Zona Romántica are busy, lit and full of other tourists well into the evening — comfortable for solo travellers. Avoid inland streets in Centro after closing time, stick to licensed bars, and take Uber back to your hotel rather than walking long distances at night.",
+          "The Malecón, Playa Los Muertos pier area and the main bar streets in Zona Romántica are busy, lit and full of other visitors well into the evening. Avoid inland streets in Centro after closing time, stick to licensed bars, and take Uber or DiDi back to your hotel rather than walking long distances at night.",
       },
       {
         question: "How do I get from Puerto Vallarta airport to my hotel safely?",
         answer:
-          "Inside the terminal, purchase an authorised taxi voucher at one of the counters before you exit — prices are fixed by zone and you pay upfront. Alternatively, Uber operates at PVR; walk outside the terminal to the designated rideshare pickup. Ignore drivers offering rides at the curb, and confirm the driver name and plate before getting in.",
+          "Inside the terminal, buy an authorised taxi voucher at one of the counters before you exit — prices are fixed by zone and you pay upfront. Uber and DiDi work in the city but cannot pick up at the terminal curb; you would have to walk out to the public road. Ignore drivers offering rides at the curb, and if you do use an app later, confirm the driver name and plate before getting in.",
       },
       {
         question: "Do I need to speak Spanish?",
@@ -370,7 +374,7 @@ export const events: Event[] = [
           "Basic English is widely spoken at hotels, restaurants and taxi stands in Puerto Vallarta's tourist zones. A handful of phrases (hola, gracias, la cuenta por favor) go a long way, and Google Translate covers most gaps outside the tourist core.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     id: "edc-las-vegas-2026",

@@ -9,6 +9,7 @@ import {
   getRelatedEvents,
   isEventPast,
 } from "@/data/events";
+import { getDestinationByCity } from "@/data/destinations";
 import { ArrowRight, CalendarDays, Check, Dot, History } from "lucide-react";
 import { searchPlaces } from "@/lib/liteapi";
 import EventPriceBadge from "@/components/EventPriceBadge";
@@ -74,6 +75,7 @@ export default async function EventPage({ params }: Props) {
 
   const past = isEventPast(event);
   const nextEdition = event.supersededBy ? getEventBySlug(event.supersededBy) : undefined;
+  const cityGuide = getDestinationByCity(event.city);
 
   // Long seasons get a representative stay rather than the whole run, and a
   // season already under way starts from tomorrow — the rates API can't quote
@@ -211,7 +213,9 @@ export default async function EventPage({ params }: Props) {
               <p className="mt-2 text-[0.9375rem] leading-relaxed text-ink-muted">
                 {nextEdition
                   ? `The next edition runs ${nextEdition.dateRange}.`
-                  : `We keep this page for reference. You can still search ${event.city} for any dates you like.`}
+                  : cityGuide
+                    ? `We keep this page for reference. The year-round ${event.city} guide is the better starting point now.`
+                    : `We keep this page for reference. You can still search ${event.city} for any dates you like.`}
               </p>
               <div className="mt-4 flex flex-wrap gap-3">
                 {nextEdition && (
@@ -221,6 +225,16 @@ export default async function EventPage({ params }: Props) {
                     fullWidth={false}
                   >
                     See {nextEdition.eventShortName} {nextEdition.startDate.slice(0, 4)}
+                    <ArrowRight className="h-4 w-4" aria-hidden />
+                  </PrimaryLink>
+                )}
+                {cityGuide && (
+                  <PrimaryLink
+                    href={`/destinations/${cityGuide.slug}`}
+                    variant={nextEdition ? "teal" : "coral"}
+                    fullWidth={false}
+                  >
+                    {event.city} city guide
                     <ArrowRight className="h-4 w-4" aria-hidden />
                   </PrimaryLink>
                 )}

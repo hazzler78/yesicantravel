@@ -81,25 +81,28 @@ export function HotelGallery({ name, images }: HotelGalleryProps) {
         </button>
       </div>
 
-      {/* Mobile: every photo in a horizontal strip so nothing is buried below the fold. */}
-      <div className="-mx-4 sm:hidden">
-        <ul className="flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {/* Mobile: every photo in a horizontal strip — next image peeks so swipe is obvious. */}
+      <div className="-mx-4 max-sm:block sm:hidden">
+        <ul className="flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {images.map((url, index) => (
             <li key={`m-${url}-${index}`} className="snap-start shrink-0">
               <button
                 type="button"
                 onClick={() => openAt(index)}
-                className="relative block h-56 w-[min(82vw,320px)] overflow-hidden rounded-card bg-surface-muted"
+                className="relative block h-52 w-[min(72vw,280px)] overflow-hidden rounded-card bg-surface-muted"
               >
                 {/* Partner CDN images aren't configured as next/image remote hosts. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={url}
                   alt={index === 0 ? name : ""}
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading={index < 3 ? "eager" : "lazy"}
                   decoding="async"
                   className="h-full w-full object-cover"
                 />
+                <span className="absolute bottom-2 right-2 rounded-control bg-ink/70 px-2 py-0.5 text-[0.6875rem] font-semibold text-ink-inverse">
+                  {index + 1}/{images.length}
+                </span>
                 <span className="sr-only">
                   Photo {index + 1} of {images.length}
                 </span>

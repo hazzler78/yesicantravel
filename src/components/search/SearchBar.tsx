@@ -23,6 +23,8 @@ export type SearchBarProps = {
   initialGuests?: number;
   /** Lightens the helper text below the bar when it sits on the dark hero band. */
   onDark?: boolean;
+  /** Fires once a search is about to navigate, so a collapsible host can close. */
+  onSubmitted?: () => void;
   className?: string;
 };
 
@@ -58,6 +60,7 @@ export function SearchBar({
   initialCheckout,
   initialGuests = 1,
   onDark = false,
+  onSubmitted,
   className = "",
 }: SearchBarProps) {
   const router = useRouter();
@@ -217,6 +220,7 @@ export function SearchBar({
     });
 
     setLoading(true);
+    onSubmitted?.();
     const params = new URLSearchParams({ checkin, checkout, adults: String(guests) });
     if (mode === "destination") {
       params.set("placeId", resolvedPlaceId);

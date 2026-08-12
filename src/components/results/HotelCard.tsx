@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ImageOff, MapPin } from "lucide-react";
+import { Clock, ImageOff, MapPin, TrainFront, Venus } from "lucide-react";
 import { formatStayTotal } from "@/lib/formatStayPrice";
+import { formatDistance, type StaySignals } from "@/lib/staySignals";
 import { RatingBadge } from "@/components/ui/RatingBadge";
-import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
+import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 
 export type HotelCardData = {
   id: string;
@@ -19,13 +20,15 @@ export type HotelCardData = {
 
 type HotelCardProps = {
   hotel: HotelCardData;
+  signals?: StaySignals;
   href: string;
   nights: number;
   onSelect?: () => void;
 };
 
-export function HotelCard({ hotel, href, nights, onSelect }: HotelCardProps) {
+export function HotelCard({ hotel, signals, href, nights, onSelect }: HotelCardProps) {
   const hasPrice = hotel.price != null;
+  const nearestTransit = signals?.nearestTransit;
 
   return (
     <article className="overflow-hidden rounded-card border border-border bg-surface shadow-card transition-colors hover:border-border-strong">
@@ -77,12 +80,31 @@ export function HotelCard({ hotel, href, nights, onSelect }: HotelCardProps) {
               </p>
             )}
 
-            <SafetyBadgeList
-              badges={hotel.safetyBadges ?? []}
-              freeCancellation={Boolean(hotel.hasFreeCancellation)}
-              max={4}
-              className="mt-3"
-            />
+            {nearestTransit && (
+              <p className="mt-1.5 flex items-start gap-1.5 text-[0.8125rem] text-ink-muted">
+                <TrainFront className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+                <span>
+                  <span className="tnum font-medium text-ink">
+                    {formatDistance(nearestTransit.distanceKm)}
+                  </span>{" "}
+                  to {nearestTransit.name}
+                </span>
+              </p>
+            )}
+
+            <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              {signals?.matches.includes("womenOnlyRoom") && (
+                <SafetyBadge label="Women-only room" tone="positive" icon={Venus} />
+              )}
+              {signals?.latestCheckIn && (
+                <SafetyBadge label={`Check-in until ${signals.latestCheckIn}`} icon={Clock} />
+              )}
+              <SafetyBadgeList
+                badges={hotel.safetyBadges ?? []}
+                freeCancellation={Boolean(hotel.hasFreeCancellation)}
+                max={4}
+              />
+            </div>
           </div>
 
           <div className="flex shrink-0 flex-col items-stretch justify-end gap-2 border-t border-border pt-3 sm:w-44 sm:items-end sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0">

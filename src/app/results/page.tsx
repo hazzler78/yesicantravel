@@ -7,7 +7,13 @@ import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { Map as MapIcon, SearchX, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
-import { SearchBar } from "@/components/search/SearchBar";
+import { deriveStaySignals, type StayFilterId, type StaySignals } from "@/lib/staySignals";
+import {
+  firstRateTotalByHotel,
+  RESULTS_HOTEL_LIMIT,
+  type RateOffer,
+} from "@/lib/resultsPricing";
+import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
@@ -33,6 +39,7 @@ interface HotelListItem extends HotelBasic, HotelCardData {
   lat?: number;
   lng?: number;
   safetyBadges?: string[];
+  signals?: StaySignals;
 }
 
 type SearchAnalyticsOutcome = {
@@ -52,10 +59,21 @@ type SearchAnalyticsOutcome = {
 const SEARCH_SESSION_STORAGE_KEY = "yict_search_session_id";
 
 const DEFAULT_FILTERS: ResultsFilterState = {
-  minRating: 8,
+  // Deliberately no rating floor. Sorting already puts the best-reviewed stays
+  // first, and a hidden floor made the "from" price on the homepage
+  // unreachable when the cheapest stay scored below it.
+  minRating: null,
   maxPrice: null,
   onlyFreeCancellation: false,
+  signals: [],
 };
+
+const SIGNAL_IDS: StayFilterId[] = [
+  "nearTransit",
+  "securityOnSite",
+  "privateCheckIn",
+  "womenOnlyRoom",
+];
 
 /**
  * Guest scores arrive on a 10-point scale, star ratings on a 5-point one.
@@ -127,14 +145,14 @@ function ResultsContent() {
   const [mapOpen, setMapOpen] = useState(false);
   const lastSearchEventSignature = useRef<string | null>(null);
 
-  const { minRating, maxPrice, onlyFreeCancellation } = filters;
+  const { minRating, maxPrice, onlyFreeCancellation, signals } = filters;
 
   const updateFilters = useCallback((patch: Partial<ResultsFilterState>) => {
     setFilters((current) => ({ ...current, ...patch }));
   }, []);
 
   const resetFilters = useCallback(() => {
-    setFilters({ minRating: null, maxPrice: null, onlyFreeCancellation: false });
+    setFilters({ minRating: null, maxPrice: null, onlyFreeCancellation: false, signals: [] });
   }, []);
 
   useEffect(() => {
@@ -185,11 +203,21 @@ function ResultsContent() {
           hotelId: string;
           roomTypes?: Array<{
             rates?: Array<{
+              name?: string;
               retailRate?: { total?: Array<{ amount: number; currency?: string }> };
               cancellationPolicies?: { refundableTag: string };
             }>;
           }>;
         }>;
+        // Room names are where a women-only dorm shows up, when it shows up at all.
+        const rateNamesByHotel: Record<string, string[]> = {};
+        for (const offer of data) {
+          const names = (offer.roomTypes ?? [])
+            .flatMap((rt) => rt.rates ?? [])
+            .map((rate) => rate.name)
+            .filter((name): name is string => Boolean(name));
+          if (names.length) rateNamesByHotel[offer.hotelId] = names;
+        }
         const hotelsFromApi = (json.hotels ?? []) as (HotelBasic & {
           location?: { latitude?: number; longitude?: number };
           rating?: number; // guest review rating, when present
@@ -201,7 +229,7 @@ function ResultsContent() {
         if (aiSearch && hotelsFromApi.length > 0) {
           // For vibe/AI search, enrich basic hotel data with full details (including coordinates)
           const details = await Promise.all(
-            hotelsFromApi.slice(0, 20).map(async (h) => {
+            hotelsFromApi.slice(0, RESULTS_HOTEL_LIMIT).map(async (h) => {
               try {
                 const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(h.id)}`);
                 const j = await r.json();
@@ -220,6 +248,7 @@ function ResultsContent() {
               lat?: number;
               lng?: number;
               safetyBadges?: string[];
+              signals?: StaySignals;
             }
           > = {};
           for (const d of details) {
@@ -232,6 +261,10 @@ function ResultsContent() {
               lat: typeof loc?.latitude === "number" ? loc.latitude : undefined,
               lng: typeof loc?.longitude === "number" ? loc.longitude : undefined,
               safetyBadges: safetyBadgesFromHotel(d),
+              signals: deriveStaySignals({
+                ...d,
+                rateNames: rateNamesByHotel[d.id],
+              }),
             };
           }
 
@@ -252,6 +285,7 @@ function ResultsContent() {
               lat: extra.lat,
               lng: extra.lng,
               safetyBadges: extra.safetyBadges ?? [],
+              signals: extra.signals,
             };
           });
           setHotels(merged);
@@ -271,25 +305,19 @@ function ResultsContent() {
         } else {
           const ids: string[] = [...new Set(data.map((d) => d.hotelId))];
           const details = await Promise.all(
-            ids.slice(0, 20).map(async (id) => {
+            ids.slice(0, RESULTS_HOTEL_LIMIT).map(async (id) => {
               const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(id)}`);
               const j = await r.json();
               return j.data ?? j;
             })
           );
-          const rateByHotel: Record<string, { amount: number; currency?: string; hasFreeCancellation: boolean }> = {};
+          const totalByHotel = firstRateTotalByHotel(data as RateOffer[]);
+          const freeCancellationByHotel: Record<string, boolean> = {};
           for (const d of data) {
-            const allRates = d.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
-            const firstRate = allRates[0];
-            const total = firstRate?.retailRate?.total?.[0];
-            const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
-            if (total && !rateByHotel[d.hotelId]) {
-              rateByHotel[d.hotelId] = {
-                amount: total.amount,
-                currency: total.currency ?? "USD",
-                hasFreeCancellation: freeCancellation,
-              };
-            }
+            if (freeCancellationByHotel[d.hotelId]) continue;
+            freeCancellationByHotel[d.hotelId] = (d.roomTypes ?? [])
+              .flatMap((rt) => rt.rates ?? [])
+              .some((r) => r.cancellationPolicies?.refundableTag === "RFN");
           }
           const merged = details.filter(Boolean).map((h) => ({
             id: h.id,
@@ -298,12 +326,13 @@ function ResultsContent() {
             address: h.address,
             rating: normaliseRating(h.rating, h.starRating),
             reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
-            price: rateByHotel[h.id]?.amount,
-            currency: rateByHotel[h.id]?.currency ?? "USD",
-            hasFreeCancellation: rateByHotel[h.id]?.hasFreeCancellation ?? false,
+            price: totalByHotel[h.id]?.amount,
+            currency: totalByHotel[h.id]?.currency ?? "EUR",
+            hasFreeCancellation: freeCancellationByHotel[h.id] ?? false,
             lat: h.location?.latitude,
             lng: h.location?.longitude,
             safetyBadges: safetyBadgesFromHotel(h),
+            signals: deriveStaySignals({ ...h, rateNames: rateNamesByHotel[h.id] }),
           }));
           setHotels(merged);
           setSearchAnalyticsOutcome({
@@ -350,14 +379,35 @@ function ResultsContent() {
 
   const nights = nightsBetween(checkin, checkout);
   const isFiltered =
-    minRating !== null || maxPrice !== null || onlyFreeCancellation;
+    minRating !== null || maxPrice !== null || onlyFreeCancellation || signals.length > 0;
+
+  /** Everything except the signal checkboxes, so their counts reflect a real next step. */
+  const baseFilteredHotels = useMemo(
+    () =>
+      hotels.filter((h) => {
+        if (minRating != null && (h.rating ?? 0) < minRating) return false;
+        if (maxPrice != null && (h.price ?? Number.MAX_SAFE_INTEGER) > maxPrice) return false;
+        if (onlyFreeCancellation && !h.hasFreeCancellation) return false;
+        return true;
+      }),
+    [hotels, minRating, maxPrice, onlyFreeCancellation]
+  );
+
+  const signalCounts = useMemo(() => {
+    const counts = Object.fromEntries(SIGNAL_IDS.map((id) => [id, 0])) as Record<
+      StayFilterId,
+      number
+    >;
+    for (const hotel of baseFilteredHotels) {
+      for (const id of hotel.signals?.matches ?? []) counts[id] += 1;
+    }
+    return counts;
+  }, [baseFilteredHotels]);
 
   const filteredAndSortedHotels = useMemo(() => {
-    const filtered = hotels.filter((h) => {
-      if (minRating != null && (h.rating ?? 0) < minRating) return false;
-      if (maxPrice != null && (h.price ?? Number.MAX_SAFE_INTEGER) > maxPrice) return false;
-      if (onlyFreeCancellation && !h.hasFreeCancellation) return false;
-      return true;
+    const filtered = baseFilteredHotels.filter((h) => {
+      const matches = h.signals?.matches ?? [];
+      return signals.every((id) => matches.includes(id));
     });
     if (sortBy === "price") {
       return [...filtered].sort((a, b) => {
@@ -368,7 +418,7 @@ function ResultsContent() {
     }
     // Default: highest rating first (safest first)
     return [...filtered].sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
-  }, [hotels, minRating, maxPrice, onlyFreeCancellation, sortBy]);
+  }, [baseFilteredHotels, signals, sortBy]);
 
   // Fetch place details server-side (avoids CORS with LiteAPI whitelabel) for map when searching by destination.
   useEffect(() => {
@@ -425,7 +475,7 @@ function ResultsContent() {
       ...searchAnalyticsOutcome,
       filteredHotelCount: filteredAndSortedHotels.length,
       hotelsWithCoordsCount: hotelsWithCoords.length,
-      filters: { minRating, maxPrice, onlyFreeCancellation, sortBy },
+      filters: { minRating, maxPrice, onlyFreeCancellation, signals, sortBy },
       context: { source: "results_page" },
     };
     const signature = JSON.stringify(payload);
@@ -445,6 +495,7 @@ function ResultsContent() {
     onlyFreeCancellation,
     placeId,
     searchAnalyticsOutcome,
+    signals,
     sortBy,
   ]);
 
@@ -466,6 +517,12 @@ function ResultsContent() {
   }, [hotelsWithCoords]);
 
   const effectivePlaceForMap = placeDetails ?? derivedPlaceFromHotels;
+
+  const searchSummary = [
+    placeLabel || aiSearch || "Your search",
+    `${formatDate(checkin)} – ${formatDate(checkout)}`,
+    `${adults} ${Number(adults) === 1 ? "traveller" : "travellers"}`,
+  ].join(" · ");
 
   const hotelHref = (id: string) =>
     `/hotel/${id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
@@ -496,7 +553,8 @@ function ResultsContent() {
       {/* Search stays editable in place — changing dates shouldn't mean going back. */}
       <div className="sticky top-16 z-30 border-b border-border bg-surface-muted/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
-          <SearchBar
+          <ResultsSearchBar
+            summary={searchSummary}
             variant="compact"
             initialMode={aiSearch ? "vibe" : "destination"}
             initialDestination={placeLabel}
@@ -565,6 +623,8 @@ function ResultsContent() {
               minRating={minRating}
               maxPrice={maxPrice}
               onlyFreeCancellation={onlyFreeCancellation}
+              signals={signals}
+              signalCounts={signalCounts}
               onChange={updateFilters}
               onReset={resetFilters}
               isFiltered={isFiltered}
@@ -616,6 +676,7 @@ function ResultsContent() {
                 <HotelCard
                   key={hotel.id}
                   hotel={hotel}
+                  signals={hotel.signals}
                   href={hotelHref(hotel.id)}
                   nights={nights}
                   onSelect={() => track("Rates Viewed", { hotelId: hotel.id })}

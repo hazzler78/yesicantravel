@@ -7,22 +7,26 @@ import { track } from "@vercel/analytics";
 import {
   ArrowLeft,
   Check,
+  Clock,
   ImageOff,
   Info,
   Lock,
   MapPin,
   ThumbsUp,
+  TrainFront,
   TriangleAlert,
+  Venus,
 } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { normalizeFacilityNames, deriveSafetyBadges } from "@/lib/safetyBadges";
+import { deriveStaySignals, formatDistance } from "@/lib/staySignals";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { HotelGallery } from "@/components/hotel/HotelGallery";
 import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
-import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
+import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 
 interface Rate {
@@ -359,6 +363,10 @@ function HotelContent() {
   ].filter((url, index, all) => url && all.indexOf(url) === index);
   const facilityNames = normalizeFacilityNames(hotel);
   const safetyBadges = deriveSafetyBadges(facilityNames);
+  const stay = deriveStaySignals({
+    ...hotel,
+    rateNames: roomGroups.flatMap((group) => group.rates.map((rate) => rate.name)),
+  });
   const description = hotel.hotelDescription ? stripHtml(hotel.hotelDescription) : "";
   const descriptionShort = description.length > 420 ? `${description.slice(0, 420).trim()}…` : description;
   const reviewScores = reviews.map((r) => r.averageScore).filter((s): s is number => typeof s === "number" && !Number.isNaN(s));
@@ -415,17 +423,50 @@ function HotelContent() {
               </div>
             )}
 
-            {safetyBadges.length > 0 && (
+            {(safetyBadges.length > 0 || stay.nearestTransit || stay.latestCheckIn) && (
               <Card className="mt-5 p-5">
                 <h2 className="font-display text-base font-semibold text-ink">
-                  Safety and comfort signals
+                  Getting in and getting around
                 </h2>
-                <div className="mt-3">
-                  <SafetyBadgeList badges={safetyBadges} max={8} />
-                </div>
+
+                {(stay.nearestTransit || stay.latestCheckIn) && (
+                  <ul className="mt-3 space-y-2 text-[0.9375rem] text-ink">
+                    {stay.nearestTransit && (
+                      <li className="flex items-start gap-2">
+                        <TrainFront className="mt-1 h-4 w-4 shrink-0 text-teal" aria-hidden />
+                        <span>
+                          <span className="tnum font-semibold">
+                            {formatDistance(stay.nearestTransit.distanceKm)}
+                          </span>{" "}
+                          to {stay.nearestTransit.name}
+                        </span>
+                      </li>
+                    )}
+                    {stay.latestCheckIn && (
+                      <li className="flex items-start gap-2">
+                        <Clock className="mt-1 h-4 w-4 shrink-0 text-teal" aria-hidden />
+                        <span>
+                          Check-in until{" "}
+                          <span className="tnum font-semibold">{stay.latestCheckIn}</span>
+                          {stay.roundTheClockReception && " — reception is staffed around the clock"}
+                        </span>
+                      </li>
+                    )}
+                  </ul>
+                )}
+
+                {(safetyBadges.length > 0 || stay.matches.includes("womenOnlyRoom")) && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {stay.matches.includes("womenOnlyRoom") && (
+                      <SafetyBadge label="Women-only room" tone="positive" icon={Venus} />
+                    )}
+                    <SafetyBadgeList badges={safetyBadges} max={8} />
+                  </div>
+                )}
+
                 <p className="mt-3 text-xs text-ink-muted">
-                  Taken from the facilities this property publishes. We don&apos;t inspect
-                  properties in person.
+                  Taken from what this property publishes. We don&apos;t inspect properties in
+                  person.
                 </p>
               </Card>
             )}

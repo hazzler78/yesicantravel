@@ -29,6 +29,7 @@ interface ResultsMapProps {
   placeDetails: PlaceDetails;
   hotels: HotelMarker[];
   className?: string;
+  onHotelNavigate?: (hotelId: string) => void;
 }
 
 function FitBounds({ placeDetails, hotels }: { placeDetails: PlaceDetails; hotels: HotelMarker[] }) {
@@ -53,7 +54,12 @@ function FitBounds({ placeDetails, hotels }: { placeDetails: PlaceDetails; hotel
   return null;
 }
 
-export default function ResultsMap({ placeDetails, hotels, className = "" }: ResultsMapProps) {
+export default function ResultsMap({
+  placeDetails,
+  hotels,
+  className = "",
+  onHotelNavigate,
+}: ResultsMapProps) {
   const { location } = placeDetails;
   const center: [number, number] = [location.latitude, location.longitude];
   const hotelsWithCoords = hotels.filter((h): h is HotelMarker => typeof h.lat === "number" && typeof h.lng === "number");
@@ -80,7 +86,11 @@ export default function ResultsMap({ placeDetails, hotels, className = "" }: Res
               <div className="min-w-[150px]">
                 <p className="font-semibold text-ink">
                   {h.href ? (
-                    <a href={h.href} className="text-teal underline-offset-4 hover:underline">
+                    <a
+                      href={h.href}
+                      className="text-teal underline-offset-4 hover:underline"
+                      onClick={() => onHotelNavigate?.(h.id)}
+                    >
                       {h.name}
                     </a>
                   ) : (

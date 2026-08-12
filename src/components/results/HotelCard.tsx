@@ -29,10 +29,14 @@ type HotelCardProps = {
 export function HotelCard({ hotel, signals, href, nights, onSelect }: HotelCardProps) {
   const hasPrice = hotel.price != null;
   const nearestTransit = signals?.nearestTransit;
+  const cardId = `hotel-card-${hotel.id}`;
 
   return (
-    <article className="overflow-hidden rounded-card border border-border bg-surface shadow-card transition-colors hover:border-border-strong">
-      <div className="flex flex-col sm:flex-row">
+    <article
+      id={cardId}
+      data-hotel-id={hotel.id}
+      className="overflow-hidden scroll-mt-36 rounded-card border border-border bg-surface shadow-card transition-colors hover:border-border-strong"
+    >      <div className="flex flex-col sm:flex-row">
         <Link
           href={href}
           onClick={onSelect}

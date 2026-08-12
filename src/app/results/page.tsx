@@ -19,6 +19,15 @@ import { ResultsFilters, type ResultsFilterState } from "@/components/results/Re
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
+import {
+  buildResultsSearchKey,
+  cacheResultsList,
+  consumeResultsReturn,
+  hotelCardDomId,
+  peekResultsReturn,
+  readResultsListCache,
+  rememberResultsReturn,
+} from "@/lib/resultsReturnState";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
@@ -158,6 +167,28 @@ function ResultsContent() {
     setFilters({ minRating: null, maxPrice: null, onlyFreeCancellation: false, signals: [] });
   }, []);
 
+  const searchKey = buildResultsSearchKey({
+    placeId: searchParams.get("placeId"),
+    aiSearch: searchParams.get("aiSearch"),
+    checkin: searchParams.get("checkin"),
+    checkout: searchParams.get("checkout"),
+    adults: searchParams.get("adults") ?? "1",
+    currency,
+  });
+
+  const rememberHotelNavigation = useCallback(
+    (hotelId: string) => {
+      rememberResultsReturn({
+        searchKey,
+        hotelId,
+        scrollY: window.scrollY,
+        filters,
+        sortBy,
+      });
+    },
+    [searchKey, filters, sortBy]
+  );
+
   useEffect(() => {
     const placeId = searchParams.get("placeId");
     const aiSearch = searchParams.get("aiSearch");
@@ -183,6 +214,24 @@ function ResultsContent() {
       return;
     }
 
+    const returning = peekResultsReturn(searchKey);
+    if (returning) {
+      setFilters(returning.filters);
+      setSortBy(returning.sortBy);
+    }
+
+    const cached = readResultsListCache(searchKey);
+    if (cached && Array.isArray(cached.hotels) && cached.hotels.length > 0) {
+      setHotels(cached.hotels as HotelListItem[]);
+      if (cached.placeLabel) setPlaceLabel(cached.placeLabel);
+      setLoading(false);
+      setError(null);
+      // Returning visitors keep the list they were browsing — no skeleton restart.
+      return;
+    }
+
+    let cancelled = false;
+
     async function run() {
       try {
         setLoading(true);
@@ -205,6 +254,7 @@ function ResultsContent() {
         });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error ?? "Search failed");
+        if (cancelled) return;
 
         const data = (json.data ?? []) as Array<{
           hotelId: string;
@@ -246,6 +296,7 @@ function ResultsContent() {
               }
             })
           );
+          if (cancelled) return;
           const byHotelId: Record<
             string,
             {
@@ -296,6 +347,11 @@ function ResultsContent() {
             };
           });
           setHotels(merged);
+          cacheResultsList({
+            searchKey,
+            hotels: merged,
+            placeLabel: undefined,
+          });
           setSearchAnalyticsOutcome({
             apiRateCount: data.length,
             apiHotelCount: hotelsFromApi.length,
@@ -318,6 +374,7 @@ function ResultsContent() {
               return j.data ?? j;
             })
           );
+          if (cancelled) return;
           const totalByHotel = firstRateTotalByHotel(data as RateOffer[]);
           const freeCancellationByHotel: Record<string, boolean> = {};
           for (const d of data) {
@@ -342,6 +399,11 @@ function ResultsContent() {
             signals: deriveStaySignals({ ...h, rateNames: rateNamesByHotel[h.id] }),
           }));
           setHotels(merged);
+          cacheResultsList({
+            searchKey,
+            hotels: merged,
+            placeLabel: undefined,
+          });
           setSearchAnalyticsOutcome({
             apiRateCount: data.length,
             apiHotelCount: hotelsFromApi.length,
@@ -357,6 +419,7 @@ function ResultsContent() {
           });
         }
       } catch (e) {
+        if (cancelled) return;
         const message = (e as Error).message;
         sendSearchAnalyticsEvent({
           mode: aiSearch ? "vibe" : "destination",
@@ -372,11 +435,39 @@ function ResultsContent() {
         });
         setError(message);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
     run();
-  }, [searchParams, currency]);
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, currency, searchKey]);
+
+  // Land back on the hotel the visitor just left — not the top of the list.
+  useEffect(() => {
+    if (loading || hotels.length === 0) return;
+    const returning = peekResultsReturn(searchKey);
+    if (!returning) return;
+
+    let cancelled = false;
+    const frame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        if (cancelled) return;
+        const card = document.getElementById(hotelCardDomId(returning.hotelId));
+        if (card) {
+          card.scrollIntoView({ block: "start" });
+        } else {
+          window.scrollTo({ top: returning.scrollY, behavior: "auto" });
+        }
+        consumeResultsReturn(searchKey);
+      });
+    });
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+    };
+  }, [loading, hotels, searchKey, filters, sortBy]);
 
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
@@ -670,6 +761,7 @@ function ResultsContent() {
                     currency: h.currency,
                     href: hotelHref(h.id),
                   }))}
+                  onHotelNavigate={rememberHotelNavigation}
                   className="h-full w-full"
                 />
               )}
@@ -686,7 +778,10 @@ function ResultsContent() {
                   signals={hotel.signals}
                   href={hotelHref(hotel.id)}
                   nights={nights}
-                  onSelect={() => track("Rates Viewed", { hotelId: hotel.id })}
+                  onSelect={() => {
+                    rememberHotelNavigation(hotel.id);
+                    track("Rates Viewed", { hotelId: hotel.id });
+                  }}
                 />
               ))}
 

@@ -27,8 +27,18 @@ export const SAFETY_BADGE_RULES: Array<{ label: string; keywords: string[] }> = 
     keywords: ["elevator", "lift"],
   },
   {
+    // The real facility string. "Illuminated parking" used to stand in for it,
+    // which is a different thing and produced a badge nobody could rely on.
     label: "Well-lit entrance",
-    keywords: ["illuminated parking", "lit parking"],
+    keywords: ["well-lit path to entrance"],
+  },
+  {
+    label: "Private check-in",
+    keywords: ["private check-in"],
+  },
+  {
+    label: "Contactless check-in",
+    keywords: ["contactless check-in"],
   },
   {
     label: "Non-smoking property",

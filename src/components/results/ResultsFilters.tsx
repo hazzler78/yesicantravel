@@ -1,12 +1,20 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
+import { DoorOpen, ShieldCheck, TrainFront, Venus } from "lucide-react";
+import type { StayFilterId } from "@/lib/staySignals";
+import { NEAR_TRANSIT_KM } from "@/lib/staySignals";
+
 export type ResultsFilterState = {
   minRating: number | null;
   maxPrice: number | null;
   onlyFreeCancellation: boolean;
+  signals: StayFilterId[];
 };
 
 type ResultsFiltersProps = ResultsFilterState & {
+  /** How many of the currently listed stays match each signal. */
+  signalCounts: Record<StayFilterId, number>;
   onChange: (patch: Partial<ResultsFilterState>) => void;
   onReset: () => void;
   isFiltered: boolean;
@@ -24,6 +32,38 @@ const PRICE_OPTIONS: Array<{ value: number | null; label: string }> = [
   { value: 150, label: "Up to 150" },
   { value: 250, label: "Up to 250" },
   { value: 400, label: "Up to 400" },
+];
+
+const SIGNAL_OPTIONS: Array<{
+  id: StayFilterId;
+  label: string;
+  hint: string;
+  Icon: LucideIcon;
+}> = [
+  {
+    id: "nearTransit",
+    label: "Short walk to a station",
+    hint: `Under ${NEAR_TRANSIT_KM * 1000} m to a train, metro or bus station`,
+    Icon: TrainFront,
+  },
+  {
+    id: "securityOnSite",
+    label: "24-hour security",
+    hint: "A staffed security presence, not only cameras",
+    Icon: ShieldCheck,
+  },
+  {
+    id: "privateCheckIn",
+    label: "Private check-in",
+    hint: "Check in away from a shared lobby desk",
+    Icon: DoorOpen,
+  },
+  {
+    id: "womenOnlyRoom",
+    label: "Women-only room",
+    hint: "Rare — few properties publish this",
+    Icon: Venus,
+  },
 ];
 
 function PillGroup<T extends number | null>({
@@ -71,10 +111,18 @@ export function ResultsFilters({
   minRating,
   maxPrice,
   onlyFreeCancellation,
+  signals,
+  signalCounts,
   onChange,
   onReset,
   isFiltered,
 }: ResultsFiltersProps) {
+  const toggleSignal = (id: StayFilterId) => {
+    onChange({
+      signals: signals.includes(id) ? signals.filter((s) => s !== id) : [...signals, id],
+    });
+  };
+
   return (
     <div className="space-y-5 rounded-card border border-border bg-surface p-4">
       <div className="flex items-center justify-between gap-2">
@@ -90,13 +138,54 @@ export function ResultsFilters({
         )}
       </div>
 
-      <PillGroup
-        legend="Guest rating"
-        hint="Out of 10, from verified stays"
-        options={RATING_OPTIONS}
-        value={minRating}
-        onSelect={(value) => onChange({ minRating: value })}
-      />
+      <fieldset className="border-t border-border pt-4">
+        <legend className="text-[0.8125rem] font-semibold text-ink">Safety and access</legend>
+        <p className="mt-0.5 text-xs text-ink-muted">
+          Counts show how many of these stays publish each one.
+        </p>
+        <ul className="mt-2.5 space-y-2.5">
+          {SIGNAL_OPTIONS.map(({ id, label, hint, Icon }) => {
+            const count = signalCounts[id] ?? 0;
+            const checked = signals.includes(id);
+            const unavailable = count === 0 && !checked;
+            return (
+              <li key={id}>
+                <label
+                  className={`flex items-start gap-2.5 ${
+                    unavailable ? "cursor-not-allowed opacity-55" : "cursor-pointer"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    disabled={unavailable}
+                    onChange={() => toggleSignal(id)}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-border-strong text-teal focus:ring-teal/30 disabled:cursor-not-allowed"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-1.5 text-[0.8125rem] font-semibold text-ink">
+                      <Icon className="h-3.5 w-3.5 shrink-0 text-ink-muted" aria-hidden />
+                      {label}
+                      <span className="tnum ml-auto pl-2 font-normal text-ink-muted">{count}</span>
+                    </span>
+                    <span className="mt-0.5 block text-xs text-ink-muted">{hint}</span>
+                  </span>
+                </label>
+              </li>
+            );
+          })}
+        </ul>
+      </fieldset>
+
+      <div className="border-t border-border pt-4">
+        <PillGroup
+          legend="Guest rating"
+          hint="Out of 10, from verified stays"
+          options={RATING_OPTIONS}
+          value={minRating}
+          onSelect={(value) => onChange({ minRating: value })}
+        />
+      </div>
 
       <PillGroup
         legend="Budget"
@@ -124,6 +213,11 @@ export function ResultsFilters({
           </span>
         </label>
       </div>
+
+      <p className="border-t border-border pt-4 text-xs leading-relaxed text-ink-muted">
+        These come from what each property publishes, not from our own inspection. Women-only
+        floors and dorms are rarely listed at all, so that filter is often empty.
+      </p>
     </div>
   );
 }

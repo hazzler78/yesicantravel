@@ -4,6 +4,7 @@ import {
   CalendarCheck,
   CigaretteOff,
   Clock,
+  DoorOpen,
   Lamp,
   Lock,
   ShieldCheck,
@@ -17,6 +18,8 @@ const BADGE_ICONS: Record<string, LucideIcon> = {
   "In-room safe": Lock,
   "Lift access": ArrowUpDown,
   "Well-lit entrance": Lamp,
+  "Private check-in": DoorOpen,
+  "Contactless check-in": DoorOpen,
   "Non-smoking property": CigaretteOff,
   "Free WiFi": Wifi,
 };

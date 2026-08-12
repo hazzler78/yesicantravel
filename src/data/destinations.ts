@@ -168,7 +168,7 @@ export const destinations: Destination[] = [
       {
         question: "What should I do if I'm pickpocketed?",
         answer:
-          "File a denuncia with the Mossos d'Esquadra — you will need the report number for any insurance claim, and most policies require it within 24 hours. Call 112 if you need help immediately; English-speaking operators are available. Cancel cards first, report second, unless you're hurt.",
+          "File a denuncia with the Mossos d'Esquadra — you will need the report number for any insurance claim, and most policies want it the same day. Call 112 if you need help immediately; English-speaking operators are available. Cancel cards first, report second, unless you're hurt.",
       },
       {
         question: "Is it safe to walk back to my hotel at night?",
@@ -176,7 +176,7 @@ export const destinations: Destination[] = [
           "On the main Eixample avenues and around the Gràcia squares, plenty of women do. Around El Raval and the narrower Gothic Quarter lanes the picture changes once the bars close and the streets empty. Barcelona's taxis are metered, plentiful and can be flagged down when the roof light is on, so the last stretch home is an easy thing to buy.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "amsterdam",
@@ -201,25 +201,25 @@ export const destinations: Destination[] = [
         name: "Jordaan",
         verdict: "recommended",
         description:
-          "Immediately west of the centre and the neighbourhood most solo visitors end up recommending: narrow streets, canal-side cafés and a residential population that keeps it lived-in rather than touristy after dark. It's a 10–15 minute walk from Centraal, with trams 13 and 17 running through.",
+          "Immediately west of the centre and the neighbourhood most solo visitors end up recommending: narrow streets, canal-side cafés and a residential population that keeps it lived-in rather than touristy after dark. It's a 10–15 minute walk from Centraal — and walking is currently the reliable way in, because roadworks have taken the trams off Westermarkt until early 2027.",
       },
       {
         name: "Oud-Zuid and the Museum Quarter",
         verdict: "recommended",
         description:
-          "Wide streets, generous pavements and the three big museums, about 15 minutes by tram from the centre. It's noticeably quieter at night than the canal belt, which suits some travellers and bores others. Trams 2, 5 and 12 serve it.",
+          "Wide streets, generous pavements and the three big museums, about 15 minutes by tram from the centre. It's noticeably quieter at night than the canal belt, which suits some travellers and bores others. Trams 2 and 5 run through it.",
       },
       {
         name: "De Pijp",
         verdict: "recommended",
         description:
-          "South of the centre around the Albert Cuyp market, and busy with residents rather than visitors — the restaurants here fill with people who live locally. The Noord/Zuidlijn metro (line 52) stops at De Pijp, putting you four minutes from Centraal.",
+          "South of the centre around the Albert Cuyp market, and busy with residents rather than visitors — the restaurants here fill with people who live locally. The Noord/Zuidlijn metro (line 52) stops at De Pijp, putting you a few minutes from Centraal.",
       },
       {
         name: "Amsterdam-Oost",
         verdict: "recommended",
         description:
-          "Residential and increasingly popular, built around the Oosterpark and Dappermarkt. Rooms cost less than in the centre and trams 1, 3, 7 and 19 connect you in, but you're committing to a tram ride rather than a walk home.",
+          "Residential and increasingly popular, built around the Oosterpark and Dappermarkt. Rooms cost less than in the centre and several tram lines connect you in, but you're committing to a tram ride rather than a walk home.",
       },
       {
         name: "De Wallen (Red Light District)",
@@ -229,12 +229,12 @@ export const destinations: Destination[] = [
       },
     ],
     safetyTips: [
-      "Trams and metro stop running shortly after midnight. Eleven GVB night buses (N81 to N93) take over, all departing from Amsterdam Centraal roughly hourly between 00:30 and 07:30 — so if you're out late, Centraal is the point you navigate back to.",
+      "Trams and metro stop running shortly after midnight. Eleven GVB night buses take over, all departing from Amsterdam Centraal roughly hourly between 00:30 and 07:30 — so if you're out late, Centraal is the point you navigate back to.",
       "A standard one-hour GVB ticket is not valid on a night bus. You need a night fare, a day or multi-day pass, or you can tap a contactless card via OVpay.",
       "The red asphalt is a road. Cyclists move fast, have priority and will not expect you to step onto it — look both ways before crossing, including when leaving a tram.",
       "Trains between Centraal and Schiphol run right through the night, roughly hourly, so a very early or very late flight never requires a taxi.",
       "Canals mostly have no railings and the water is cold and deep. It is the reason Amsterdam advises against walking canal edges after a heavy night out.",
-      "Veilig Thuis on 0800-2000 is the national advice and support line for abuse and violence; 112 is the emergency number.",
+      "Veilig Thuis on 0800-2000 is the national advice line for domestic violence and child abuse — free, 24/7, and you can stay anonymous. 112 is the emergency number.",
     ],
     gettingAround:
       "Schiphol has a railway station directly beneath the terminal, so you never go outside: trains to Amsterdam Centraal take 15–20 minutes, run four to six times an hour during the day and continue hourly through the night. Centraal itself is staffed around the clock and is the hub for every night bus, which makes it the most reliable place to arrive alone at an awkward hour. From there, most canal-ring hotels are a short tram ride or a walk of 10–20 minutes.",
@@ -242,7 +242,7 @@ export const destinations: Destination[] = [
       name: "Veilig Thuis",
       number: "0800-2000",
       description:
-        "The Dutch national advice and reporting line for domestic abuse and violence. Free, and staff can advise in English.",
+        "The Dutch national advice and reporting line for domestic violence and child abuse. Free, 24 hours a day, and you can stay anonymous.",
     },
     faqs: [
       {
@@ -258,7 +258,7 @@ export const destinations: Destination[] = [
       {
         question: "How do I get around after the trams stop?",
         answer:
-          "GVB runs eleven night bus lines, N81 through N93, every night. They all start from Amsterdam Centraal and run about once an hour from 00:30 until 07:30. Check the departure time before you set out — an hourly service is unforgiving if you miss one. Your standard one-hour ticket will not be valid; use a day pass or tap contactless.",
+          "GVB runs eleven night bus lines every night. They all start from Amsterdam Centraal and run about once an hour from 00:30 until 07:30. Check the departure time before you set out — an hourly service is unforgiving if you miss one. Your standard one-hour ticket will not be valid; use a day pass or tap contactless.",
       },
       {
         question: "Is the Red Light District safe to walk through?",
@@ -271,7 +271,7 @@ export const destinations: Destination[] = [
           "More than you'd expect. Cyclists have right of way on the red asphalt, travel faster than they look, and often don't have lights. The most common visitor accident is stepping off a tram or out of a doorway straight into a bike lane. Look both ways, every time.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "paris",
@@ -325,10 +325,10 @@ export const destinations: Destination[] = [
     ],
     safetyTips: [
       "The last metro reaches the end of the line around 01:15 Sunday to Thursday and around 02:15 on Fridays, Saturdays and the eves of public holidays. If you board mid-route the last train passes 15 to 30 minutes earlier — aim for the second-to-last train, not the last.",
-      "When the metro stops, Noctilien night buses run from 00:30 to 05:30 across roughly 47 lines, organised around five hubs: Châtelet, Gare de l'Est, Gare de Lyon, Gare Montparnasse and Gare Saint-Lazare.",
+      "When the metro stops, Noctilien night buses run from 00:30 to 05:30 across 48 lines, organised around five hubs: Châtelet, Gare de l'Est, Gare de Lyon, Gare Montparnasse and Gare Saint-Lazare.",
       "Learn the three standard street approaches and you can dismiss all of them: the clipboard petition (usually near the Louvre, Sacré-Cœur or the Eiffel Tower), the friendship bracelet tied onto your wrist at the Montmartre steps, and the three-cup game. All are distraction set-ups with an accomplice.",
       "Only take taxis from an official rank or booked through an app. A Paris taxi has a roof sign and a visible meter; anyone approaching you inside a station or airport terminal offering a ride is not a licensed taxi.",
-      "3919, Violences Femmes Info, is the national listening and referral line for women. 112 is the general emergency number and 17 reaches the police directly.",
+      "3919, Violences Femmes Info, is the national listening and referral line for women — free, anonymous, 24/7, and the call does not appear on the phone bill. 112 is the general emergency number and 17 reaches the police directly.",
     ],
     gettingAround:
       "From Charles de Gaulle, the RER B reaches Gare du Nord and Châtelet in 30–35 minutes and is the fastest route, though it is crowded and stops around midnight; the Roissybus to Opéra is slower but keeps your luggage with you and drops you centrally. From Orly, metro line 14 now runs directly into the middle of Paris, which has made that airport considerably simpler to arrive at alone. Within the city, walking plus the metro covers almost everything, and a Navigo Easy card saves fumbling for tickets at a machine late at night.",
@@ -336,7 +336,7 @@ export const destinations: Destination[] = [
       name: "Violences Femmes Info",
       number: "3919",
       description:
-        "The French national listening, information and referral line for women experiencing violence. Anonymous and free, and it can direct you to local services.",
+        "The French national listening, information and referral line for women experiencing violence. Anonymous, free, 24 hours a day, and the call does not appear on the phone bill.",
     },
     faqs: [
       {
@@ -365,7 +365,7 @@ export const destinations: Destination[] = [
           "Generally yes, and many Parisian women do it nightly. Carriages towards the middle of the train are usually busier, platforms are covered by CCTV, and the network is well used until closing. The bigger practical risk is misjudging the last train and being stranded, which is why the Noctilien network is worth knowing before you go out.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "berlin",
@@ -419,7 +419,7 @@ export const destinations: Destination[] = [
     ],
     safetyTips: [
       "On Friday and Saturday nights and before public holidays, the U-Bahn and S-Bahn run all night — U-Bahn roughly every 15 minutes, S-Bahn every 30 (the U4 is the exception). That makes Berlin one of the easiest European cities to get home in at 04:00.",
-      "From Sunday to Thursday the trains stop around 01:00 to 01:30 and night buses take over. The N-prefixed lines N1 to N9 follow the corresponding U-Bahn routes, so the replacement is usually a bus with the same number as the line you wanted.",
+      "From Sunday to Thursday the trains stop around 01:00 to 01:30 and night buses take over. The N-prefixed lines N1–N3 and N5–N9 follow the corresponding U-Bahn routes (there is no N4, matching the U4 which does not run at night), so the replacement is usually a bus with the same number as the line you wanted.",
       "The MetroTram runs 24 hours a day, every 30 minutes from 00:30, which covers much of the east when the trains are down.",
       "Buy and validate a ticket before you board. There are no barriers, inspections are frequent, inspectors are in plain clothes and the penalty fare is €60 with no discretion for tourists.",
       "Berlin still runs on cash to a surprising degree — plenty of bars, Spätis and smaller restaurants take no cards at all. Carry enough for a taxi home.",
@@ -447,7 +447,7 @@ export const destinations: Destination[] = [
       {
         question: "Does Berlin public transport run all night?",
         answer:
-          "At weekends, yes. On Friday and Saturday nights and before public holidays the U-Bahn and S-Bahn run continuously, at roughly 15 and 30 minute intervals. On weeknights they stop between about 01:00 and 01:30, and night buses numbered N1 to N9 follow the U-Bahn routes until service resumes.",
+          "At weekends, yes. On Friday and Saturday nights and before public holidays the U-Bahn and S-Bahn run continuously, at roughly 15 and 30 minute intervals. On weeknights they stop between about 01:00 and 01:30, and night buses numbered N1–N3 and N5–N9 follow the U-Bahn routes until service resumes.",
       },
       {
         question: "Do I really need to buy a ticket if there are no barriers?",
@@ -460,7 +460,7 @@ export const destinations: Destination[] = [
           "It's normal, and the all-night weekend transport makes it more practical than in most cities. The standard precautions apply in the busiest nightlife areas — keep your drink with you, keep your phone and bag secured in crowds around Warschauer Straße, and have a route home in mind before you set off rather than after.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "milan",
@@ -555,7 +555,7 @@ export const destinations: Destination[] = [
           "Inside the ring, yes, and the routes between Brera, the Duomo and Porta Nuova stay populated well into the evening. Further out the city becomes low-rise and quiet quickly. Milan's taxis are metered and wait at official ranks rather than being flagged down, so plan to reach a rank or book one in advance.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "london",
@@ -612,7 +612,7 @@ export const destinations: Destination[] = [
       "When a booked minicab arrives you will have a confirmation with the driver's name, licence number and registration plate. If the car or the driver doesn't match, don't get in. Touts outside clubs and stations are the specific thing this rule exists to protect you from.",
       "The Night Tube runs on Friday and Saturday nights on the Victoria, Central, Jubilee, Northern and Piccadilly lines. Night buses run 24 hours a day, every night, and all of them carry CCTV.",
       "Every Tube, Elizabeth line and London Overground station is staffed from the first train to the last, so there is always someone to approach on a platform or at a gateline.",
-      "Phone snatching by moped and bicycle is the fastest-growing street crime in central London. Don't stand at the kerb using your phone, particularly around Oxford Street, Soho and the South Bank.",
+      "Phone snatching from the kerb — often by moped or bicycle — is a known problem in central London. Don't stand at the edge of the pavement using your phone, particularly around Oxford Street, Soho and the South Bank.",
       "999 is the emergency number (112 also works). To report something on the rail network without calling, text the British Transport Police on 61016. The National Domestic Abuse Helpline is 0808 2000 247.",
     ],
     gettingAround:
@@ -650,7 +650,7 @@ export const destinations: Destination[] = [
           "No. Tap in and out with any contactless bank card or phone and the system charges you the correct fare and caps it daily. It works on the Tube, buses, trams, the Elizabeth line, the Overground and the DLR, and it's cheaper than buying paper tickets.",
       },
     ],
-    contentVerified: false,
+    contentVerified: true,
   },
   {
     slug: "cancun",

@@ -2,7 +2,6 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { track } from "@vercel/analytics";
 import {
   Check,

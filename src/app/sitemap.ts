@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getAllDestinationSlugs } from "@/data/destinations";
-import { getAllEventSlugs } from "@/data/events";
+import { getIndexableEventSlugs } from "@/data/events";
 import { ContentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { redirectedDestinationSlugs } from "@/lib/legacyRedirects";
@@ -21,7 +21,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-  const eventSlugs = getAllEventSlugs().map((slug) => ({
+  // Finished editions stay reachable but are left out here — asking Google to
+  // crawl a page we mark noindex just burns crawl budget.
+  const eventSlugs = getIndexableEventSlugs().map((slug) => ({
     url: `${BASE_URL}/events/${slug}`,
     lastModified: now,
     changeFrequency: "weekly" as const,

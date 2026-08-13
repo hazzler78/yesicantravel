@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 
-const CARTO_TILES = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+const CARTO_TILES = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
+const OSM_TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const CARTO_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const OSM_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
 interface PlaceDetails {
   location: { latitude: number; longitude: number };
@@ -51,6 +54,28 @@ const TEAL_PIN = pinIcon("teal");
 const CORAL_PIN = pinIcon("coral");
 const DESTINATION_PIN = pinIcon("destination");
 
+function MapTiles() {
+  const [tileUrl, setTileUrl] = useState(CARTO_TILES);
+  const errorCount = useRef(0);
+
+  return (
+    <TileLayer
+      key={tileUrl}
+      attribution={tileUrl === CARTO_TILES ? CARTO_ATTRIBUTION : OSM_ATTRIBUTION}
+      url={tileUrl}
+      eventHandlers={{
+        tileerror: () => {
+          errorCount.current += 1;
+          if (tileUrl === CARTO_TILES && errorCount.current >= 4) {
+            errorCount.current = 0;
+            setTileUrl(OSM_TILES);
+          }
+        },
+      }}
+    />
+  );
+}
+
 function InvalidateSize() {
   const map = useMap();
 
@@ -61,7 +86,9 @@ function InvalidateSize() {
     };
 
     invalidate();
-    const timeouts = [50, 200, 500].map((ms) => window.setTimeout(invalidate, ms));
+    const frame = window.requestAnimationFrame(invalidate);
+    const timeouts = [50, 200, 400, 800].map((ms) => window.setTimeout(invalidate, ms));
+    map.whenReady(invalidate);
 
     const observer = new ResizeObserver(() => invalidate());
     observer.observe(container);
@@ -71,6 +98,7 @@ function InvalidateSize() {
     document.addEventListener("visibilitychange", invalidate);
 
     return () => {
+      window.cancelAnimationFrame(frame);
       timeouts.forEach((id) => window.clearTimeout(id));
       observer.disconnect();
       window.removeEventListener("resize", invalidate);
@@ -139,7 +167,7 @@ export default function ResultsMap({
   );
   const markerRefs = useRef<Map<string, L.Marker>>(new Map());
   const isStay = variant === "stay";
-  const initialZoom = isStay ? 16 : 13;
+  const initialZoom = isStay ? 15 : 13;
 
   return (
     <div className={`h-full w-full ${className}`}>
@@ -149,11 +177,11 @@ export default function ResultsMap({
         scrollWheelZoom={!isStay}
         dragging
         touchZoom
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: "100%", width: "100%", minHeight: 256 }}
         className="yict-map"
         attributionControl
       >
-        <TileLayer attribution={CARTO_ATTRIBUTION} url={CARTO_TILES} />
+        <MapTiles />
         <InvalidateSize />
         {!isStay && hotelsWithCoords.length > 0 && (
           <FitArea hotels={hotelsWithCoords} selectedHotelId={selectedHotelId} />

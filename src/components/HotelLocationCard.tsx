@@ -76,7 +76,7 @@ export function HotelLocationCard({
       </div>
 
       {coords ? (
-        <div className="relative h-64 w-full bg-surface-muted sm:h-80">
+        <div className="relative h-64 w-full overflow-hidden bg-surface-muted sm:h-80">
           <StayMap
             variant="stay"
             placeDetails={{ location: { latitude: coords.lat, longitude: coords.lng } }}
@@ -89,7 +89,7 @@ export function HotelLocationCard({
                 address,
               },
             ]}
-            className="h-full w-full"
+            className="absolute inset-0 h-full w-full"
           />
         </div>
       ) : (

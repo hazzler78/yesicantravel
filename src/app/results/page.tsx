@@ -169,6 +169,13 @@ function ResultsContent() {
     setFilters({ minRating: null, maxPrice: null, onlyFreeCancellation: false, signals: [] });
   }, []);
 
+  const previousCurrency = useRef(currency);
+  useEffect(() => {
+    if (previousCurrency.current === currency) return;
+    previousCurrency.current = currency;
+    setFilters((current) => (current.maxPrice == null ? current : { ...current, maxPrice: null }));
+  }, [currency]);
+
   const searchKey = buildResultsSearchKey({
     placeId: searchParams.get("placeId"),
     aiSearch: searchParams.get("aiSearch"),
@@ -482,6 +489,10 @@ function ResultsContent() {
   const aiSearch = searchParams.get("aiSearch");
 
   const nights = nightsBetween(checkin, checkout);
+  const stayPrices = useMemo(
+    () => hotels.map((hotel) => hotel.price).filter((price): price is number => typeof price === "number" && price > 0),
+    [hotels],
+  );
   const isFiltered =
     minRating !== null || maxPrice !== null || onlyFreeCancellation || signals.length > 0;
 
@@ -758,6 +769,9 @@ function ResultsContent() {
               onChange={updateFilters}
               onReset={resetFilters}
               isFiltered={isFiltered}
+              currency={currency}
+              nights={nights}
+              stayPrices={stayPrices}
             />
           </aside>
 

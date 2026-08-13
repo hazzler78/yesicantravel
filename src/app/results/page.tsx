@@ -19,6 +19,7 @@ import { ResultsFilters, type ResultsFilterState } from "@/components/results/Re
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
+import { extractLatLng } from "@/lib/geo";
 import {
   buildResultsSearchKey,
   cacheResultsList,
@@ -155,6 +156,7 @@ function ResultsContent() {
   const [searchAnalyticsOutcome, setSearchAnalyticsOutcome] = useState<SearchAnalyticsOutcome | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
   const lastSearchEventSignature = useRef<string | null>(null);
 
   const { minRating, maxPrice, onlyFreeCancellation, signals } = filters;
@@ -311,13 +313,13 @@ function ResultsContent() {
           > = {};
           for (const d of details) {
             if (!d?.id) continue;
-            const loc = d.location;
+            const coords = extractLatLng(d);
             byHotelId[d.id] = {
               address: d.address,
               rating: normaliseRating(d.rating, d.starRating),
               reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : undefined,
-              lat: typeof loc?.latitude === "number" ? loc.latitude : undefined,
-              lng: typeof loc?.longitude === "number" ? loc.longitude : undefined,
+              lat: coords?.lat,
+              lng: coords?.lng,
               safetyBadges: safetyBadgesFromHotel(d),
               signals: deriveStaySignals({
                 ...d,
@@ -332,6 +334,7 @@ function ResultsContent() {
             const firstRate = allRates[0];
             const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
             const extra = byHotelId[h.id] ?? {};
+            const fallbackCoords = extractLatLng(h);
             return {
               ...h,
               address: extra.address ?? h.address,
@@ -340,8 +343,8 @@ function ResultsContent() {
               price: firstRate?.retailRate?.total?.[0]?.amount,
               currency: firstRate?.retailRate?.total?.[0]?.currency ?? "USD",
               hasFreeCancellation: freeCancellation,
-              lat: extra.lat,
-              lng: extra.lng,
+              lat: extra.lat ?? fallbackCoords?.lat,
+              lng: extra.lng ?? fallbackCoords?.lng,
               safetyBadges: extra.safetyBadges ?? [],
               signals: extra.signals,
             };
@@ -383,7 +386,9 @@ function ResultsContent() {
               .flatMap((rt) => rt.rates ?? [])
               .some((r) => r.cancellationPolicies?.refundableTag === "RFN");
           }
-          const merged = details.filter(Boolean).map((h) => ({
+          const merged = details.filter(Boolean).map((h) => {
+            const coords = extractLatLng(h);
+            return {
             id: h.id,
             name: h.name,
             main_photo: h.main_photo ?? h.hotelImages?.[0]?.url,
@@ -393,11 +398,12 @@ function ResultsContent() {
             price: totalByHotel[h.id]?.amount,
             currency: totalByHotel[h.id]?.currency ?? "EUR",
             hasFreeCancellation: freeCancellationByHotel[h.id] ?? false,
-            lat: h.location?.latitude,
-            lng: h.location?.longitude,
+            lat: coords?.lat,
+            lng: coords?.lng,
             safetyBadges: safetyBadgesFromHotel(h),
             signals: deriveStaySignals({ ...h, rateNames: rateNamesByHotel[h.id] }),
-          }));
+          };
+          });
           setHotels(merged);
           cacheResultsList({
             searchKey,
@@ -535,11 +541,11 @@ function ResultsContent() {
       })
       .then((json) => {
         const data = json.data ?? json;
-        const loc = data?.location;
+        const loc = extractLatLng(data);
         if (typeof data?.displayName === "string") setPlaceLabel(data.displayName);
-        if (loc && typeof loc.latitude === "number" && typeof loc.longitude === "number") {
+        if (loc) {
           setPlaceDetails({
-            location: { latitude: loc.latitude, longitude: loc.longitude },
+            location: { latitude: loc.lat, longitude: loc.lng },
             viewport: data.viewport,
           });
         } else {
@@ -626,6 +632,32 @@ function ResultsContent() {
     `/hotel/${id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
       placeId ? `&placeId=${placeId}` : ""
     }${aiSearch ? `&aiSearch=${encodeURIComponent(aiSearch)}` : ""}`;
+
+  const mapHotels = useMemo(
+    () =>
+      hotelsWithCoords.map((h) => ({
+        id: h.id,
+        name: h.name,
+        lat: h.lat,
+        lng: h.lng,
+        address: h.address,
+        rating: h.rating,
+        price: h.price,
+        currency: h.currency,
+        href: `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
+          placeId ? `&placeId=${placeId}` : ""
+        }${aiSearch ? `&aiSearch=${encodeURIComponent(aiSearch)}` : ""}`,
+      })),
+    [aiSearch, adults, checkin, checkout, hotelsWithCoords, placeId],
+  );
+
+  const showHotelOnMap = (hotelId: string) => {
+    setSelectedHotelId(hotelId);
+    setMapOpen(true);
+    window.setTimeout(() => {
+      document.getElementById("yict-map")?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 50);
+  };
 
   if (error) {
     return (
@@ -732,37 +764,31 @@ function ResultsContent() {
           <div className="min-w-0 space-y-4">
             <div
               id="yict-map"
-              className={`h-64 w-full overflow-hidden rounded-card border border-border bg-surface-muted ${
-                mapOpen ? "flex items-center justify-center" : "hidden lg:flex lg:items-center lg:justify-center"
+              role="region"
+              className={`relative h-72 w-full overflow-hidden rounded-card border border-border bg-surface-muted sm:h-80 ${
+                mapOpen ? "block" : "hidden lg:block"
               }`}
               aria-label="Map of stays in this area"
             >
               {!effectivePlaceForMap && !placeId ? (
-                <p className="px-4 text-center text-[0.9375rem] text-ink-muted">
+                <p className="absolute inset-0 flex items-center justify-center px-4 text-center text-[0.9375rem] text-ink-muted">
                   The map appears once stays include location data, or when you search by destination.
                 </p>
               ) : placeDetailsError && !derivedPlaceFromHotels ? (
-                <p className="px-4 text-center text-[0.9375rem] text-ink-muted">
+                <p className="absolute inset-0 flex items-center justify-center px-4 text-center text-[0.9375rem] text-ink-muted">
                   The map couldn&apos;t load. You can still browse the list below.
                 </p>
               ) : !effectivePlaceForMap ? (
-                <p className="text-[0.9375rem] text-ink-muted">Loading map…</p>
+                <p className="absolute inset-0 flex items-center justify-center text-[0.9375rem] text-ink-muted">
+                  Loading map…
+                </p>
               ) : (
                 <ResultsMap
                   placeDetails={effectivePlaceForMap}
-                  hotels={hotelsWithCoords.map((h) => ({
-                    id: h.id,
-                    name: h.name,
-                    lat: h.lat,
-                    lng: h.lng,
-                    address: h.address,
-                    rating: h.rating,
-                    price: h.price,
-                    currency: h.currency,
-                    href: hotelHref(h.id),
-                  }))}
+                  hotels={mapHotels}
+                  selectedHotelId={selectedHotelId ?? undefined}
                   onHotelNavigate={rememberHotelNavigation}
-                  className="h-full w-full"
+                  className="absolute inset-0 h-full w-full"
                 />
               )}
             </div>
@@ -778,6 +804,11 @@ function ResultsContent() {
                   signals={hotel.signals}
                   href={hotelHref(hotel.id)}
                   nights={nights}
+                  onShowOnMap={
+                    typeof hotel.lat === "number" && typeof hotel.lng === "number"
+                      ? () => showHotelOnMap(hotel.id)
+                      : undefined
+                  }
                   onSelect={() => {
                     rememberHotelNavigation(hotel.id);
                     track("Rates Viewed", { hotelId: hotel.id });

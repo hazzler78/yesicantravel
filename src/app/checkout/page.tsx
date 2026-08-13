@@ -436,7 +436,7 @@ function CheckoutContent() {
         setStep("error");
       }
     })();
-  }, [step, prebookId, transactionId, adults, occupancies, hotelId, checkin, checkout, saveCustomerForSuggestions, ingestBookingRevenue]);
+  }, [step, prebookId, transactionId, occupancyQuery, hotelId, checkin, checkout, saveCustomerForSuggestions, ingestBookingRevenue]);
 
   // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
   // Must run unconditionally (before any early return) to avoid React "fewer hooks" error.

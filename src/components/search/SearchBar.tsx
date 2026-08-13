@@ -94,16 +94,6 @@ export function SearchBar({
     adults: clampAdults(initialAdults ?? initialGuests ?? 1),
     childAges: (initialChildAges ?? []).map(clampChildAge).slice(0, MAX_CHILDREN),
   }));
-  const initialChildAgesKey = (initialChildAges ?? []).join(",");
-
-  useEffect(() => {
-    setParty({
-      adults: clampAdults(initialAdults ?? initialGuests ?? 1),
-      childAges: initialChildAgesKey
-        ? initialChildAgesKey.split(",").map((age) => clampChildAge(Number(age)))
-        : [],
-    });
-  }, [initialAdults, initialGuests, initialChildAgesKey]);
 
   const [places, setPlaces] = useState<Place[]>([]);
   const [showPlaces, setShowPlaces] = useState(false);

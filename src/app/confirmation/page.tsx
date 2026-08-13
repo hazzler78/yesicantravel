@@ -12,6 +12,7 @@ import { BookingSuccess } from "@/components/checkout/BookingSuccess";
 import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
 import { Card } from "@/components/ui/Card";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
+import { HotelLocationCard } from "@/components/HotelLocationCard";
 
 interface Booking {
   bookingId?: string;
@@ -33,11 +34,14 @@ function ConfirmationContent() {
   const bookingId = searchParams.get("bookingId");
   const [booking, setBooking] = useState<Booking | null>(null);
   const [hotelDetail, setHotelDetail] = useState<{
+    name?: string;
     main_photo?: string;
     address?: string;
+    city?: string;
     hotelDescription?: string;
     hotelFacilities?: string[];
     starRating?: number;
+    location?: { latitude?: number; longitude?: number };
   } | null>(null);
 
   useEffect(() => {
@@ -208,6 +212,17 @@ function ConfirmationContent() {
           </div>
         )}
       </BookingSuccess>
+
+      {hotelDetail && (hotelDetail.address || hotelDetail.location) && (
+        <div className="mt-4">
+          <HotelLocationCard
+            name={hotelDetail.name ?? booking?.hotel?.name ?? "Your stay"}
+            address={hotelDetail.address}
+            city={hotelDetail.city}
+            location={hotelDetail.location ?? hotelDetail}
+          />
+        </div>
+      )}
 
       <Card className="mt-4 p-5">
         <h2 className="font-display text-base font-semibold text-ink">Before you travel</h2>

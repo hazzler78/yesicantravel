@@ -23,6 +23,7 @@ import { deriveStaySignals, formatDistance } from "@/lib/staySignals";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { HotelGallery } from "@/components/hotel/HotelGallery";
 import { BackToResultsLink } from "@/components/hotel/BackToResultsLink";
+import { HotelLocationCard } from "@/components/HotelLocationCard";
 import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
@@ -68,6 +69,7 @@ interface HotelDetail {
   hotelDescription?: string;
   facilities?: Facility[];
   hotelFacilities?: string[];
+  location?: { latitude?: number; longitude?: number; lat?: number; lng?: number };
   rooms?: Array<{ id: number; roomName: string; photos?: Array<{ url: string }> }>;
 }
 
@@ -411,7 +413,9 @@ function HotelContent() {
               {hotel.address && (
                 <p className="flex items-center gap-1.5 text-[0.9375rem] text-ink-muted">
                   <MapPin className="h-4 w-4 shrink-0" aria-hidden />
-                  {hotel.address}
+                  <a href="#stay-location" className="hover:text-teal hover:underline hover:underline-offset-4">
+                    {hotel.address}
+                  </a>
                 </p>
               )}
               {hotel.starRating != null && (
@@ -482,6 +486,16 @@ function HotelContent() {
                 </p>
               </Card>
             )}
+
+            <div id="stay-location" className="mt-4 scroll-mt-24">
+              <HotelLocationCard
+                name={hotel.name}
+                address={hotel.address}
+                city={hotel.city}
+                location={hotel.location ?? hotel}
+                nearestTransit={stay.nearestTransit}
+              />
+            </div>
 
             <h2 id="rooms" className="mt-8 font-display text-xl font-semibold tracking-tight text-ink">
               Choose your room

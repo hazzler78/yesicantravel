@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { extractLatLng } from "@/lib/geo";
 import { getPlaceDetails } from "@/lib/liteapi";
 
 /** Extract latitude/longitude from various API response shapes (LiteAPI / Google-style). */
@@ -25,26 +26,11 @@ function normalizePlaceLocation(raw: unknown): {
   // Unwrap if response is { data: { ... } }
   const data = (obj.data && typeof obj.data === "object" ? obj.data : obj) as Record<string, unknown>;
 
-  let lat: number | undefined;
-  let lng: number | undefined;
-
-  const loc = data?.location as Record<string, unknown> | undefined;
-  if (loc && typeof loc.latitude === "number" && typeof loc.longitude === "number") {
-    lat = loc.latitude;
-    lng = loc.longitude;
-  }
-  const geom = data?.geometry as Record<string, unknown> | undefined;
-  const geomLoc = geom?.location as Record<string, unknown> | undefined;
-  if ((lat == null || lng == null) && geomLoc && typeof geomLoc.lat === "number" && typeof geomLoc.lng === "number") {
-    lat = geomLoc.lat;
-    lng = geomLoc.lng;
-  }
-  if ((lat == null || lng == null) && typeof data?.lat === "number" && typeof data?.lng === "number") {
-    lat = data.lat;
-    lng = data.lng;
-  }
-
-  if (lat == null || lng == null) return null;
+  const coords =
+    extractLatLng(data) ??
+    extractLatLng((data?.geometry as Record<string, unknown> | undefined)?.location);
+  if (!coords) return null;
+  const { lat, lng } = coords;
 
   let viewport: { high: { latitude: number; longitude: number }; low: { latitude: number; longitude: number } } | undefined;
   const vp = data?.viewport as Record<string, unknown> | undefined;

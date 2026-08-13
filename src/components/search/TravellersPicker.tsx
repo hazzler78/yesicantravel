@@ -118,6 +118,7 @@ export function TravellersPicker({
         type="button"
         id={`${reactId}-travellers`}
         aria-expanded={open}
+        aria-haspopup="dialog"
         aria-controls={panelId}
         onClick={() => setOpen((current) => !current)}
         className={`${inputClass} mt-1 cursor-pointer truncate text-left`}

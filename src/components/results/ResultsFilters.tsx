@@ -1,9 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import type { LucideIcon } from "lucide-react";
 import { DoorOpen, ShieldCheck, TrainFront, Venus } from "lucide-react";
 import type { StayFilterId } from "@/lib/staySignals";
 import { NEAR_TRANSIT_KM } from "@/lib/staySignals";
+import type { CurrencyCode } from "@/lib/currency";
+import { formatStayTotal } from "@/lib/formatStayPrice";
+import { budgetCapsFromStayTotals } from "@/lib/budgetFilter";
 
 export type ResultsFilterState = {
   minRating: number | null;
@@ -18,6 +22,10 @@ type ResultsFiltersProps = ResultsFilterState & {
   onChange: (patch: Partial<ResultsFilterState>) => void;
   onReset: () => void;
   isFiltered: boolean;
+  currency: CurrencyCode;
+  nights: number;
+  /** Stay totals in `currency`, used to pick budget steps that match this search. */
+  stayPrices: number[];
 };
 
 const RATING_OPTIONS: Array<{ value: number | null; label: string }> = [
@@ -25,13 +33,6 @@ const RATING_OPTIONS: Array<{ value: number | null; label: string }> = [
   { value: 7, label: "7+" },
   { value: 8, label: "8+" },
   { value: 9, label: "9+" },
-];
-
-const PRICE_OPTIONS: Array<{ value: number | null; label: string }> = [
-  { value: null, label: "Any" },
-  { value: 150, label: "Up to 150" },
-  { value: 250, label: "Up to 250" },
-  { value: 400, label: "Up to 400" },
 ];
 
 const SIGNAL_OPTIONS: Array<{
@@ -116,7 +117,22 @@ export function ResultsFilters({
   onChange,
   onReset,
   isFiltered,
+  currency,
+  nights,
+  stayPrices,
 }: ResultsFiltersProps) {
+  const priceOptions = useMemo(() => {
+    const caps = budgetCapsFromStayTotals(stayPrices, currency);
+    const values = maxPrice != null && !caps.includes(maxPrice) ? [...caps, maxPrice].sort((a, b) => a - b) : caps;
+    return [
+      { value: null, label: "Any" },
+      ...values.map((value) => ({
+        value,
+        label: `Up to ${formatStayTotal(value, currency)}`,
+      })),
+    ];
+  }, [stayPrices, currency, maxPrice]);
+
   const toggleSignal = (id: StayFilterId) => {
     onChange({
       signals: signals.includes(id) ? signals.filter((s) => s !== id) : [...signals, id],
@@ -187,13 +203,15 @@ export function ResultsFilters({
         />
       </div>
 
-      <PillGroup
-        legend="Budget"
-        hint="Total for the whole stay"
-        options={PRICE_OPTIONS}
-        value={maxPrice}
-        onSelect={(value) => onChange({ maxPrice: value })}
-      />
+      <div className="border-t border-border pt-4">
+        <PillGroup
+          legend="Budget"
+          hint={`Whole stay · ${nights} ${nights === 1 ? "night" : "nights"} · ${currency}`}
+          options={priceOptions}
+          value={maxPrice}
+          onSelect={(value) => onChange({ maxPrice: value })}
+        />
+      </div>
 
       <div className="border-t border-border pt-4">
         <label className="flex cursor-pointer items-start gap-2.5">

@@ -19,7 +19,7 @@ Homepage (/) — hero and trust copy visitors see (English):
 export const SITE_FEATURES_FOR_ASSISTANT = `
 Recent site behaviour (high level):
 - Search defaults to 1 guest on the homepage and throughout the booking flow (solo-friendly).
-- Results filters: rating, budget, and free cancellation. Results and checkout also show safety-style badges derived from listed hotel facilities (not an on-site inspection). There are no dedicated 24/7 / women-only filter toggles yet.
+- Results filters: rating, budget (shown in the visitor's selected currency, with steps taken from the stay totals on the page), and free cancellation. Results and checkout also show safety-style badges derived from listed hotel facilities (not an on-site inspection). There are no dedicated 24/7 / women-only filter toggles yet.
 - Hotel pages show description, facilities, AI guest sentiment (pros/cons), individual review snippets, and safety-style badges derived from listed facilities.
 - Checkout shows a short "you're booking" summary (photo, name, address, dates, guests, safety badges when available) and required phone with a note that it is for the hotel (e.g. late check-in).
 - Checkout trust copy: secure payments; cancellation terms shown per rate; safety signals from hotel facilities — no blanket "48-hour free cancellation" or "Safer Stays guarantee" claim.

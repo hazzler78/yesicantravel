@@ -60,13 +60,24 @@ export async function searchRates(params: {
   checkin: string;
   checkout: string;
   adults: number;
+  children?: number[];
+  occupancies?: Array<{ adults: number; children?: number[] }>;
   currency?: string;
   guestNationality?: string;
   maxRatesPerHotel?: number;
 }) {
   const currency = normalizeCurrency(params.currency);
+  const occupancies =
+    params.occupancies && params.occupancies.length > 0
+      ? params.occupancies
+      : [
+          {
+            adults: params.adults,
+            ...(params.children && params.children.length > 0 ? { children: params.children } : {}),
+          },
+        ];
   const body: Record<string, unknown> = {
-    occupancies: [{ adults: params.adults }],
+    occupancies,
     currency,
     guestNationality:
       params.guestNationality ?? guestNationalityForCurrency(currency),
@@ -85,8 +96,12 @@ export async function searchRates(params: {
     headers: defaultHeaders,
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Rates search failed: ${res.status}`);
-  return res.json();
+  const data = await res.json().catch(() => ({}));
+  if (data?.error?.code === 2001) {
+    return { data: [], hotels: [], error: data.error };
+  }
+  if (!res.ok) throw new Error(data?.error?.message ?? `Rates search failed: ${res.status}`);
+  return data;
 }
 
 export async function prebook(offerId: string, usePaymentSdk = true) {

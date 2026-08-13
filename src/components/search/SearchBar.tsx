@@ -2,10 +2,18 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, MapPin, Search, Sparkles, Users } from "lucide-react";
+import { CalendarDays, MapPin, Search, Sparkles } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import {
+  appendOccupancyParams,
+  clampAdults,
+  clampChildAge,
+  MAX_CHILDREN,
+  type Party,
+} from "@/lib/occupancy";
+import { TravellersPicker } from "@/components/search/TravellersPicker";
 
 type Place = { placeId: string; displayName: string; formattedAddress?: string };
 
@@ -21,6 +29,8 @@ export type SearchBarProps = {
   initialCheckin?: string;
   initialCheckout?: string;
   initialGuests?: number;
+  initialAdults?: number;
+  initialChildAges?: number[];
   /** Lightens the helper text below the bar when it sits on the dark hero band. */
   onDark?: boolean;
   /** Fires once a search is about to navigate, so a collapsible host can close. */
@@ -59,6 +69,8 @@ export function SearchBar({
   initialCheckin,
   initialCheckout,
   initialGuests = 1,
+  initialAdults,
+  initialChildAges,
   onDark = false,
   onSubmitted,
   className = "",
@@ -78,7 +90,20 @@ export function SearchBar({
   const [vibe, setVibe] = useState(initialVibe);
   const [checkin, setCheckin] = useState(initialCheckin ?? isoDaysFromNow(14));
   const [checkout, setCheckout] = useState(initialCheckout ?? isoDaysFromNow(16));
-  const [guests, setGuests] = useState(initialGuests);
+  const [party, setParty] = useState<Party>(() => ({
+    adults: clampAdults(initialAdults ?? initialGuests ?? 1),
+    childAges: (initialChildAges ?? []).map(clampChildAge).slice(0, MAX_CHILDREN),
+  }));
+  const initialChildAgesKey = (initialChildAges ?? []).join(",");
+
+  useEffect(() => {
+    setParty({
+      adults: clampAdults(initialAdults ?? initialGuests ?? 1),
+      childAges: initialChildAgesKey
+        ? initialChildAgesKey.split(",").map((age) => clampChildAge(Number(age)))
+        : [],
+    });
+  }, [initialAdults, initialGuests, initialChildAgesKey]);
 
   const [places, setPlaces] = useState<Place[]>([]);
   const [showPlaces, setShowPlaces] = useState(false);
@@ -221,7 +246,8 @@ export function SearchBar({
 
     setLoading(true);
     onSubmitted?.();
-    const params = new URLSearchParams({ checkin, checkout, adults: String(guests) });
+    const params = new URLSearchParams({ checkin, checkout });
+    appendOccupancyParams(params, party);
     if (mode === "destination") {
       params.set("placeId", resolvedPlaceId);
     } else {
@@ -372,24 +398,13 @@ export function SearchBar({
           />
         </div>
 
-        <div className={`min-w-0 border-b border-border md:w-36 md:border-b-0 md:border-r ${fieldPadding}`}>
-          <label htmlFor={`${reactId}-guests`} className={labelClass}>
-            <Users className="h-3.5 w-3.5" aria-hidden />
-            Travellers
-          </label>
-          <select
-            id={`${reactId}-guests`}
-            value={guests}
-            onChange={(event) => setGuests(Number(event.target.value))}
-            className={`${inputClass} mt-1 cursor-pointer appearance-none`}
-          >
-            {[1, 2, 3, 4, 5, 6].map((n) => (
-              <option key={n} value={n}>
-                {n} {n === 1 ? "traveller" : "travellers"}
-              </option>
-            ))}
-          </select>
-        </div>
+        <TravellersPicker
+          party={party}
+          onChange={setParty}
+          compact={compact}
+          inputClass={inputClass}
+          labelClass={labelClass}
+        />
 
         <div className={compact ? "p-2" : "p-2.5"}>
           <button

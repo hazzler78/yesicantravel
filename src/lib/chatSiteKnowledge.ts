@@ -20,7 +20,8 @@ export const SITE_FEATURES_FOR_ASSISTANT = `
 Recent site behaviour (high level):
 - Search defaults to 1 guest on the homepage and throughout the booking flow (solo-friendly).
 - Results filters: rating, budget, and free cancellation. Results and checkout also show safety-style badges derived from listed hotel facilities (not an on-site inspection). There are no dedicated 24/7 / women-only filter toggles yet.
-- Hotel pages show description, facilities, AI guest sentiment (pros/cons), individual review snippets, and safety-style badges derived from listed facilities.
+- Hotel pages show description, facilities, AI guest sentiment (pros/cons), individual review snippets, safety-style badges derived from listed facilities, and an interactive map of the published address with Google/Apple Maps and directions links.
+- Results search includes a map of stays (desktop always; mobile behind a Map toggle). Each card with coordinates has a "Show on map" control.
 - Checkout shows a short "you're booking" summary (photo, name, address, dates, guests, safety badges when available) and required phone with a note that it is for the hotel (e.g. late check-in).
 - Checkout trust copy: secure payments; cancellation terms shown per rate; safety signals from hotel facilities — no blanket "48-hour free cancellation" or "Safer Stays guarantee" claim.
 - Microsoft Clarity may be enabled for session insights; funnel events also go to analytics (Search, HotelClick, CheckoutStart, PaymentSubmit, BookingSuccess).

@@ -24,9 +24,10 @@ type HotelCardProps = {
   href: string;
   nights: number;
   onSelect?: () => void;
+  onShowOnMap?: () => void;
 };
 
-export function HotelCard({ hotel, signals, href, nights, onSelect }: HotelCardProps) {
+export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap }: HotelCardProps) {
   const hasPrice = hotel.price != null;
   const nearestTransit = signals?.nearestTransit;
   const cardId = `hotel-card-${hotel.id}`;
@@ -82,6 +83,16 @@ export function HotelCard({ hotel, signals, href, nights, onSelect }: HotelCardP
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
                 <span className="line-clamp-2">{hotel.address}</span>
               </p>
+            )}
+            {onShowOnMap && (
+              <button
+                type="button"
+                onClick={onShowOnMap}
+                aria-controls="yict-map"
+                className="mt-1 text-[0.8125rem] font-semibold text-teal hover:underline hover:underline-offset-4"
+              >
+                Show on map
+              </button>
             )}
 
             {nearestTransit && (

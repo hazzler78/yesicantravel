@@ -69,3 +69,17 @@ export const popularCities: PopularCity[] = [
 export function getPopularCityBySlug(slug: string): PopularCity | undefined {
   return popularCities.find((c) => c.slug === slug);
 }
+
+/**
+ * Place ids for year-round city guides that are not on the homepage strip.
+ * Same LiteAPI lookup as the comment above.
+ */
+const extraDestinationPlaceIds: Record<string, string> = {
+  "las-vegas": "ChIJ0X31pIK3voARo3mz1ebVzDo",
+  okinawa: "ChIJ51ur7mJw9TQR79H9hnJhuzU",
+};
+
+/** Place id used for both the from-price quote and the destination CTA search. */
+export function getPlaceIdForDestinationSlug(slug: string): string | undefined {
+  return getPopularCityBySlug(slug)?.placeId ?? extraDestinationPlaceIds[slug];
+}

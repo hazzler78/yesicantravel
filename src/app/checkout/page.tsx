@@ -20,6 +20,14 @@ import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { SafetyBadgeList } from "@/components/ui/SafetyBadge";
+import {
+  buildStaySearchParams,
+  guestsForBooking,
+  occupanciesForRequest,
+  occupancySummary,
+  parsePartyFromSearchParams,
+  requestedRoomsFromSearchParams,
+} from "@/lib/occupancy";
 
 const STORAGE_KEY = "liteapi_checkout_guest";
 const CLIENT_REF_KEY = "liteapi_checkout_client_ref";
@@ -34,7 +42,7 @@ function PaymentFormInit({
   hotelId,
   checkin,
   checkout,
-  adults,
+  occupancyQuery,
 }: {
   secretKey: string;
   publicKey: "sandbox" | "live";
@@ -44,7 +52,7 @@ function PaymentFormInit({
   hotelId: string;
   checkin: string;
   checkout: string;
-  adults: string;
+  occupancyQuery: string;
 }) {
   const initialized = useRef(false);
   useEffect(() => {
@@ -54,7 +62,7 @@ function PaymentFormInit({
     initialized.current = true;
     const returnUrl =
       typeof window !== "undefined"
-        ? `${window.location.origin}${window.location.pathname}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&adults=${adults}&prebookId=${prebookId}&transactionId=${transactionId}`
+        ? `${window.location.origin}${window.location.pathname}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&${occupancyQuery}&prebookId=${prebookId}&transactionId=${transactionId}`
         : "";
     const payment = new w.LiteAPIPayment({
       publicKey,
@@ -65,7 +73,7 @@ function PaymentFormInit({
       options: { business: { name: "Safer Stays" } },
     });
     payment.handlePayment();
-  }, [secretKey, publicKey, prebookId, transactionId, offerId, hotelId, checkin, checkout, adults]);
+  }, [secretKey, publicKey, prebookId, transactionId, offerId, hotelId, checkin, checkout, occupancyQuery]);
   return null;
 }
 
@@ -78,6 +86,21 @@ function CheckoutContent() {
   const adults = searchParams.get("adults") ?? "1";
   const placeId = searchParams.get("placeId");
   const aiSearch = searchParams.get("aiSearch");
+  const party = parsePartyFromSearchParams(searchParams);
+  const requestedRooms = requestedRoomsFromSearchParams(searchParams);
+  const occupancies = occupanciesForRequest(party, requestedRooms);
+  const occupancyQuery = buildStaySearchParams({ party, rooms: requestedRooms }).toString();
+  const travellerCount = party.adults + party.childAges.length;
+  const hotelStayHref = hotelId
+    ? `/hotel/${hotelId}?${buildStaySearchParams({
+        checkin,
+        checkout,
+        party,
+        rooms: requestedRooms,
+        placeId,
+        aiSearch,
+      })}`
+    : "/";
   const prebookId = searchParams.get("prebookId");
   const transactionId = searchParams.get("transactionId");
   const totalAmountRaw = searchParams.get("totalAmount");
@@ -92,17 +115,17 @@ function CheckoutContent() {
   const backToHotelsHref = useMemo(() => {
     if (!checkin || !checkout || !hotelId) return "/";
     if (placeId || aiSearch) {
-      const q = new URLSearchParams({
+      return `/results?${buildStaySearchParams({
         checkin,
         checkout,
-        adults,
-      });
-      if (placeId) q.set("placeId", placeId);
-      if (aiSearch) q.set("aiSearch", aiSearch);
-      return `/results?${q}`;
+        party,
+        rooms: requestedRooms,
+        placeId,
+        aiSearch,
+      })}`;
     }
-    return `/hotel/${hotelId}?checkin=${checkin}&checkout=${checkout}&adults=${adults}`;
-  }, [placeId, aiSearch, checkin, checkout, adults, hotelId]);
+    return hotelStayHref;
+  }, [placeId, aiSearch, checkin, checkout, hotelId, hotelStayHref, party, requestedRooms]);
 
   const [step, setStep] = useState<"form" | "payment" | "booking" | "done" | "error">("form");
   const [paymentConfig, setPaymentConfig] = useState<{
@@ -270,10 +293,10 @@ function CheckoutContent() {
       });
       pinterestTrack("checkout", {
         event_id: `checkout-${offerId}-${hotelId}`,
-        order_quantity: Number(adults),
+        order_quantity: travellerCount,
       });
     }
-  }, [offerId, hotelId, checkin, checkout, adults, step]);
+  }, [offerId, hotelId, checkin, checkout, adults, travellerCount, step]);
 
   useEffect(() => {
     if (step !== "payment" || !hotelId || !offerId) return;
@@ -360,17 +383,12 @@ function CheckoutContent() {
               email: guest.email,
               phone: String(guest.phone).trim(),
             },
-            // LiteAPI expects one primary guest per room (occupancyNumber = room index),
-            // and this app currently books a single room with `adults` occupants.
-            // So we send exactly one guest with occupancyNumber 1.
-            guests: [
-              {
-                occupancyNumber: 1,
-                firstName: guest.firstName,
-                lastName: guest.lastName,
-                email: guest.email,
-              },
-            ],
+            // LiteAPI expects one named guest per room (occupancyNumber = room index).
+            guests: guestsForBooking(occupancies, {
+              firstName: guest.firstName,
+              lastName: guest.lastName,
+              email: guest.email,
+            }),
           }),
         });
         const json = await res.json();
@@ -394,7 +412,7 @@ function CheckoutContent() {
           event_id: (data as { bookingId?: string }).bookingId ?? undefined,
           currency: (data as { currency?: string }).currency ?? undefined,
           value: (data as { price?: number }).price ?? undefined,
-          order_quantity: Number(adults),
+          order_quantity: travellerCount,
         });
         saveCustomerForSuggestions({
           email: guest.email,
@@ -418,7 +436,7 @@ function CheckoutContent() {
         setStep("error");
       }
     })();
-  }, [step, prebookId, transactionId, adults, hotelId, checkin, checkout, saveCustomerForSuggestions, ingestBookingRevenue]);
+  }, [step, prebookId, transactionId, occupancyQuery, hotelId, checkin, checkout, saveCustomerForSuggestions, ingestBookingRevenue]);
 
   // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
   // Must run unconditionally (before any early return) to avoid React "fewer hooks" error.
@@ -519,7 +537,7 @@ function CheckoutContent() {
           hotelId,
           checkin,
           checkout,
-          adults: Number(adults),
+          adults: party.adults,
         }),
       });
       const prebookJson = await prebookRes.json();
@@ -539,15 +557,11 @@ function CheckoutContent() {
             paymentMethod: "ACC_CREDIT_CARD",
             clientReference: clientRef,
             holder: guestPayload,
-            // Single-room booking: one primary guest with occupancyNumber 1.
-            guests: [
-              {
-                occupancyNumber: 1,
-                firstName: firstName.trim(),
-                lastName: lastName.trim(),
-                email: email.trim(),
-              },
-            ],
+            guests: guestsForBooking(occupancies, {
+              firstName: firstName.trim(),
+              lastName: lastName.trim(),
+              email: email.trim(),
+            }),
           }),
         });
         const bookJson = await bookRes.json();
@@ -569,7 +583,7 @@ function CheckoutContent() {
           event_id: (data as { bookingId?: string }).bookingId ?? undefined,
           currency: (data as { currency?: string }).currency ?? undefined,
           value: (data as { price?: number }).price ?? undefined,
-          order_quantity: Number(adults),
+          order_quantity: travellerCount,
         });
         saveCustomerForSuggestions({
           email: guestPayload.email,
@@ -600,7 +614,7 @@ function CheckoutContent() {
       setStep("payment");
 
       const base = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
-      const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&adults=${adults}&prebookId=${pid}&transactionId=${tid}`;
+      const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&${occupancyQuery}&prebookId=${pid}&transactionId=${tid}`;
       const paymentEnv = typeof prebookSandbox === "boolean" ? (prebookSandbox ? "sandbox" : "live") : (paymentConfig?.paymentEnv ?? "sandbox");
       (window as unknown as { liteAPIConfig?: unknown }).liteAPIConfig = {
         publicKey: paymentEnv,
@@ -632,7 +646,7 @@ function CheckoutContent() {
       <CheckoutMessage
         title="We couldn't complete this booking"
         body={error ?? "Something went wrong on the way to the property."}
-        actionHref={`/hotel/${hotelId}?checkin=${checkin}&checkout=${checkout}&adults=${adults}`}
+        actionHref={hotelStayHref}
         actionLabel="Back to the stay"
       />
     );
@@ -732,7 +746,9 @@ function CheckoutContent() {
                       <p className="tnum mt-1 text-[0.8125rem] text-ink">
                         {checkin} – {checkout}
                         {nights > 0 && <> · {nights} night{nights === 1 ? "" : "s"}</>}
-                        {adults && <> · {adults} guest{Number(adults) === 1 ? "" : "s"}</>}
+                        {occupancySummary(party, requestedRooms) && (
+                          <> · {occupancySummary(party, requestedRooms)}</>
+                        )}
                       </p>
                     )}
                   </div>
@@ -920,7 +936,7 @@ function CheckoutContent() {
                 hotelId={hotelId!}
                 checkin={checkin!}
                 checkout={checkout!}
-                adults={adults}
+                occupancyQuery={occupancyQuery}
               />
             )}
           </div>

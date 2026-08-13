@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { searchRates } from "@/lib/liteapi";
 import { normalizeCurrency, resolveRequestCurrency } from "@/lib/currency";
+import { sanitizeChildAges, sanitizeOccupancies } from "@/lib/occupancy";
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,6 +19,8 @@ export async function POST(request: NextRequest) {
       checkin: body.checkin,
       checkout: body.checkout,
       adults: body.adults ?? 1,
+      children: sanitizeChildAges(body.children),
+      occupancies: sanitizeOccupancies(body.occupancies),
       currency,
       guestNationality: body.guestNationality,
       maxRatesPerHotel: body.maxRatesPerHotel,

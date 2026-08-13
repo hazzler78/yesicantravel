@@ -18,7 +18,7 @@ Homepage (/) — hero and trust copy visitors see (English):
 /** Product behaviour the assistant should describe accurately. */
 export const SITE_FEATURES_FOR_ASSISTANT = `
 Recent site behaviour (high level):
-- Search defaults to 1 guest on the homepage and throughout the booking flow (solo-friendly).
+- Search defaults to 1 adult on the homepage and throughout the booking flow (solo-friendly). Visitors can add children with ages. Hotels quote *room occupancy*, not a headcount: 4 adults in one room is a family/quad (often unavailable in smaller towns), while 2 adults + 2 children is a different product. Results may retry as two rooms when a single room has no rates.
 - Results filters: rating, budget (shown in the visitor's selected currency, with steps taken from the stay totals on the page), and free cancellation. Results and checkout also show safety-style badges derived from listed hotel facilities (not an on-site inspection). There are no dedicated 24/7 / women-only filter toggles yet.
 - Hotel pages show description, facilities, AI guest sentiment (pros/cons), individual review snippets, safety-style badges derived from listed facilities, and an interactive map of the published address with Google/Apple Maps and directions links.
 - Results search includes a map of stays (desktop always; mobile behind a Map toggle). Each card with coordinates has a "Show on map" control.

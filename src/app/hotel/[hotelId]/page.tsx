@@ -30,6 +30,14 @@ import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
+import {
+  appendOccupancyParams,
+  buildStaySearchParams,
+  occupanciesForRequest,
+  occupancySummary,
+  parsePartyFromSearchParams,
+  requestedRoomsFromSearchParams,
+} from "@/lib/occupancy";
 
 interface Rate {
   name: string;
@@ -140,12 +148,22 @@ function HotelContent() {
 
   const checkin = searchParams.get("checkin");
   const checkout = searchParams.get("checkout");
-  const adults = searchParams.get("adults") ?? "1";
+  const party = parsePartyFromSearchParams(searchParams);
+  const requestedRooms = requestedRoomsFromSearchParams(searchParams);
+  const occupancies = occupanciesForRequest(party, requestedRooms);
+  const occupancyKey = `${party.adults}|${party.childAges.join(",")}|${requestedRooms}`;
 
   useEffect(() => {
     if (!hotelId) return;
-    trackFunnelEvent("HotelClick", { hotelId, checkin, checkout, adults });
-  }, [hotelId, checkin, checkout, adults]);
+    trackFunnelEvent("HotelClick", {
+      hotelId,
+      checkin,
+      checkout,
+      adults: party.adults,
+      children: party.childAges.length,
+      rooms: requestedRooms,
+    });
+  }, [hotelId, checkin, checkout, occupancyKey, party.adults, party.childAges.length, requestedRooms]);
 
   // Fetch reviews in parallel with the main hotel/rates call — they're non-blocking social proof.
   // LiteAPI review response shape varies; be defensive.
@@ -199,7 +217,9 @@ function HotelContent() {
               hotelIds: [hotelId],
               checkin,
               checkout,
-              adults: Number(adults),
+              adults: occupancies[0]?.adults ?? party.adults,
+              children: party.childAges,
+              occupancies,
               maxRatesPerHotel: 50,
               currency,
               guestNationality: guestNationalityForCurrency(currency),
@@ -266,7 +286,7 @@ function HotelContent() {
       }
     }
     run();
-  }, [hotelId, checkin, checkout, adults, currency]);
+  }, [hotelId, checkin, checkout, occupancyKey, currency]);
 
   const handleBook = (offerId: string) => {
     const total = roomGroups
@@ -279,7 +299,7 @@ function HotelContent() {
       currency: total?.currency,
       checkin,
       checkout,
-      adults,
+      adults: party.adults,
     });
     const eventId = generateMetaEventId("init_checkout");
     const metaData = {
@@ -289,7 +309,7 @@ function HotelContent() {
       currency: total?.currency,
       checkin,
       checkout,
-      adults,
+      adults: party.adults,
     };
     fbqTrack("InitiateCheckout", metaData, { eventId });
     void sendMetaCapiEvent({
@@ -303,8 +323,8 @@ function HotelContent() {
       hotelId,
       checkin: checkin!,
       checkout: checkout!,
-      adults: adults!,
     });
+    appendOccupancyParams(q, party, { rooms: requestedRooms });
     const pid = searchParams.get("placeId");
     const ai = searchParams.get("aiSearch");
     if (pid) q.set("placeId", pid);
@@ -318,12 +338,13 @@ function HotelContent() {
 
   const backHref =
     searchParams.get("placeId") || searchParams.get("aiSearch")
-      ? `/results?${new URLSearchParams({
-          ...(searchParams.get("placeId") && { placeId: searchParams.get("placeId")! }),
-          ...(searchParams.get("aiSearch") && { aiSearch: searchParams.get("aiSearch")! }),
-          checkin: checkin ?? "",
-          checkout: checkout ?? "",
-          adults: adults ?? "1",
+      ? `/results?${buildStaySearchParams({
+          checkin,
+          checkout,
+          party,
+          rooms: requestedRooms,
+          placeId: searchParams.get("placeId"),
+          aiSearch: searchParams.get("aiSearch"),
         })}`
       : "/";
 
@@ -578,7 +599,9 @@ function HotelContent() {
               {roomGroups.length === 0 && (
                 <Card className="p-6 text-center">
                   <p className="text-[0.9375rem] text-ink-muted">
-                    No rooms available for these dates. Try shifting your stay by a night.
+                    No rooms available for {occupancySummary(party, requestedRooms)}. Hotels quote
+                    room occupancy, not a headcount — four adults in one room is not the same as two
+                    adults and two children.
                   </p>
                 </Card>
               )}
@@ -716,8 +739,7 @@ function HotelContent() {
                 {formatStayDate(checkin)} – {formatStayDate(checkout)}
               </p>
               <p className="text-[0.9375rem] text-ink-muted">
-                {nights} {nights === 1 ? "night" : "nights"} · {adults}{" "}
-                {Number(adults) === 1 ? "traveller" : "travellers"}
+                {nights} {nights === 1 ? "night" : "nights"} · {occupancySummary(party, requestedRooms)}
               </p>
 
               {cheapest && (

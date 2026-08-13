@@ -19,6 +19,15 @@ import { ResultsFilters, type ResultsFilterState } from "@/components/results/Re
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
+import {
+  appendOccupancyParams,
+  buildSplitOccupancies,
+  DEFAULT_CHILD_AGE,
+  occupanciesForRequest,
+  partyFromSearchParams,
+  partyLabel,
+  travellersSummary,
+} from "@/lib/occupancy";
 import { extractLatLng } from "@/lib/geo";
 import {
   buildResultsSearchKey,
@@ -157,6 +166,8 @@ function ResultsContent() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
+  const [usedSplitRooms, setUsedSplitRooms] = useState(false);
+  const [pairAvailable, setPairAvailable] = useState(false);
   const lastSearchEventSignature = useRef<string | null>(null);
 
   const { minRating, maxPrice, onlyFreeCancellation, signals } = filters;
@@ -182,6 +193,9 @@ function ResultsContent() {
     checkin: searchParams.get("checkin"),
     checkout: searchParams.get("checkout"),
     adults: searchParams.get("adults") ?? "1",
+    children: searchParams.get("children"),
+    childAges: searchParams.get("childAges"),
+    rooms: searchParams.get("rooms"),
     currency,
   });
 
@@ -246,23 +260,58 @@ function ResultsContent() {
         setLoading(true);
         setError(null);
         setSearchAnalyticsOutcome(null);
-        const body: Record<string, string | number> = {
-          checkin: checkin!,
-          checkout: checkout!,
-          adults: Number(adults),
-          currency,
-          guestNationality: guestNationalityForCurrency(currency),
-        };
-        if (placeId) body.placeId = placeId;
-        if (aiSearch) body.aiSearch = aiSearch;
-
-        const res = await fetch("/api/rates", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
+        setUsedSplitRooms(false);
+        setPairAvailable(false);
+        const party = partyFromSearchParams({
+          adults,
+          children: searchParams.get("children"),
+          childAges: searchParams.get("childAges"),
         });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error ?? "Search failed");
+        const requestedRooms = Number(searchParams.get("rooms") ?? 1) >= 2 ? 2 : 1;
+
+        const requestRates = async (occupancies: Array<{ adults: number; children?: number[] }>) => {
+          const res = await fetch("/api/rates", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              checkin: checkin!,
+              checkout: checkout!,
+              adults: party.adults,
+              children: party.childAges,
+              occupancies,
+              currency,
+              guestNationality: guestNationalityForCurrency(currency),
+              ...(placeId ? { placeId } : {}),
+              ...(aiSearch ? { aiSearch } : {}),
+            }),
+          });
+          const payload = await res.json();
+          const message =
+            typeof payload.error === "string" ? payload.error : payload.error?.message;
+          if (!res.ok && payload?.error?.code !== 2001) {
+            throw new Error(message ?? "Search failed");
+          }
+          return payload;
+        };
+
+        let json = await requestRates(occupanciesForRequest(party, requestedRooms));
+        let split = requestedRooms >= 2;
+        const primaryCount = (json.data ?? json.hotels ?? []).length;
+        if (primaryCount === 0 && requestedRooms < 2) {
+          const splitOccupancies = buildSplitOccupancies(party);
+          if (splitOccupancies && splitOccupancies.length > 1) {
+            const retry = await requestRates(splitOccupancies);
+            if ((retry.data ?? retry.hotels ?? []).length > 0) {
+              json = retry;
+              split = true;
+            }
+          }
+        }
+        if ((json.data ?? json.hotels ?? []).length === 0 && party.adults + party.childAges.length >= 3) {
+          const probe = await requestRates([{ adults: 2 }]);
+          if ((probe.data ?? probe.hotels ?? []).length > 0) setPairAvailable(true);
+        }
+        setUsedSplitRooms(split);
         if (cancelled) return;
 
         const data = (json.data ?? []) as Array<{
@@ -487,6 +536,26 @@ function ResultsContent() {
   const adults = searchParams.get("adults") ?? "1";
   const placeId = searchParams.get("placeId");
   const aiSearch = searchParams.get("aiSearch");
+  const party = partyFromSearchParams({
+    adults,
+    children: searchParams.get("children"),
+    childAges: searchParams.get("childAges"),
+  });
+  const roomsInSearch = Number(searchParams.get("rooms") ?? 1) >= 2 || usedSplitRooms ? 2 : 1;
+
+  const occupancyHref = (next: { adults?: number; childAges?: number[]; rooms?: number }) => {
+    const qs = new URLSearchParams();
+    if (placeId) qs.set("placeId", placeId);
+    if (aiSearch) qs.set("aiSearch", aiSearch);
+    if (checkin) qs.set("checkin", checkin);
+    if (checkout) qs.set("checkout", checkout);
+    appendOccupancyParams(
+      qs,
+      { adults: next.adults ?? party.adults, childAges: next.childAges ?? party.childAges },
+      { rooms: next.rooms },
+    );
+    return `/results?${qs.toString()}`;
+  };
 
   const nights = nightsBetween(checkin, checkout);
   const stayPrices = useMemo(
@@ -636,13 +705,19 @@ function ResultsContent() {
   const searchSummary = [
     placeLabel || aiSearch || "Your search",
     `${formatDate(checkin)} – ${formatDate(checkout)}`,
-    `${adults} ${Number(adults) === 1 ? "traveller" : "travellers"}`,
+    travellersSummary(party),
   ].join(" · ");
 
-  const hotelHref = (id: string) =>
-    `/hotel/${id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
-      placeId ? `&placeId=${placeId}` : ""
-    }${aiSearch ? `&aiSearch=${encodeURIComponent(aiSearch)}` : ""}`;
+  const hotelHref = (id: string) => {
+    const qs = new URLSearchParams({
+      checkin: checkin ?? "",
+      checkout: checkout ?? "",
+    });
+    appendOccupancyParams(qs, party, { rooms: roomsInSearch });
+    if (placeId) qs.set("placeId", placeId);
+    if (aiSearch) qs.set("aiSearch", aiSearch);
+    return `/hotel/${id}?${qs.toString()}`;
+  };
 
   const mapHotels = useMemo(
     () =>
@@ -655,11 +730,9 @@ function ResultsContent() {
         rating: h.rating,
         price: h.price,
         currency: h.currency,
-        href: `/hotel/${h.id}?checkin=${checkin}&checkout=${checkout}&adults=${adults}${
-          placeId ? `&placeId=${placeId}` : ""
-        }${aiSearch ? `&aiSearch=${encodeURIComponent(aiSearch)}` : ""}`,
+        href: hotelHref(h.id),
       })),
-    [aiSearch, adults, checkin, checkout, hotelsWithCoords, placeId],
+    [aiSearch, checkin, checkout, hotelsWithCoords, party, placeId, roomsInSearch],
   );
 
   const showHotelOnMap = (hotelId: string) => {
@@ -695,6 +768,7 @@ function ResultsContent() {
       <div className="sticky top-16 z-30 border-b border-border bg-surface-muted/95 backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
           <ResultsSearchBar
+            key={`${party.adults}-${party.childAges.join(",")}-${roomsInSearch}`}
             summary={searchSummary}
             variant="compact"
             initialMode={aiSearch ? "vibe" : "destination"}
@@ -703,7 +777,8 @@ function ResultsContent() {
             initialVibe={aiSearch ?? ""}
             initialCheckin={checkin ?? undefined}
             initialCheckout={checkout ?? undefined}
-            initialGuests={Number(adults) || 1}
+            initialAdults={party.adults}
+            initialChildAges={party.childAges}
           />
         </div>
       </div>
@@ -716,8 +791,7 @@ function ResultsContent() {
             </h1>
             <p className="mt-1 text-[0.9375rem] text-ink-muted">
               {formatDate(checkin)} – {formatDate(checkout)} · {nights}{" "}
-              {nights === 1 ? "night" : "nights"} · {adults}{" "}
-              {Number(adults) === 1 ? "traveller" : "travellers"}
+              {nights === 1 ? "night" : "nights"} · {partyLabel(party, roomsInSearch)}
             </p>
           </div>
 
@@ -807,6 +881,13 @@ function ResultsContent() {
               )}
             </div>
 
+            {usedSplitRooms && !loading && hotels.length > 0 && (
+              <div className="rounded-card border border-border bg-teal-soft/40 px-4 py-3 text-[0.9375rem] text-ink">
+                Few properties sell a single room for {travellersSummary(party)}. These prices are
+                for two rooms.
+              </div>
+            )}
+
             {loading &&
               Array.from({ length: 4 }).map((_, index) => <HotelCardSkeleton key={index} />)}
 
@@ -836,14 +917,16 @@ function ResultsContent() {
                   <SearchX className="h-5 w-5" aria-hidden />
                 </span>
                 <h2 className="mt-4 font-display text-lg font-semibold text-ink">
-                  {hotels.length === 0 ? "No stays for these dates" : "Nothing matches these filters"}
+                  {hotels.length === 0 ? "No stays for this party" : "Nothing matches these filters"}
                 </h2>
                 <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-ink-muted">
                   {hotels.length === 0
-                    ? "Try shifting your dates by a day or two, or search a nearby city."
+                    ? pairAvailable
+                      ? `Hotels here are quoting rooms for two adults, not ${travellersSummary(party)} in one room. That usually means doubles — not that the town is full.`
+                      : "Try shifting your dates by a day or two, searching nearby, or splitting adults and children."
                     : "Loosen the rating or budget filter to see more of what's available."}
                 </p>
-                <div className="mt-5 flex justify-center gap-2">
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
                   {hotels.length > 0 && isFiltered && (
                     <button
                       type="button"
@@ -852,6 +935,24 @@ function ResultsContent() {
                     >
                       Clear filters
                     </button>
+                  )}
+                  {hotels.length === 0 && party.adults >= 3 && party.childAges.length === 0 && (
+                    <SecondaryLink
+                      href={occupancyHref({
+                        adults: 2,
+                        childAges: Array.from({ length: Math.min(2, party.adults - 2) }, () => DEFAULT_CHILD_AGE),
+                      })}
+                    >
+                      Try 2 adults and children
+                    </SecondaryLink>
+                  )}
+                  {hotels.length === 0 && party.adults + party.childAges.length >= 3 && (
+                    <SecondaryLink href={occupancyHref({ adults: 2, childAges: [] })}>
+                      Search 2 adults
+                    </SecondaryLink>
+                  )}
+                  {hotels.length === 0 && party.adults + party.childAges.length >= 3 && roomsInSearch < 2 && (
+                    <SecondaryLink href={occupancyHref({ rooms: 2 })}>Search two rooms</SecondaryLink>
                   )}
                   <SecondaryLink href="/">New search</SecondaryLink>
                 </div>

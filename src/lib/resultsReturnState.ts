@@ -32,6 +32,9 @@ export function buildResultsSearchKey(parts: {
   checkin?: string | null;
   checkout?: string | null;
   adults?: string | null;
+  children?: string | null;
+  childAges?: string | null;
+  rooms?: string | null;
   currency?: string | null;
 }): string {
   return [
@@ -40,6 +43,9 @@ export function buildResultsSearchKey(parts: {
     parts.checkin ?? "",
     parts.checkout ?? "",
     parts.adults ?? "1",
+    parts.children ?? "",
+    parts.childAges ?? "",
+    parts.rooms ?? "1",
     parts.currency ?? "EUR",
   ].join("|");
 }

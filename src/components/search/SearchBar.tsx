@@ -14,6 +14,7 @@ import {
   type Party,
 } from "@/lib/occupancy";
 import { TravellersPicker } from "@/components/search/TravellersPicker";
+import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES, type StayType } from "@/lib/stayTypes";
 
 type Place = { placeId: string; displayName: string; formattedAddress?: string };
 
@@ -31,6 +32,7 @@ export type SearchBarProps = {
   initialGuests?: number;
   initialAdults?: number;
   initialChildAges?: number[];
+  initialStay?: StayType;
   /** Lightens the helper text below the bar when it sits on the dark hero band. */
   onDark?: boolean;
   /** Fires once a search is about to navigate, so a collapsible host can close. */
@@ -71,6 +73,7 @@ export function SearchBar({
   initialGuests = 1,
   initialAdults,
   initialChildAges,
+  initialStay = "all",
   onDark = false,
   onSubmitted,
   className = "",
@@ -100,6 +103,7 @@ export function SearchBar({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [stayType, setStayType] = useState<StayType>(() => parseStayType(initialStay));
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -243,6 +247,7 @@ export function SearchBar({
     } else {
       params.set("aiSearch", vibe.trim());
     }
+    if (stayType !== "all") params.set("stay", stayType);
     router.push(`/results?${params}`);
     setLoading(false);
   };
@@ -409,6 +414,25 @@ export function SearchBar({
             {loading ? "Searching…" : "Search"}
           </button>
         </div>
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-1.5" role="group" aria-label="Type of stay">
+        {STAY_TYPE_ORDER.map((id) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setStayType(id)}
+            className={`min-h-[32px] rounded-full px-3 text-[0.8125rem] font-medium transition-colors ${
+              stayType === id
+                ? "bg-ink text-white"
+                : onDark
+                  ? "bg-white/15 text-ink-inverse/80 hover:bg-white/25"
+                  : "bg-surface-muted text-ink-muted hover:text-ink"
+            }`}
+          >
+            {STAY_TYPES[id].label}
+          </button>
+        ))}
       </div>
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1">

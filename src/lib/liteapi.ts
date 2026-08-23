@@ -65,6 +65,10 @@ export async function searchRates(params: {
   currency?: string;
   guestNationality?: string;
   maxRatesPerHotel?: number;
+  hotelTypeIds?: number[];
+  latitude?: number;
+  longitude?: number;
+  radius?: number;
 }) {
   const currency = normalizeCurrency(params.currency);
   const occupancies =
@@ -87,9 +91,21 @@ export async function searchRates(params: {
     maxRatesPerHotel: params.maxRatesPerHotel ?? 1,
     includeHotelData: true,
   };
-  if (params.placeId) body.placeId = params.placeId;
+  // One primary location: coords+radius beat placeId (~1 km) for suburbs.
+  if (
+    typeof params.latitude === "number" &&
+    typeof params.longitude === "number" &&
+    typeof params.radius === "number"
+  ) {
+    body.latitude = params.latitude;
+    body.longitude = params.longitude;
+    body.radius = params.radius;
+  } else if (params.placeId) {
+    body.placeId = params.placeId;
+  }
   if (params.hotelIds && params.hotelIds.length) body.hotelIds = params.hotelIds;
   if (params.aiSearch) body.aiSearch = params.aiSearch;
+  if (params.hotelTypeIds && params.hotelTypeIds.length) body.hotelTypeIds = params.hotelTypeIds;
 
   const res = await fetch(`${API_BASE}/hotels/rates`, {
     method: "POST",

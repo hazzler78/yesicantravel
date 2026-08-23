@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { Map as MapIcon, SearchX, SlidersHorizontal, TriangleAlert } from "lucide-react";
@@ -29,6 +29,7 @@ import {
   travellersSummary,
 } from "@/lib/occupancy";
 import { extractLatLng } from "@/lib/geo";
+import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES } from "@/lib/stayTypes";
 import {
   buildResultsSearchKey,
   cacheResultsList,
@@ -150,6 +151,8 @@ function formatDate(iso: string | null) {
 
 function ResultsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const stay = parseStayType(searchParams.get("stay"));
   const currency = useCurrency();
   const [hotels, setHotels] = useState<HotelListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -281,6 +284,7 @@ function ResultsContent() {
               occupancies,
               currency,
               guestNationality: guestNationalityForCurrency(currency),
+              stay,
               ...(placeId ? { placeId } : {}),
               ...(aiSearch ? { aiSearch } : {}),
             }),
@@ -547,6 +551,7 @@ function ResultsContent() {
     const qs = new URLSearchParams();
     if (placeId) qs.set("placeId", placeId);
     if (aiSearch) qs.set("aiSearch", aiSearch);
+    if (stay !== "all") qs.set("stay", stay);
     if (checkin) qs.set("checkin", checkin);
     if (checkout) qs.set("checkout", checkout);
     appendOccupancyParams(
@@ -716,6 +721,7 @@ function ResultsContent() {
     appendOccupancyParams(qs, party, { rooms: roomsInSearch });
     if (placeId) qs.set("placeId", placeId);
     if (aiSearch) qs.set("aiSearch", aiSearch);
+    if (stay !== "all") qs.set("stay", stay);
     return `/hotel/${id}?${qs.toString()}`;
   };
 
@@ -779,6 +785,7 @@ function ResultsContent() {
             initialCheckout={checkout ?? undefined}
             initialAdults={party.adults}
             initialChildAges={party.childAges}
+            initialStay={stay}
           />
         </div>
       </div>
@@ -793,6 +800,27 @@ function ResultsContent() {
               {formatDate(checkin)} – {formatDate(checkout)} · {nights}{" "}
               {nights === 1 ? "night" : "nights"} · {partyLabel(party, roomsInSearch)}
             </p>
+            <div className="mt-3 flex flex-wrap gap-1.5" role="group" aria-label="Type of stay">
+              {STAY_TYPE_ORDER.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => {
+                    const next = new URLSearchParams(searchParams.toString());
+                    if (id === "all") next.delete("stay");
+                    else next.set("stay", id);
+                    router.replace(`/results?${next.toString()}`);
+                  }}
+                  className={`min-h-[32px] rounded-full px-3 text-[0.8125rem] font-medium ${
+                    stay === id
+                      ? "bg-ink text-white"
+                      : "border border-border bg-surface text-ink-muted hover:text-ink"
+                  }`}
+                >
+                  {STAY_TYPES[id].label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">

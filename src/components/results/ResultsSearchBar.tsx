@@ -3,10 +3,13 @@
 import { useEffect, useState } from "react";
 import { ChevronUp, Pencil, Search } from "lucide-react";
 import { SearchBar, type SearchBarProps } from "@/components/search/SearchBar";
+import type { StayType } from "@/lib/stayTypes";
 
 type ResultsSearchBarProps = SearchBarProps & {
   /** One-line description of the current search, shown while collapsed. */
   summary: string;
+  /** Called when the visitor switches All/Hotels/Budget/Apartments — re-runs the search. */
+  onStayChange?: (stay: StayType) => void;
 };
 
 /** Enough movement to read as intent, not as momentum jitter on a touch screen. */
@@ -18,7 +21,7 @@ const COLLAPSE_AFTER_PX = 40;
  * results where it isn't. So it collapses to a single summary row that can be
  * tapped open, and closes itself again as soon as you scroll down.
  */
-export function ResultsSearchBar({ summary, ...searchBarProps }: ResultsSearchBarProps) {
+export function ResultsSearchBar({ summary, onStayChange, ...searchBarProps }: ResultsSearchBarProps) {
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export function ResultsSearchBar({ summary, ...searchBarProps }: ResultsSearchBa
 
       {/* Kept mounted so a half-typed destination survives collapsing. */}
       <div className={expanded ? "block" : "hidden md:block"}>
-        <SearchBar {...searchBarProps} onSubmitted={() => setExpanded(false)} />
+        <SearchBar {...searchBarProps} onStayChange={onStayChange} onSubmitted={() => setExpanded(false)} />
         {expanded && (
           <button
             type="button"

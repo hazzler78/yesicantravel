@@ -29,7 +29,7 @@ import {
   travellersSummary,
 } from "@/lib/occupancy";
 import { extractLatLng } from "@/lib/geo";
-import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES } from "@/lib/stayTypes";
+import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES, type StayType } from "@/lib/stayTypes";
 import {
   buildResultsSearchKey,
   cacheResultsList,
@@ -560,6 +560,16 @@ function ResultsContent() {
   });
   const roomsInSearch = Number(searchParams.get("rooms") ?? 1) >= 2 || usedSplitRooms ? 2 : 1;
 
+  const changeStayType = useCallback(
+    (id: StayType) => {
+      const next = new URLSearchParams(searchParams.toString());
+      if (id === "all") next.delete("stay");
+      else next.set("stay", id);
+      router.replace(`/results?${next.toString()}`);
+    },
+    [router, searchParams]
+  );
+
   const occupancyHref = (next: { adults?: number; childAges?: number[]; rooms?: number }) => {
     const qs = new URLSearchParams();
     if (placeId) qs.set("placeId", placeId);
@@ -799,6 +809,7 @@ function ResultsContent() {
             initialAdults={party.adults}
             initialChildAges={party.childAges}
             initialStay={stay}
+            onStayChange={changeStayType}
           />
         </div>
       </div>
@@ -818,12 +829,7 @@ function ResultsContent() {
                 <button
                   key={id}
                   type="button"
-                  onClick={() => {
-                    const next = new URLSearchParams(searchParams.toString());
-                    if (id === "all") next.delete("stay");
-                    else next.set("stay", id);
-                    router.replace(`/results?${next.toString()}`);
-                  }}
+                  onClick={() => changeStayType(id)}
                   className={`min-h-[32px] rounded-full px-3 text-[0.8125rem] font-medium ${
                     stay === id
                       ? "bg-ink text-white"

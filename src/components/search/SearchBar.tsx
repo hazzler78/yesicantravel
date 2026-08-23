@@ -33,6 +33,8 @@ export type SearchBarProps = {
   initialAdults?: number;
   initialChildAges?: number[];
   initialStay?: StayType;
+  /** When set (results page), switching the stay type re-runs the search immediately. */
+  onStayChange?: (stay: StayType) => void;
   /** Lightens the helper text below the bar when it sits on the dark hero band. */
   onDark?: boolean;
   /** Fires once a search is about to navigate, so a collapsible host can close. */
@@ -74,6 +76,7 @@ export function SearchBar({
   initialAdults,
   initialChildAges,
   initialStay = "all",
+  onStayChange,
   onDark = false,
   onSubmitted,
   className = "",
@@ -104,6 +107,12 @@ export function SearchBar({
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [stayType, setStayType] = useState<StayType>(() => parseStayType(initialStay));
+
+  // Results page re-renders with a new `stay` param after a tab switch —
+  // keep the pills in the search bar in sync with the URL.
+  useEffect(() => {
+    setStayType(parseStayType(initialStay));
+  }, [initialStay]);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -421,7 +430,12 @@ export function SearchBar({
           <button
             key={id}
             type="button"
-            onClick={() => setStayType(id)}
+            onClick={() => {
+              setStayType(id);
+              // On results, switching the type re-runs the search immediately
+              // instead of waiting for another Search click.
+              onStayChange?.(id);
+            }}
             className={`min-h-[32px] rounded-full px-3 text-[0.8125rem] font-medium transition-colors ${
               stayType === id
                 ? "bg-ink text-white"

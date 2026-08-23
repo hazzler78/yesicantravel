@@ -53,6 +53,63 @@ export async function getPlaceDetails(placeId: string) {
   return res.json();
 }
 
+/** Lightweight map pins for the explore view: hotels in an area, no prices. */
+export type ExploreHotel = {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  hotelTypeId?: number | null;
+  rating?: number;
+  city?: string;
+  address?: string;
+};
+
+export async function searchHotelsByArea(params: {
+  latitude: number;
+  longitude: number;
+  radius: number;
+  hotelTypeIds?: number[];
+  limit?: number;
+}): Promise<ExploreHotel[]> {
+  const search = new URLSearchParams({
+    latitude: String(params.latitude),
+    longitude: String(params.longitude),
+    radius: String(params.radius),
+    limit: String(params.limit ?? 5000),
+  });
+  if (params.hotelTypeIds && params.hotelTypeIds.length) {
+    search.set("hotelTypeIds", params.hotelTypeIds.join(","));
+  }
+  const res = await fetch(`${API_BASE}/data/hotels?${search.toString()}`, {
+    headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" },
+  });
+  if (!res.ok) throw new Error(`Area hotels failed: ${res.status}`);
+  const data = await res.json();
+  const hotels = (data?.data ?? []) as Array<{
+    id?: string;
+    name?: string;
+    latitude?: number;
+    longitude?: number;
+    hotelTypeId?: number | null;
+    rating?: number;
+    city?: string;
+    address?: string;
+  }>;
+  return hotels
+    .filter((h) => h?.id && typeof h.latitude === "number" && typeof h.longitude === "number")
+    .map((h) => ({
+      id: h.id!,
+      name: h.name ?? "Stays",
+      lat: h.latitude!,
+      lng: h.longitude!,
+      hotelTypeId: h.hotelTypeId ?? null,
+      rating: h.rating,
+      city: h.city,
+      address: h.address,
+    }));
+}
+
 export async function searchRates(params: {
   placeId?: string;
   hotelIds?: string[];

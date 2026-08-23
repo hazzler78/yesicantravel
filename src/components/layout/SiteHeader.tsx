@@ -9,6 +9,7 @@ import { CurrencyControl } from "@/components/currency/CurrencyControl";
 import { TextSizeControl } from "./TextSizeControl";
 
 const NAV_LINKS = [
+  { href: "/explore", label: "Map" },
   { href: "/popular-cities", label: "Popular cities" },
   { href: "/events", label: "Peak dates" },
   { href: "/destinations", label: "City guides" },

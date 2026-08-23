@@ -200,6 +200,7 @@ function ResultsContent() {
     childAges: searchParams.get("childAges"),
     rooms: searchParams.get("rooms"),
     currency,
+    stay,
   });
 
   const rememberHotelNavigation = useCallback(

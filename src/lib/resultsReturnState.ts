@@ -36,6 +36,7 @@ export function buildResultsSearchKey(parts: {
   childAges?: string | null;
   rooms?: string | null;
   currency?: string | null;
+  stay?: string | null;
 }): string {
   return [
     parts.placeId ?? "",
@@ -47,6 +48,7 @@ export function buildResultsSearchKey(parts: {
     parts.childAges ?? "",
     parts.rooms ?? "1",
     parts.currency ?? "EUR",
+    parts.stay ?? "all",
   ].join("|");
 }
 

@@ -430,6 +430,12 @@ function ResultsContent() {
           });
         } else {
           const ids: string[] = [...new Set(data.map((d) => d.hotelId))];
+          // The rates response already carries root-level latitude/longitude.
+          const apiHotelByKey = new Map(
+            hotelsFromApi
+              .filter((h) => h?.id)
+              .map((h) => [h.id, h as (HotelBasic & { latitude?: number; longitude?: number })])
+          );
           const details = await Promise.all(
             ids.slice(0, RESULTS_HOTEL_LIMIT).map(async (id) => {
               const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(id)}`);
@@ -447,13 +453,19 @@ function ResultsContent() {
               .some((r) => r.cancellationPolicies?.refundableTag === "RFN");
           }
           const merged = details.filter(Boolean).map((h) => {
-            const coords = extractLatLng(h);
+            const apiHotel = apiHotelByKey.get(h.id);
+            const coords =
+              extractLatLng(h) ??
+              extractLatLng(apiHotel) ?? {
+                lat: apiHotel?.latitude,
+                lng: apiHotel?.longitude,
+              };
             return {
             id: h.id,
             name: h.name,
-            main_photo: h.main_photo ?? h.hotelImages?.[0]?.url,
-            address: h.address,
-            rating: normaliseRating(h.rating, h.starRating),
+            main_photo: h.main_photo ?? apiHotel?.main_photo ?? h.hotelImages?.[0]?.url,
+            address: h.address ?? apiHotel?.address,
+            rating: normaliseRating(h.rating, h.starRating) ?? apiHotel?.rating,
             reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
             price: totalByHotel[h.id]?.amount,
             currency: totalByHotel[h.id]?.currency ?? "EUR",

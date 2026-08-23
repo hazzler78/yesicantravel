@@ -1,13 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPlaceDetails, searchRates } from "@/lib/liteapi";
+import { searchRates } from "@/lib/liteapi";
 import { normalizeCurrency, resolveRequestCurrency } from "@/lib/currency";
 import { sanitizeChildAges, sanitizeOccupancies } from "@/lib/occupancy";
-import {
-  DEFAULT_SEARCH_RADIUS_M,
-  extractPlaceLatLng,
-  parseStayType,
-  STAY_TYPES,
-} from "@/lib/stayTypes";
+import { DEFAULT_SEARCH_RADIUS_M, parseStayType, STAY_TYPES } from "@/lib/stayTypes";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,22 +22,19 @@ export async function POST(request: NextRequest) {
     let radius: number | undefined;
     let placeId = typeof body.placeId === "string" ? body.placeId : undefined;
 
-    if (placeId) {
-      try {
-        const details = await getPlaceDetails(placeId);
-        const coords = extractPlaceLatLng(details);
-        if (coords) {
-          latitude = coords.latitude;
-          longitude = coords.longitude;
-          radius =
-            typeof body.radius === "number" && body.radius >= 1000
-              ? Math.min(body.radius, 50_000)
-              : DEFAULT_SEARCH_RADIUS_M;
-          placeId = undefined;
-        }
-      } catch {
-        // Fall back to LiteAPI placeId search.
-      }
+    // placeId is the primary search (LiteAPI resolves the region well).
+    // Coords+radius only kick in when a caller passes them explicitly or as a fallback.
+    if (
+      typeof body.latitude === "number" &&
+      typeof body.longitude === "number"
+    ) {
+      latitude = body.latitude;
+      longitude = body.longitude;
+      radius =
+        typeof body.radius === "number" && body.radius >= 1000
+          ? Math.min(body.radius, 50_000)
+          : DEFAULT_SEARCH_RADIUS_M;
+      placeId = undefined;
     }
 
     const data = await searchRates({

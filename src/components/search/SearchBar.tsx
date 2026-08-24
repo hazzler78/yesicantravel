@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CalendarDays, MapPin, Search, Sparkles } from "lucide-react";
+import { MapPin, Search, Sparkles } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
@@ -13,6 +13,7 @@ import {
   MAX_CHILDREN,
   type Party,
 } from "@/lib/occupancy";
+import { DateRangePicker } from "@/components/search/DateRangePicker";
 import { TravellersPicker } from "@/components/search/TravellersPicker";
 import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES, type StayType } from "@/lib/stayTypes";
 
@@ -48,11 +49,7 @@ function isoDaysFromNow(days: number) {
   return date.toISOString().slice(0, 10);
 }
 
-function nextDay(iso: string) {
-  return new Date(new Date(iso).getTime() + 86_400_000).toISOString().slice(0, 10);
-}
-
-/** How far ahead properties will quote. Also caps the native date picker's year field. */
+/** How far ahead properties will quote. Also caps the calendar's selectable range. */
 const BOOKING_WINDOW_DAYS = 730;
 
 function isBookableDate(iso: string, earliest: string, latest: string) {
@@ -119,7 +116,6 @@ export function SearchBar({
 
   const minCheckin = isoDaysFromNow(0);
   const maxDate = isoDaysFromNow(BOOKING_WINDOW_DAYS);
-  const minCheckout = checkin ? nextDay(checkin) : minCheckin;
 
   useEffect(() => () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -361,46 +357,20 @@ export function SearchBar({
           )}
         </div>
 
-        <div className={`min-w-0 border-b border-border md:w-40 md:border-b-0 md:border-r ${fieldPadding}`}>
-          <label htmlFor={`${reactId}-checkin`} className={labelClass}>
-            <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-            Check-in
-          </label>
-          <input
-            id={`${reactId}-checkin`}
-            type="date"
-            value={checkin}
-            min={minCheckin}
-            max={maxDate}
-            className={`${inputClass} tnum mt-1`}
-            onChange={(event) => {
-              setCheckin(event.target.value);
-              setFormError(null);
-              if (checkout && event.target.value && checkout <= event.target.value) {
-                setCheckout(nextDay(event.target.value));
-              }
-            }}
-          />
-        </div>
-
-        <div className={`min-w-0 border-b border-border md:w-40 md:border-b-0 md:border-r ${fieldPadding}`}>
-          <label htmlFor={`${reactId}-checkout`} className={labelClass}>
-            <CalendarDays className="h-3.5 w-3.5" aria-hidden />
-            Check-out
-          </label>
-          <input
-            id={`${reactId}-checkout`}
-            type="date"
-            value={checkout}
-            min={minCheckout}
-            max={maxDate}
-            className={`${inputClass} tnum mt-1`}
-            onChange={(event) => {
-              setCheckout(event.target.value);
-              setFormError(null);
-            }}
-          />
-        </div>
+        <DateRangePicker
+          checkin={checkin}
+          checkout={checkout}
+          minDate={minCheckin}
+          maxDate={maxDate}
+          compact={compact}
+          inputClass={`${inputClass} tnum`}
+          labelClass={labelClass}
+          onChange={({ checkin: nextIn, checkout: nextOut }) => {
+            setCheckin(nextIn);
+            setCheckout(nextOut);
+            setFormError(null);
+          }}
+        />
 
         <TravellersPicker
           party={party}

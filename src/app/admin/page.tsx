@@ -22,6 +22,13 @@ const modules: AdminModule[] = [
     cta: "Open search dashboard",
   },
   {
+    id: "growth",
+    title: "90-day growth metrics",
+    description: "Weekly signups, /bio visits, and social clicks toward the 50-lead goal.",
+    href: "/admin/growth",
+    cta: "Open growth dashboard",
+  },
+  {
     id: "social-playbook",
     title: "Social & traffic playbook",
     description: "90-day posting cadence, video templates, Pinterest pins, and UTM bio links.",

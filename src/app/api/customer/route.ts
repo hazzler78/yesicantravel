@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { LeadEventType } from "@prisma/client";
 import { getAttributionFromRequest } from "@/lib/attribution";
 import { logLeadEvent, upsertLeadProfile } from "@/lib/revenueAgent";
-import { upsertMailerLiteSubscriber } from "@/lib/mailerlite";
+import { ensureSubscriberInNurtureGroups } from "@/lib/mailerlite";
 
 /**
  * Save customer to MailerLite after a successful booking.
@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
       hotelId,
       checkin,
       checkout,
+      source,
     } = body as {
       email?: string;
       firstName?: string;
@@ -28,7 +29,11 @@ export async function POST(request: NextRequest) {
       hotelId?: string;
       checkin?: string;
       checkout?: string;
+      source?: "lead_magnet" | "booking" | "newsletter";
     };
+
+    const isLeadMagnet = source === "lead_magnet";
+    const campaignName = isLeadMagnet ? "solo_female_checklist" : "newsletter_signup";
 
     if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
@@ -46,14 +51,18 @@ export async function POST(request: NextRequest) {
       attribution
     );
     await logLeadEvent({
-      type: LeadEventType.newsletter_signup,
-      eventName: "newsletter_signup",
+      type: isLeadMagnet ? LeadEventType.lead_magnet_download : LeadEventType.newsletter_signup,
+      eventName: isLeadMagnet ? "lead_magnet_download" : "newsletter_signup",
       leadProfileId: leadProfile?.id,
+      pageUrl: isLeadMagnet ? "/lead-magnet" : undefined,
       metadata: {
         hotelId,
         checkin,
         checkout,
-        source: "api_customer",
+        source: source ?? "api_customer",
+        utmSource: attribution.source,
+        utmMedium: attribution.medium,
+        utmCampaign: attribution.campaign,
       },
     });
 
@@ -76,16 +85,10 @@ export async function POST(request: NextRequest) {
       if (checkout && String(checkout).trim()) fields.last_checkout = String(checkout).trim();
     }
 
-    const groupId = process.env.MAILERLITE_GROUP_ID;
-    const groups: string[] = [];
-    if (groupId?.trim()) groups.push(groupId.trim());
-    const nurtureGroup = process.env.MAILERLITE_NURTURE_GROUP_ID?.trim();
-    if (nurtureGroup && !groups.includes(nurtureGroup)) groups.push(nurtureGroup);
-
-    const mailerResult = await upsertMailerLiteSubscriber({
-      email,
+    const mailerResult = await ensureSubscriberInNurtureGroups(email, {
+      firstName: firstName?.trim(),
+      campaignName,
       fields,
-      groups: groups.length > 0 ? groups : undefined,
     });
 
     if (!mailerResult.ok) {
@@ -95,7 +98,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ saved: true });
+    return NextResponse.json({ saved: true, groups: mailerResult.assignedGroups });
   } catch (e) {
     console.error("[customer]", e);
     return NextResponse.json(

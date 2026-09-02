@@ -1,6 +1,7 @@
 import { Check } from "lucide-react";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { Card } from "@/components/ui/Card";
+import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 
 export const metadata = {
   title: "Solo Female Safety Checklist",
@@ -19,6 +20,7 @@ const INCLUDES = [
 export default function LeadMagnetPage() {
   return (
     <div className="bg-canvas">
+      <PageVisitTracker path="/lead-magnet" />
       <div className="mx-auto grid max-w-4xl gap-8 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-[1fr_360px]">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">

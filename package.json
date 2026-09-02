@@ -9,7 +9,8 @@
     "lint": "eslint",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
-    "seed:blog": "node scripts/seed-first-seo-blog.js"
+    "seed:blog": "node scripts/seed-first-seo-blog.js",
+    "mailerlite:backfill-nurture": "node scripts/backfill-mailerlite-nurture.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

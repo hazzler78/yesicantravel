@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { enrollInNurtureSequence } from "@/lib/mailerlite";
+import { ensureSubscriberInNurtureGroups } from "@/lib/mailerlite";
 
 export function getDefaultNurtureSequence() {
   return [
@@ -34,7 +34,7 @@ export async function queueNurtureEvent(
   const normalized = email.trim().toLowerCase();
   const lead = await prisma.leadProfile.findUnique({ where: { email: normalized } });
 
-  const mailerLite = await enrollInNurtureSequence(normalized, {
+  const mailerLite = await ensureSubscriberInNurtureGroups(normalized, {
     firstName: options?.firstName,
     campaignName,
   });

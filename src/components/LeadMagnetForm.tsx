@@ -16,31 +16,22 @@ export default function LeadMagnetForm() {
     setMessage("");
 
     try {
-      const payload = { email: email.trim(), firstName: firstName.trim() || undefined };
-      const [saveRes] = await Promise.all([
-        fetch("/api/customer", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }),
-        fetch("/api/automation/ingest", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ kind: "lead", lead: { ...payload, consentMarketing: true } }),
-        }),
-      ]);
+      const payload = {
+        email: email.trim(),
+        firstName: firstName.trim() || undefined,
+        source: "lead_magnet" as const,
+      };
 
-      if (!saveRes.ok) throw new Error("Unable to save lead");
-
-      await fetch("/api/automation/email/nurture", {
+      const saveRes = await fetch("/api/customer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: payload.email,
-          firstName: payload.firstName,
-          campaignName: "solo_female_checklist",
-        }),
+        body: JSON.stringify(payload),
       });
+
+      const data = (await saveRes.json()) as { saved?: boolean; reason?: string };
+      if (!saveRes.ok || !data.saved) {
+        throw new Error(data.reason ?? "Unable to save lead");
+      }
 
       setStatus("success");
       setMessage("Checklist unlocked. Check your inbox for the download and next steps.");

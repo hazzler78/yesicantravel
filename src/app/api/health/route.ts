@@ -57,6 +57,8 @@ export async function GET() {
   checks.ga4 = Boolean(
     process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID?.startsWith("G-")
   );
+  checks.mailerliteApiKey = Boolean(process.env.MAILERLITE_API_KEY);
+  checks.mailerliteNurtureGroup = Boolean(process.env.MAILERLITE_NURTURE_GROUP_ID?.trim());
 
   const status = ok ? 200 : 503;
   return NextResponse.json(

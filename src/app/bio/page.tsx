@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_POSTING_CADENCE } from "@/lib/socialPlaybook";
 import { SOCIAL_LINKS } from "@/components/brand/SocialIcons";
+import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 
 export const metadata: Metadata = {
   title: "Links — Yes I Can Travel",
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 export default function BioPage() {
   return (
     <div className="bg-canvas">
+      <PageVisitTracker path="/bio" />
       <div className="mx-auto max-w-md px-4 py-10 sm:px-6 sm:py-14">
         <div className="text-center">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">

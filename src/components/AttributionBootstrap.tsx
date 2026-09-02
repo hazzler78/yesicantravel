@@ -39,6 +39,12 @@ export default function AttributionBootstrap() {
         const existing = JSON.parse(existingRaw) as Record<string, unknown>;
         const merged = { ...payload, ...existing };
         document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(merged))};path=/;max-age=${TTL_SECONDS};samesite=lax`;
+        void fetch("/api/analytics/page", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: window.location.pathname }),
+          keepalive: true,
+        });
         return;
       } catch {
         // ignore and overwrite
@@ -46,6 +52,13 @@ export default function AttributionBootstrap() {
     }
 
     document.cookie = `${COOKIE_NAME}=${encodeURIComponent(JSON.stringify(payload))};path=/;max-age=${TTL_SECONDS};samesite=lax`;
+
+    void fetch("/api/analytics/page", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path: window.location.pathname }),
+      keepalive: true,
+    });
   }, []);
 
   return null;

@@ -1337,6 +1337,326 @@ export const events: Event[] = [
     whyNow:
       "Three days in Slottsskogen followed by club nights around the centre. Staying near Linnéplatsen or Järntorget puts you within walking distance of both, which beats waiting for a night tram.",
   },
+  {
+    id: "rome-marathon-2026",
+    slug: "rome-marathon-2026",
+    city: "Rome",
+    country: "Italy",
+    eventName: "Roma Marathon",
+    eventShortName: "Rome Marathon",
+    startDate: "2026-03-15",
+    endDate: "2026-03-15",
+    category: "sports",
+    aiSearchTemplate: "safe central hotels Rome near marathon start well-lit 24h reception",
+    placeQuery: "Rome, Italy",
+    venueNotes: "Start and finish at Via dei Fori Imperiali, near the Colosseum",
+    whyNow:
+      "One of Europe's most scenic city marathons — but Rome's cobbles and early starts mean a well-located hotel with 24/7 reception matters more than saving €20 a night.",
+    knownFor: [
+      "The Colosseum and Roman Forum at the start line",
+      "Trastevere and Monti for evening walks",
+      "Metro line B to the start area",
+      "Late-night dining in the centro storico",
+    ],
+    neighbourhoods: [
+      {
+        name: "Monti",
+        description:
+          "A short walk to Via dei Fori Imperiali and busy with restaurants until late. Narrow streets but well lit, and popular with visitors — you won't feel isolated walking back after dinner.",
+        verdict: "recommended",
+      },
+      {
+        name: "Trastevere",
+        description:
+          "Characterful, walkable, and lively in the evenings. A 20-minute walk or quick tram to the start. Good if you want atmosphere beyond the race weekend.",
+        verdict: "recommended",
+      },
+      {
+        name: "Termini area",
+        description:
+          "Convenient for trains and budget hotels, but the streets immediately around the station are the ones Rome visitors are most often warned about after dark. Fine if you take a taxi to the door rather than walking the last stretch.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "The race starts early — book a hotel that confirms 24/7 reception or bag drop if you need to leave before dawn.",
+      "Pickpocketing concentrates on crowded buses and around Termini; keep your phone in a front pocket on race morning.",
+      "Cobblestones are real — factor them into shoe choice and post-race walking plans.",
+      "Share your hotel address offline; mobile signal can be patchy in the Forum area on race day.",
+    ],
+    gettingAround:
+      "Fiumicino connects to Termini on the Leonardo Express in about 32 minutes. Ciampino is closer but needs a bus to the metro. For the start, metro line B to Colosseo puts you a few minutes from Via dei Fori Imperiali.",
+    faqs: [
+      {
+        question: "When is the Rome Marathon 2026?",
+        answer:
+          "The Roma Marathon 2026 is on Sunday 15 March. The start is on Via dei Fori Imperiali, with the finish near the Colosseum.",
+      },
+      {
+        question: "Where should I stay for the Rome Marathon?",
+        answer:
+          "Monti or the centro storico keep you within walking distance of the start and well-lit evening streets. Termini works for budget and transport but use taxis late at night.",
+      },
+      {
+        question: "Is Rome safe for a woman running a marathon alone?",
+        answer:
+          "The course and start area are heavily stewarded on race day. The practical planning is the nights before and after — choose a hotel with clear late access and prefer busy, lit routes back from dinner.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "stockholm-pride-2026",
+    slug: "stockholm-pride-2026",
+    city: "Stockholm",
+    country: "Sweden",
+    eventName: "Stockholm Pride",
+    eventShortName: "Stockholm Pride",
+    startDate: "2026-08-03",
+    endDate: "2026-08-08",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Stockholm Pride Östermalm Södermalm well-lit",
+    placeQuery: "Stockholm, Sweden",
+    venueNotes: "Pride Park at Östermalm IP; parade through central Stockholm",
+    whyNow:
+      "Nordic Pride week draws a huge international crowd. Central Stockholm is walkable and well lit, but hotels near the park sell out months ahead.",
+    knownFor: [
+      "Pride Park at Östermalm IP",
+      "Parade through Norrmalm and Gamla Stan",
+      "Late-summer daylight until after 21:00",
+      "T-bana coverage across the city centre",
+    ],
+    neighbourhoods: [
+      {
+        name: "Södermalm",
+        description:
+          "The city's most popular visitor base — busy streets, cafes open late in summer, and a short T-bana ride to Östermalm. Hornstull and Medborgarplatsen stay lively after the parade.",
+        verdict: "recommended",
+      },
+      {
+        name: "Östermalm",
+        description:
+          "Closest to Pride Park and upscale but safe. Quieter at night than Södermalm but very well lit and residential.",
+        verdict: "recommended",
+      },
+      {
+        name: "Norrmalm / Sergels torg",
+        description:
+          "On the parade route and central for everything, but Sergels torg itself can feel chaotic late at night. Stay on side streets off Drottninggatan rather than overlooking the square.",
+        verdict: "recommended",
+      },
+    ],
+    safetyTips: [
+      "Stockholm is one of Europe's safer capitals — the main risk at Pride is crowded T-bana platforms, not street harassment.",
+      "Book early; Pride week is among the most expensive hotel weeks of the year.",
+      "The parade route is long — wear comfortable shoes and plan a meet-up point with friends.",
+      "Most venues are cashless; a backup card matters more than cash.",
+    ],
+    gettingAround:
+      "Arlanda Express reaches T-Centralen in 20 minutes. The T-bana covers the city centre until around 01:00 on weekends; night buses run after that. Pride Park is at Stadion on the red line.",
+    faqs: [
+      {
+        question: "When is Stockholm Pride 2026?",
+        answer:
+          "Stockholm Pride 2026 runs from Monday 3 to Saturday 8 August, with the parade on Saturday. Pride Park is at Östermalm IP.",
+      },
+      {
+        question: "Where should I stay for Stockholm Pride?",
+        answer:
+          "Södermalm for atmosphere and nightlife, Östermalm for proximity to Pride Park, or Norrmalm for central access to the parade — all are well served by the T-bana.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "madrid-pride-2026",
+    slug: "madrid-pride-2026",
+    city: "Madrid",
+    country: "Spain",
+    eventName: "Madrid Orgullo (MADO)",
+    eventShortName: "Madrid Pride",
+    startDate: "2026-07-01",
+    endDate: "2026-07-05",
+    category: "festival",
+    aiSearchTemplate: "safe hotels Madrid Chueca Pride well-lit central 24h reception",
+    placeQuery: "Madrid, Spain",
+    venueNotes: "Chueca neighbourhood; parade along Paseo del Prado",
+    whyNow:
+      "One of Europe's largest Pride celebrations — Chueca is the heart of it, and hotels within walking distance disappear fast.",
+    knownFor: [
+      "Chueca — the LGBTQ+ hub of Madrid",
+      "Parade along Paseo del Prado",
+      "Late nights — Madrileños eat dinner at 22:00",
+      "Metro lines 1, 5, and 10 through the centre",
+    ],
+    neighbourhoods: [
+      {
+        name: "Chueca",
+        description:
+          "The epicentre of Pride week — busy, loud, and well patrolled. Perfect if you want to be in the middle of it; less ideal if you need quiet to sleep before 02:00.",
+        verdict: "recommended",
+      },
+      {
+        name: "Malasaña",
+        description:
+          "Adjacent to Chueca, slightly calmer but still walkable to the parade. Good balance of nightlife and sleep.",
+        verdict: "recommended",
+      },
+      {
+        name: "Sol / La Latina",
+        description:
+          "Central and well connected, but pickpocketing on crowded metro lines is the main risk — not personal safety. Keep bags zipped on lines 1 and 5 during Pride.",
+        verdict: "recommended",
+      },
+    ],
+    safetyTips: [
+      "Chueca is packed during Pride — book a hotel with confirmed 24/7 reception for late returns.",
+      "Metro runs until 01:30; after that, taxis are plentiful but use official ranks.",
+      "Hydration matters — July in Madrid is hot, and parade day is long.",
+      "Share your location with a friend if you're heading to after-parties outside the main district.",
+    ],
+    gettingAround:
+      "Barajas connects to Nuevos Ministerios on line 8 in about 25 minutes. Chueca station (lines 2 and 5) is the Pride hub. The parade runs along Paseo del Prado from Atocha.",
+    faqs: [
+      {
+        question: "When is Madrid Pride 2026?",
+        answer:
+          "MADO (Madrid Orgullo) 2026 runs from Wednesday 1 to Sunday 5 July, with the main parade on Saturday. The heart of the event is the Chueca neighbourhood.",
+      },
+      {
+        question: "Is Madrid safe for solo women during Pride?",
+        answer:
+          "The Chueca and centre areas are heavily attended and patrolled during Pride. The realistic risk is pickpocketing on crowded metro platforms — not walking alone at night in the main district.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "brussels-summer-festival-2026",
+    slug: "brussels-summer-festival-2026",
+    city: "Brussels",
+    country: "Belgium",
+    eventName: "Brussels Summer Festival",
+    eventShortName: "BSF",
+    startDate: "2026-08-12",
+    endDate: "2026-08-16",
+    category: "festival",
+    aiSearchTemplate: "safe hotels Brussels city centre near Place des Palais well-lit",
+    placeQuery: "Brussels, Belgium",
+    venueNotes: "Place des Palais and city-centre stages",
+    whyNow:
+      "Five days of free and ticketed concerts in the city centre — staying within walking distance of the Grote Markt avoids late-night transport entirely.",
+    knownFor: [
+      "Free concerts at Place des Palais",
+      "Grote Markt and city-centre stages",
+      "Compact, walkable historic centre",
+      "Excellent chocolate and frites — obviously",
+    ],
+    neighbourhoods: [
+      {
+        name: "City centre / Grote Markt",
+        description:
+          "Walk to every stage. Streets are well lit and busy until late during the festival. The main trade-off is noise — request a quiet room if you're a light sleeper.",
+        verdict: "recommended",
+      },
+      {
+        name: "Ixelles",
+        description:
+          "Trendy, safe, and a 15-minute tram to the centre. Good if you want a local neighbourhood feel with easy festival access.",
+        verdict: "recommended",
+      },
+      {
+        name: "Brussels-Midi area",
+        description:
+          "Convenient for Eurostar and Thalys, but the streets around Midi station are less comfortable after dark than the centre. Take a taxi to your hotel door at night.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "The festival site is in the city centre — walking back is realistic if you stay nearby.",
+      "Brussels is bilingual; addresses in French and Dutch can differ — save both to your phone.",
+      "Pickpocketing happens in crowded festival crowds, not on quiet side streets.",
+      "Eurostar from London St Pancras takes about two hours — a popular add-on for UK solo travellers.",
+    ],
+    gettingAround:
+      "Brussels Airport connects to the centre on line 12/21 in under 30 minutes. The festival stages cluster around Place des Palais and the Grote Markt — all walkable from a central hotel.",
+    faqs: [
+      {
+        question: "When is Brussels Summer Festival 2026?",
+        answer:
+          "BSF 2026 runs from Wednesday 12 to Sunday 16 August, with stages across the city centre including Place des Palais.",
+      },
+      {
+        question: "Where should I stay for BSF?",
+        answer:
+          "The historic centre keeps every stage within walking distance. Ixelles is a good alternative if you prefer a neighbourhood feel with tram access.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "florence-gelato-festival-2026",
+    slug: "florence-gelato-festival-2026",
+    city: "Florence",
+    country: "Italy",
+    eventName: "Florence Gelato Festival",
+    eventShortName: "Gelato Festival",
+    startDate: "2026-05-07",
+    endDate: "2026-05-10",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Florence Santa Maria Novella well-lit solo women",
+    placeQuery: "Florence, Italy",
+    venueNotes: "Piazza Santa Maria Novella and historic centre",
+    whyNow:
+      "A long weekend of artisan gelato in one of Italy's most walkable cities — perfect for a first solo trip to Tuscany.",
+    knownFor: [
+      "Artisan gelato masters from across Italy",
+      "The Duomo and Uffizi within walking distance",
+      "Compact historic centre — almost everything is on foot",
+      "Evening passeggiata along the Arno",
+    ],
+    neighbourhoods: [
+      {
+        name: "Santa Maria Novella",
+        description:
+          "The festival's home piazza and a major train station — busy, well lit, and central. Ideal if you're arriving by train from Rome or Pisa.",
+        verdict: "recommended",
+      },
+      {
+        name: "San Lorenzo / Duomo",
+        description:
+          "Heart of the historic centre. Tourist-heavy but safe and lively until late. Short walk to every gelato stand.",
+        verdict: "recommended",
+      },
+      {
+        name: "Oltrarno",
+        description:
+          "Across the river, quieter and more local. Still walkable to the festival, with better-value restaurants than the tourist core.",
+        verdict: "recommended",
+      },
+    ],
+    safetyTips: [
+      "Florence's centre is compact — a central hotel means you rarely need transport at night.",
+      "The main risk is pickpockets near the Duomo and on crowded buses, not street safety.",
+      "Book restaurants for dinner — the best trattorias fill up even off-season.",
+      "Cobblestones everywhere — comfortable shoes beat fashion every time.",
+    ],
+    gettingAround:
+      "Florence's Santa Maria Novella station is walkable to most central hotels. The airport bus takes 20 minutes to the station. The festival site is the piazza in front of the church of the same name.",
+    faqs: [
+      {
+        question: "When is the Florence Gelato Festival 2026?",
+        answer:
+          "The Florence edition runs from Thursday 7 to Sunday 10 May 2026 at Piazza Santa Maria Novella, with masterclasses and tastings across the long weekend.",
+      },
+      {
+        question: "Is Florence good for a first solo trip?",
+        answer:
+          "Yes — the centre is small, walkable, and full of other visitors. A hotel near Santa Maria Novella gives you train access and festival proximity in one.",
+      },
+    ],
+    contentVerified: true,
+  },
 ];
 
 /** Events whose last day has passed are hidden from the site automatically. */

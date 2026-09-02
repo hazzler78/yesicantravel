@@ -14,6 +14,10 @@ import { currencyBootstrapScript } from "@/components/currency/CurrencyControl";
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "948121024567031";
 const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
+const GTM_CONTAINER_ID = process.env.NEXT_PUBLIC_GTM_ID;
+const GA4_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID?.startsWith("G-")
+  ? process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID
+  : undefined;
 
 const inter = Inter({
   variable: "--font-inter",
@@ -67,6 +71,17 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
       <body className={`${inter.variable} ${fraunces.variable} flex min-h-screen flex-col`}>
+        {GTM_CONTAINER_ID && (
+          <noscript>
+            <iframe
+              src={`https://www.googletagmanager.com/ns.html?id=${GTM_CONTAINER_ID}`}
+              height="0"
+              width="0"
+              style={{ display: "none", visibility: "hidden" }}
+              title="Google Tag Manager"
+            />
+          </noscript>
+        )}
         {/* Runs before the page paints so stored text-size / currency don't flash. */}
         <script dangerouslySetInnerHTML={{ __html: textSizeBootstrapScript }} />
         <script dangerouslySetInnerHTML={{ __html: currencyBootstrapScript }} />
@@ -97,6 +112,16 @@ pintrk('page');`}
           }}
         />
 
+        {GTM_CONTAINER_ID && (
+          <Script
+            id="gtm-loader"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${GTM_CONTAINER_ID}');`,
+            }}
+          />
+        )}
+
         {CLARITY_PROJECT_ID && (
           <Script
             id="ms-clarity"
@@ -105,6 +130,18 @@ pintrk('page');`}
               __html: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, "clarity", "script", "${CLARITY_PROJECT_ID}");`,
             }}
           />
+        )}
+
+        {GA4_MEASUREMENT_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA4_MEASUREMENT_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-config" strategy="afterInteractive">
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA4_MEASUREMENT_ID}',{send_page_view:true});`}
+            </Script>
+          </>
         )}
         <noscript>
           <img

@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "prisma:generate": "prisma generate",
-    "prisma:push": "prisma db push"
+    "prisma:push": "prisma db push",
+    "seed:blog": "node scripts/seed-first-seo-blog.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

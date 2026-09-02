@@ -15,9 +15,11 @@ These are NOT set by default; the app boots and builds without them, but the ext
 - `LITEAPI_KEY` — required for the core booking pipeline. Without it: `/api/rates` returns **401** (no hotel results on `/results`), `/api/places` autocomplete **500s** on partial/short queries, the homepage "trending" min-price calls **500**, and `/api/health` reports `apiKey:false`. Use a **sandbox** key (starts with `sand`) for safe test bookings; the app treats the env as sandbox based on the key prefix / API responses.
 - `DATABASE_URL` — Postgres URL for Prisma-backed features (blog/content, leads, automation, revenue/attribution analytics). The app and `next build` still succeed without it (Prisma errors during static generation are caught), but those routes error at request time.
 - `XAI_API_KEY` (optional `XAI_MODEL`) — the "Atlas" chat assistant (`/api/chat`).
-- `MAILERLITE_API_KEY` (+ related `MAILERLITE_*`) — newsletter/lead capture.
+- `MAILERLITE_API_KEY` (+ related `MAILERLITE_*`) — newsletter/lead capture. Optional `MAILERLITE_NURTURE_GROUP_ID` enrols leads in a MailerLite automation (4-email nurture sequence on signup).
 - `REVENUE_AGENT_ADMIN_TOKEN` / `REVENUE_AGENT_CRON_SECRET` — auth for `/api/automation/*` routes and cron jobs.
-- Meta/analytics vars (`NEXT_PUBLIC_META_PIXEL_ID`, `META_ACCESS_TOKEN`, `NEXT_PUBLIC_CLARITY_PROJECT_ID`, etc.) are optional and have safe defaults / no-op when unset.
+- Meta/analytics vars (`NEXT_PUBLIC_META_PIXEL_ID`, `META_ACCESS_TOKEN`, `NEXT_PUBLIC_CLARITY_PROJECT_ID`, `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_GA4_MEASUREMENT_ID` with a `G-` prefix only, etc.) are optional and have safe defaults / no-op when unset.
+  - **Purchase tracking:** Pixel fires client-side; CAPI needs `META_ACCESS_TOKEN` in Vercel. `/api/health` reports `metaCapiToken`, `clarity`, `gtm`, and `ga4`.
+  - **Social traffic:** `/bio` is the UTM-tracked link hub for Instagram/TikTok. Internal playbook at `/admin/social-playbook`. Seed first SEO blog post with `node scripts/seed-first-seo-blog.js` (requires `DATABASE_URL`).
 
 ### Non-obvious gotchas
 - `npm run lint` currently reports **pre-existing** errors/warnings (e.g. `react-hooks/set-state-in-effect`, `@next/next/no-img-element`) that live in the repo source, not caused by the environment. Don't treat them as setup failures.

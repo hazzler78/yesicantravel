@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { enrollInNurtureSequence } from "@/lib/mailerlite";
 
 export function getDefaultNurtureSequence() {
   return [
@@ -25,18 +26,38 @@ export function getDefaultNurtureSequence() {
   ];
 }
 
-export async function queueNurtureEvent(email: string, campaignName = "lead_magnet_welcome") {
-  const lead = await prisma.leadProfile.findUnique({ where: { email: email.trim().toLowerCase() } });
-  if (!lead) return null;
+export async function queueNurtureEvent(
+  email: string,
+  campaignName = "lead_magnet_welcome",
+  options?: { firstName?: string }
+) {
+  const normalized = email.trim().toLowerCase();
+  const lead = await prisma.leadProfile.findUnique({ where: { email: normalized } });
 
-  return prisma.emailEvent.create({
+  const mailerLite = await enrollInNurtureSequence(normalized, {
+    firstName: options?.firstName,
+    campaignName,
+  });
+
+  if (!lead) {
+    return {
+      queued: false,
+      mailerLite,
+      reason: "lead_not_found",
+    };
+  }
+
+  const event = await prisma.emailEvent.create({
     data: {
       eventType: "nurture_queued",
       campaignName,
       metadata: {
         sequence: getDefaultNurtureSequence(),
+        mailerLite,
       },
       leadProfileId: lead.id,
     },
   });
+
+  return { queued: true, event, mailerLite };
 }

@@ -47,6 +47,17 @@ export async function GET() {
     }
   }
 
+  // Tracking readiness (does not fail the booking pipeline health check).
+  checks.metaPixelId = Boolean(
+    process.env.NEXT_PUBLIC_META_PIXEL_ID || process.env.META_PIXEL_ID || "948121024567031"
+  );
+  checks.metaCapiToken = Boolean(process.env.META_ACCESS_TOKEN);
+  checks.clarity = Boolean(process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID);
+  checks.gtm = Boolean(process.env.NEXT_PUBLIC_GTM_ID);
+  checks.ga4 = Boolean(
+    process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID?.startsWith("G-")
+  );
+
   const status = ok ? 200 : 503;
   return NextResponse.json(
     {

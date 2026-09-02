@@ -3,6 +3,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ContentStatus } from "@prisma/client";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { ShareButton } from "@/components/ShareButton";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
@@ -45,6 +46,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         excerpt: string | null;
         bodyMarkdown: string;
         status: ContentStatus;
+        slug: string;
       }
     | null = null;
   try {
@@ -55,6 +57,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         excerpt: true,
         bodyMarkdown: true,
         status: true,
+        slug: true,
       },
     });
   } catch {
@@ -68,8 +71,26 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   }
   if (!post || post.status !== ContentStatus.published) notFound();
 
+  const canonicalUrl = `https://yesicantravel.com/blog/${post.slug}`;
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt ?? undefined,
+    url: canonicalUrl,
+    publisher: {
+      "@type": "Organization",
+      name: "Yes I Can Travel",
+      url: "https://yesicantravel.com",
+    },
+  };
+
   return (
     <div className="bg-canvas">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:py-14">
         <article className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
@@ -81,6 +102,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           {post.excerpt && (
             <p className="mt-4 text-base leading-relaxed text-ink-muted">{post.excerpt}</p>
           )}
+
+          <div className="mt-5">
+            <ShareButton
+              title={post.title}
+              path={`/blog/${post.slug}`}
+              campaign={`blog_${post.slug}`}
+            />
+          </div>
 
           <div className="mt-8">
             <ReactMarkdown

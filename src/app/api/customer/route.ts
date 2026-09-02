@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { LeadEventType } from "@prisma/client";
 import { getAttributionFromRequest } from "@/lib/attribution";
 import { logLeadEvent, upsertLeadProfile } from "@/lib/revenueAgent";
+import { upsertMailerLiteSubscriber } from "@/lib/mailerlite";
 
 /**
  * Save customer to MailerLite after a successful booking.
@@ -69,8 +70,6 @@ export async function POST(request: NextRequest) {
       last_name: (lastName ?? "").trim() || "—",
     };
     if (phone && String(phone).trim()) fields.phone = String(phone).trim();
-    // For interest-based suggestions: create custom fields in MailerLite (Subscribers → Fields):
-    // last_hotel_id, last_checkin, last_checkout. Then set MAILERLITE_SAVE_INTERESTS=1
     if (process.env.MAILERLITE_SAVE_INTERESTS === "1") {
       if (hotelId && String(hotelId).trim()) fields.last_hotel_id = String(hotelId).trim();
       if (checkin && String(checkin).trim()) fields.last_checkin = String(checkin).trim();
@@ -78,27 +77,20 @@ export async function POST(request: NextRequest) {
     }
 
     const groupId = process.env.MAILERLITE_GROUP_ID;
-    const payload: { email: string; fields: Record<string, string>; groups?: string[] } = {
-      email: email.trim().toLowerCase(),
-      fields,
-    };
-    if (groupId && groupId.trim()) payload.groups = [groupId.trim()];
+    const groups: string[] = [];
+    if (groupId?.trim()) groups.push(groupId.trim());
+    const nurtureGroup = process.env.MAILERLITE_NURTURE_GROUP_ID?.trim();
+    if (nurtureGroup && !groups.includes(nurtureGroup)) groups.push(nurtureGroup);
 
-    const res = await fetch("https://connect.mailerlite.com/api/subscribers", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify(payload),
+    const mailerResult = await upsertMailerLiteSubscriber({
+      email,
+      fields,
+      groups: groups.length > 0 ? groups : undefined,
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      console.error("[customer] MailerLite error:", res.status, err);
+    if (!mailerResult.ok) {
       return NextResponse.json(
-        { saved: false, reason: "MailerLite request failed" },
+        { saved: false, reason: mailerResult.reason ?? "MailerLite request failed" },
         { status: 200 }
       );
     }

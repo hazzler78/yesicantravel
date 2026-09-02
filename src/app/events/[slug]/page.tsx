@@ -13,6 +13,7 @@ import { getDestinationByCity } from "@/data/destinations";
 import { ArrowRight, CalendarDays, Check, Dot, History } from "lucide-react";
 import { searchPlaces } from "@/lib/liteapi";
 import EventPriceBadge from "@/components/EventPriceBadge";
+import { ShareButton } from "@/components/ShareButton";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 
@@ -254,11 +255,16 @@ export default async function EventPage({ params }: Props) {
                 and cancellation terms are shown on every result, and you can change the dates
                 whenever you like.
               </p>
-              <div className="mt-5">
+              <div className="mt-5 flex flex-wrap items-center gap-3">
                 <PrimaryLink href={searchUrl} variant="coral" fullWidth={false}>
                   Search stays in {event.city}
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </PrimaryLink>
+                <ShareButton
+                  title={`${event.eventName} — safe solo stays | Yes I Can Travel`}
+                  path={`/events/${event.slug}`}
+                  campaign={`event_${event.slug}`}
+                />
               </div>
             </>
           )}

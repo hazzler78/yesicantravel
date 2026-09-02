@@ -35,7 +35,11 @@ export default function LeadMagnetForm() {
       await fetch("/api/automation/email/nurture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: payload.email, campaignName: "solo_female_checklist" }),
+        body: JSON.stringify({
+          email: payload.email,
+          firstName: payload.firstName,
+          campaignName: "solo_female_checklist",
+        }),
       });
 
       setStatus("success");

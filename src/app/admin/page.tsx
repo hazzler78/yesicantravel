@@ -22,6 +22,13 @@ const modules: AdminModule[] = [
     cta: "Open search dashboard",
   },
   {
+    id: "social-playbook",
+    title: "Social & traffic playbook",
+    description: "90-day posting cadence, video templates, Pinterest pins, and UTM bio links.",
+    href: "/admin/social-playbook",
+    cta: "Open playbook",
+  },
+  {
     id: "revenue-agent",
     title: "Revenue Growth Agent",
     description: "Track monthly report, approval state, and recent automation job runs.",

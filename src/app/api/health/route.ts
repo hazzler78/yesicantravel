@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 10;
@@ -59,6 +60,18 @@ export async function GET() {
   );
   checks.mailerliteApiKey = Boolean(process.env.MAILERLITE_API_KEY);
   checks.mailerliteNurtureGroup = Boolean(process.env.MAILERLITE_NURTURE_GROUP_ID?.trim());
+
+  if (process.env.DATABASE_URL) {
+    try {
+      await prisma.leadProfile.count();
+      checks.database = true;
+    } catch (e) {
+      checks.database = false;
+      checks.databaseError = (e as Error).message;
+    }
+  } else {
+    checks.database = false;
+  }
 
   const status = ok ? 200 : 503;
   return NextResponse.json(

@@ -27,6 +27,7 @@ export default function NewsletterForm() {
         body: JSON.stringify({
           email: email.trim(),
           firstName: firstName.trim() || undefined,
+          source: "newsletter",
         }),
       });
       const json = await res.json().catch(() => ({} as { saved?: boolean; reason?: string }));

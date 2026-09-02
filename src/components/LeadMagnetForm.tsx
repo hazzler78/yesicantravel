@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { TextField } from "@/components/ui/TextField";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
 
 export default function LeadMagnetForm() {
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ export default function LeadMagnetForm() {
       }
 
       setStatus("success");
-      setMessage("Checklist unlocked. Check your inbox for the download and next steps.");
+      setMessage("You’re in. Open your checklist below — tips will also arrive by email.");
       setEmail("");
       setFirstName("");
     } catch {
@@ -42,6 +43,26 @@ export default function LeadMagnetForm() {
       setMessage("Could not process your request right now. Please try again.");
     }
   };
+
+  if (status === "success") {
+    return (
+      <div className="mt-4 space-y-3 rounded-card border border-teal/30 bg-teal-soft/30 p-4">
+        <p role="status" className="text-[0.9375rem] font-medium text-ink">
+          {message}
+        </p>
+        <PrimaryLink href="/checklist" variant="coral" size="md">
+          Open your checklist
+        </PrimaryLink>
+        <p className="text-[0.8125rem] text-ink-muted">
+          Prefer email? Watch your inbox for the same checklist and follow-up tips.{" "}
+          <Link href="/popular-cities" className="font-medium text-teal hover:underline">
+            Or start browsing cities
+          </Link>
+          .
+        </p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={onSubmit} className="mt-4 space-y-3">
@@ -66,10 +87,7 @@ export default function LeadMagnetForm() {
         {status === "loading" ? "Sending…" : "Send me the checklist"}
       </PrimaryButton>
       {message && (
-        <p
-          role="status"
-          className={`text-[0.8125rem] ${status === "success" ? "text-positive" : "text-coral"}`}
-        >
+        <p role="status" className="text-[0.8125rem] text-coral">
           {message}
         </p>
       )}

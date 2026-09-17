@@ -4,6 +4,7 @@ import { SOCIAL_BIO_URL } from "@/lib/reelsThisWeek";
 import { CAROUSEL_NO_FILM_PACKAGE, READY_CAROUSEL_SLIDES } from "@/lib/carouselNoFilmPackage";
 import { READY_PINS, PINS_ZIP_PATH, pinDestinationUrl } from "@/lib/readyPins";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
+import { CopyTextButton } from "@/components/admin/CopyTextButton";
 
 export const metadata: Metadata = {
   title: "Post now — growth",
@@ -33,9 +34,12 @@ export default function PostNowPage() {
           <h2 className="mt-1 font-display text-lg font-semibold text-ink">
             Set Instagram + TikTok bio
           </h2>
-          <p className="mt-3 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">
-            {SOCIAL_BIO_URL}
-          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <p className="min-w-0 flex-1 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">
+              {SOCIAL_BIO_URL}
+            </p>
+            <CopyTextButton text={SOCIAL_BIO_URL} label="Copy bio URL" />
+          </div>
           <p className="mt-2 text-xs text-ink-muted">
             /bio already has the checklist signup form.
           </p>
@@ -59,6 +63,9 @@ export default function PostNowPage() {
           <pre className="mt-2 whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
             {CAROUSEL_NO_FILM_PACKAGE.caption}
           </pre>
+          <div className="mt-2">
+            <CopyTextButton text={CAROUSEL_NO_FILM_PACKAGE.caption} label="Copy caption" />
+          </div>
           <p className="mt-2 text-xs text-ink-muted">
             First comment: {CAROUSEL_NO_FILM_PACKAGE.firstComment}
           </p>

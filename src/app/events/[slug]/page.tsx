@@ -14,6 +14,7 @@ import { ArrowRight, CalendarDays, Check, Dot, History } from "lucide-react";
 import { searchPlaces } from "@/lib/liteapi";
 import EventPriceBadge from "@/components/EventPriceBadge";
 import { ShareButton } from "@/components/ShareButton";
+import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 
@@ -394,6 +395,8 @@ export default async function EventPage({ params }: Props) {
             </div>
           </div>
         )}
+
+        <LeadMagnetHomeCta embedded />
 
         {related.length > 0 && (
           <section className="mt-10">

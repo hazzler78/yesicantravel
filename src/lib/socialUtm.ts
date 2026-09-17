@@ -38,6 +38,14 @@ export const BIO_LINKS: BioLink[] = [
     platforms: ["instagram", "tiktok", "facebook"],
   },
   {
+    id: "blog-amsterdam-night",
+    label: "Amsterdam safe at night guide",
+    description: "Solo women neighbourhood tips + checklist",
+    path: "/blog/amsterdam-safe-solo-women-night",
+    utm: { source: "instagram", medium: "bio", campaign: "blog_amsterdam_night" },
+    platforms: ["instagram", "tiktok", "pinterest"],
+  },
+  {
     id: "popular-cities",
     label: "Explore safe cities in Europe",
     description: "Paris, Berlin, Barcelona & more — live prices",

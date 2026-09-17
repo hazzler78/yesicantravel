@@ -10,6 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "seed:blog": "node scripts/seed-first-seo-blog.js",
+    "seed:blog:amsterdam": "node scripts/seed-amsterdam-seo-blog.js",
     "mailerlite:backfill-nurture": "node scripts/backfill-mailerlite-nurture.js"
   },
   "dependencies": {

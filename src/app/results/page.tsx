@@ -16,6 +16,7 @@ import {
 import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
+import { LeadMagnetInlineCta } from "@/components/home/LeadMagnetInlineCta";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
@@ -934,6 +935,8 @@ function ResultsContent() {
                 for two rooms.
               </div>
             )}
+
+            {!loading && hotels.length > 0 && <LeadMagnetInlineCta />}
 
             {loading &&
               Array.from({ length: 4 }).map((_, index) => <HotelCardSkeleton key={index} />)}

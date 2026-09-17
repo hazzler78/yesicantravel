@@ -4,6 +4,7 @@ import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_POSTING_CADENCE } from "@/lib/socialPlaybook";
 import { SOCIAL_LINKS } from "@/components/brand/SocialIcons";
 import PageVisitTracker from "@/components/analytics/PageVisitTracker";
+import LeadMagnetForm from "@/components/LeadMagnetForm";
 
 export const metadata: Metadata = {
   title: "Links — Yes I Can Travel",
@@ -11,6 +12,9 @@ export const metadata: Metadata = {
     "Free safety checklist, city guides, and event stays for women travelling solo in Europe.",
   robots: { index: false, follow: false },
 };
+
+/** Lead magnet first — form captures on-page; other bio links below. */
+const BIO_LINKS_BELOW_FORM = BIO_LINKS.filter((l) => l.id !== "lead-magnet");
 
 export default function BioPage() {
   return (
@@ -29,8 +33,21 @@ export default function BioPage() {
           </p>
         </div>
 
-        <nav className="mt-8 space-y-3" aria-label="Featured links">
-          {BIO_LINKS.map((link) => (
+        <section
+          className="mt-8 rounded-card border border-teal/25 bg-teal-soft/40 p-4"
+          aria-labelledby="bio-checklist-heading"
+        >
+          <h2 id="bio-checklist-heading" className="font-display text-lg font-semibold text-ink">
+            Free solo safety checklist
+          </h2>
+          <p className="mt-1 text-[0.8125rem] text-ink-muted">
+            Instant access + email tips. No spam.
+          </p>
+          <LeadMagnetForm />
+        </section>
+
+        <nav className="mt-6 space-y-3" aria-label="Featured links">
+          {BIO_LINKS_BELOW_FORM.map((link) => (
             <Link
               key={link.id}
               href={bioLinkHref(link, "instagram")}

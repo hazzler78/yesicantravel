@@ -9,7 +9,7 @@ import {
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
-import { CAROUSEL_NO_FILM_PACKAGE } from "@/lib/carouselNoFilmPackage";
+import { CAROUSEL_NO_FILM_PACKAGE, READY_CAROUSEL_SLIDES } from "@/lib/carouselNoFilmPackage";
 import { READY_PINS, pinDestinationUrl } from "@/lib/readyPins";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
@@ -49,16 +49,25 @@ export default function SocialPlaybookPage() {
           No-film carousel (post in 10 min)
         </h2>
         <p className="mt-1 text-sm text-ink-muted">
-          {CAROUSEL_NO_FILM_PACKAGE.platformNote} · {CAROUSEL_NO_FILM_PACKAGE.canvaSize}
+          {CAROUSEL_NO_FILM_PACKAGE.platformNote} · Set bio to{" "}
+          <code className="text-xs">{CAROUSEL_NO_FILM_PACKAGE.bioMustBe}</code> first.
         </p>
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-[0.9375rem] text-ink">
-          {CAROUSEL_NO_FILM_PACKAGE.slides.map((s) => (
-            <li key={s.slide}>
-              <span className="font-semibold whitespace-pre-line">{s.headline}</span>
-              <span className="block text-sm text-ink-muted">{s.sub}</span>
-            </li>
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+          {READY_CAROUSEL_SLIDES.map((slide) => (
+            <a
+              key={slide.id}
+              href={slide.filePath}
+              download
+              className="block overflow-hidden rounded-card border border-border bg-surface transition-colors hover:border-teal/40"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={slide.filePath} alt={slide.headline} className="w-full" />
+              <p className="p-2 text-center text-[0.65rem] font-medium text-teal">
+                Download {slide.id.slice(0, 2)}
+              </p>
+            </a>
           ))}
-        </ol>
+        </div>
         <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
           Caption (copy all)
         </p>

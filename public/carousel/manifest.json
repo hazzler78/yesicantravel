@@ -1,0 +1,66 @@
+[
+  {
+    "id": "01-hook",
+    "filePath": "/carousel/carousel-01-hook.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-01-hook.png",
+    "lines": [
+      "3 things I never skip",
+      "as a solo woman"
+    ],
+    "sub": "Save this before you book"
+  },
+  {
+    "id": "02-reception",
+    "filePath": "/carousel/carousel-02-reception.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-02-reception.png",
+    "lines": [
+      "1 · Reception hours"
+    ],
+    "sub": "Will someone be at the desk when you arrive?"
+  },
+  {
+    "id": "03-map",
+    "filePath": "/carousel/carousel-03-map.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-03-map.png",
+    "lines": [
+      "2 · Map pin truth"
+    ],
+    "sub": "Does the pin match a lit, walkable street?"
+  },
+  {
+    "id": "04-cancel",
+    "filePath": "/carousel/carousel-04-cancel.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-04-cancel.png",
+    "lines": [
+      "3 · Free cancellation"
+    ],
+    "sub": "Plans change. Flexibility = calm."
+  },
+  {
+    "id": "05-sort",
+    "filePath": "/carousel/carousel-05-sort.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-05-sort.png",
+    "lines": [
+      "We sort safest first"
+    ],
+    "sub": "Not cheapest. Not most popular."
+  },
+  {
+    "id": "06-checklist",
+    "filePath": "/carousel/carousel-06-checklist.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-06-checklist.png",
+    "lines": [
+      "Free checklist"
+    ],
+    "sub": "Reception · arrival after dark · what to check"
+  },
+  {
+    "id": "07-cta",
+    "filePath": "/carousel/carousel-07-cta.png",
+    "publicUrl": "https://yesicantravel.com/carousel/carousel-07-cta.png",
+    "lines": [
+      "Link in bio"
+    ],
+    "sub": "yesicantravel.com/bio"
+  }
+]

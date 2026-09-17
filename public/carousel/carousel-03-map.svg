@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1350" viewBox="0 0 1080 1350" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7F4EF"/>
+      <stop offset="100%" stop-color="#E8F4F3"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1350" fill="url(#bg)"/>
+  <rect x="48" y="48" width="984" height="1254" rx="28" fill="#FFFFFF" stroke="#D4E8E6" stroke-width="3"/>
+  <text x="540" y="160" text-anchor="middle" font-family="Georgia, serif" font-size="24" fill="#0D7377" letter-spacing="4">YES I CAN TRAVEL</text>
+  <text x="540" y="560" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="700" fill="#1A2332">2 · Map pin truth</text>
+  <text x="540" y="720" text-anchor="middle" font-family="system-ui, sans-serif" font-size="30" fill="#5A6570">Does the pin match a lit, walkable street?</text>
+  <rect x="340" y="1100" width="400" height="72" rx="14" fill="#E07A5F"/>
+  <text x="540" y="1146" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" font-weight="700" fill="#FFFFFF">Travel confidently</text>
+</svg>

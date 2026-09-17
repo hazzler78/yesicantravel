@@ -189,7 +189,7 @@ export default function SocialPlaybookPage() {
       <section className="mt-10">
         <h2 className="font-display text-lg font-semibold text-ink">Ready Pinterest pins (upload today)</h2>
         <p className="mt-1 text-sm text-ink-muted">
-          SVG 1000×1500 — download, upload to Pinterest, paste destination URL with UTM.
+          PNG 1000×1500 — download and upload to Pinterest; paste the destination URL with UTM.
         </p>
         <div className="mt-4 space-y-4">
           {READY_PINS.map((pin) => (
@@ -215,7 +215,7 @@ export default function SocialPlaybookPage() {
                     download
                     className="mt-3 inline-flex text-sm font-semibold text-teal hover:underline"
                   >
-                    Download SVG →
+                    Download PNG →
                   </a>
                 </div>
               </div>

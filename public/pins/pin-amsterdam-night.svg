@@ -6,16 +6,16 @@
     </linearGradient>
   </defs>
   <rect width="1000" height="1500" fill="url(#bg)"/>
-  <text x="500" y="200" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#D4F1F0" letter-spacing="3">SOLO WOMEN · AMSTERDAM</text>
+  <text x="500" y="200" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#D4F1F0" letter-spacing="3">SOLO WOMEN - AMSTERDAM</text>
   <text x="500" y="360" text-anchor="middle" font-family="Georgia, serif" font-size="58" font-weight="700" fill="#FFFFFF">Safe at night?</text>
-  <text x="500" y="450" text-anchor="middle" font-family="Georgia, serif" font-size="58" font-weight="700" fill="#FFFFFF">Here's what matters</text>
+  <text x="500" y="450" text-anchor="middle" font-family="Georgia, serif" font-size="58" font-weight="700" fill="#FFFFFF">Here is what matters</text>
   <g font-family="system-ui, sans-serif" font-size="28" fill="#E8F4F3">
-    <text x="500" y="620" text-anchor="middle">Jordaan · De Pijp · Centraal</text>
-    <text x="500" y="700" text-anchor="middle">24/7 reception · lit streets</text>
-    <text x="500" y="780" text-anchor="middle">Practical  not fear-based</text>
+    <text x="500" y="620" text-anchor="middle">Jordaan / De Pijp / Centraal</text>
+    <text x="500" y="700" text-anchor="middle">24/7 reception + lit streets</text>
+    <text x="500" y="780" text-anchor="middle">Practical, not fear-based</text>
   </g>
   <rect x="220" y="980" width="560" height="88" rx="16" fill="#E07A5F"/>
-  <text x="500" y="1036" text-anchor="middle" font-family="system-ui, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Read the free guide ’</text>
-  <text x="500" y="1200" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#A8C5C3">yesicantravel.com/blog/amsterdam&</text>
+  <text x="500" y="1036" text-anchor="middle" font-family="system-ui, sans-serif" font-size="30" font-weight="700" fill="#FFFFFF">Read the free guide</text>
+  <text x="500" y="1200" text-anchor="middle" font-family="system-ui, sans-serif" font-size="24" fill="#A8C5C3">yesicantravel.com/blog</text>
   <text x="500" y="1360" text-anchor="middle" font-family="Georgia, serif" font-size="22" fill="#D4F1F0">Yes I Can Travel</text>
 </svg>

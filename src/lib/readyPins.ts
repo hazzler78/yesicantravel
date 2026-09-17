@@ -19,8 +19,8 @@ export const READY_PINS: ReadyPin[] = [
   {
     id: "pin-lead-magnet",
     title: "Free solo female safety checklist",
-    filePath: "/pins/pin-lead-magnet.svg",
-    publicUrl: `${ORIGIN}/pins/pin-lead-magnet.svg`,
+    filePath: "/pins/pin-lead-magnet.png",
+    publicUrl: `${ORIGIN}/pins/pin-lead-magnet.png`,
     destinationPath: "/lead-magnet",
     utmCampaign: "pin_lead_magnet",
     pinDescription:
@@ -29,8 +29,8 @@ export const READY_PINS: ReadyPin[] = [
   {
     id: "pin-amsterdam-night",
     title: "Amsterdam safe at night for solo women",
-    filePath: "/pins/pin-amsterdam-night.svg",
-    publicUrl: `${ORIGIN}/pins/pin-amsterdam-night.svg`,
+    filePath: "/pins/pin-amsterdam-night.png",
+    publicUrl: `${ORIGIN}/pins/pin-amsterdam-night.png`,
     destinationPath: "/blog/amsterdam-safe-solo-women-night",
     utmCampaign: "pin_amsterdam_night",
     pinDescription:
@@ -39,8 +39,8 @@ export const READY_PINS: ReadyPin[] = [
   {
     id: "pin-berlin-marathon",
     title: "Berlin Marathon 2026 solo women hotels",
-    filePath: "/pins/pin-berlin-marathon.svg",
-    publicUrl: `${ORIGIN}/pins/pin-berlin-marathon.svg`,
+    filePath: "/pins/pin-berlin-marathon.png",
+    publicUrl: `${ORIGIN}/pins/pin-berlin-marathon.png`,
     destinationPath: "/events/berlin-marathon-2026",
     utmCampaign: "pin_berlin_marathon",
     pinDescription:

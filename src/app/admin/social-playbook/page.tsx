@@ -9,6 +9,7 @@ import {
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
 import { REEL_ONE_POST_PACKAGE } from "@/lib/reelOnePostPackage";
+import { READY_PINS, pinDestinationUrl } from "@/lib/readyPins";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
 export const metadata: Metadata = {
@@ -183,6 +184,44 @@ export default function SocialPlaybookPage() {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="mt-10">
+        <h2 className="font-display text-lg font-semibold text-ink">Ready Pinterest pins (upload today)</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          SVG 1000×1500 — download, upload to Pinterest, paste destination URL with UTM.
+        </p>
+        <div className="mt-4 space-y-4">
+          {READY_PINS.map((pin) => (
+            <article key={pin.id} className="rounded-card border border-border bg-surface p-4">
+              <div className="flex flex-wrap gap-4">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={pin.filePath}
+                  alt={pin.title}
+                  className="h-40 w-auto rounded border border-border bg-canvas"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold text-ink">{pin.title}</p>
+                  <p className="mt-1 text-xs text-ink-muted">{pin.pinDescription}</p>
+                  <p className="mt-2 font-mono text-[0.65rem] text-ink-muted break-all">
+                    Pin image: {pin.publicUrl}
+                  </p>
+                  <p className="mt-1 font-mono text-[0.65rem] text-ink-muted break-all">
+                    Destination: {pinDestinationUrl(pin)}
+                  </p>
+                  <a
+                    href={pin.filePath}
+                    download
+                    className="mt-3 inline-flex text-sm font-semibold text-teal hover:underline"
+                  >
+                    Download SVG →
+                  </a>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="mt-10">

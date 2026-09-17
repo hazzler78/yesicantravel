@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Check, MapPin, Moon, Shield } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
+import LeadMagnetForm from "@/components/LeadMagnetForm";
 
 export const metadata: Metadata = {
   title: "Solo Female Safety Checklist",
@@ -64,6 +65,17 @@ export default function ChecklistPage() {
           Practical steps — not fear. Use this before you book and again the day you travel.
           You decide what feels right for your trip.
         </p>
+
+        <Card className="mt-6 border-teal/25 bg-teal-soft/30 p-5">
+          <h2 className="font-display text-base font-semibold text-ink">
+            Want the follow-up tips by email?
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Optional — the checklist below is free either way. Sign up for the 4-email nurture
+            sequence if you want reminders before you book.
+          </p>
+          <LeadMagnetForm pagePath="/checklist" />
+        </Card>
 
         <div className="mt-8 space-y-4">
           {SECTIONS.map(({ Icon, title, items }) => (

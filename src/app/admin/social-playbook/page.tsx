@@ -8,7 +8,7 @@ import {
 } from "@/lib/socialPlaybook";
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
-import { REEL_ONE_POST_PACKAGE } from "@/lib/reelOnePostPackage";
+import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
 import { READY_PINS, pinDestinationUrl } from "@/lib/readyPins";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
@@ -25,55 +25,58 @@ export default function SocialPlaybookPage() {
         Internal reference — this week&apos;s Reels scripts, nurture emails, UTM links, and cadence.
       </p>
 
-      <section className="mt-8 rounded-card border border-coral/40 bg-coral-soft/30 p-5">
-        <h2 className="font-display text-lg font-semibold text-ink">Post Reel #1 now</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          {REEL_ONE_POST_PACKAGE.durationTarget}s · same file → Instagram Reels + TikTok
-        </p>
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-[0.9375rem] text-ink">
-          {REEL_ONE_POST_PACKAGE.beforeYouPost.map((step) => (
-            <li key={step}>{step}</li>
-          ))}
-        </ol>
-        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
-          CapCut overlays (in order)
-        </p>
-        <ol className="mt-2 list-decimal space-y-1 pl-5 font-mono text-xs text-ink-muted">
-          {REEL_ONE_POST_PACKAGE.overlaysInOrder.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
-        </ol>
-        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
-          Caption (copy all)
-        </p>
-        <pre className="mt-2 whitespace-pre-wrap rounded-card border border-border bg-surface p-3 text-xs text-ink">
-          {REEL_ONE_POST_PACKAGE.captionFull}
-        </pre>
-        <p className="mt-3 text-xs text-ink-muted">
-          First comment: <code className="text-ink">{REEL_ONE_POST_PACKAGE.firstComment}</code>
-        </p>
-      </section>
-
       <section className="mt-8 rounded-card border border-teal/30 bg-teal-soft/40 p-5">
-        <h2 className="font-display text-lg font-semibold text-ink">Do this week</h2>
+        <h2 className="font-display text-lg font-semibold text-ink">Do this week (traffic blockers)</h2>
         <ol className="mt-3 list-decimal space-y-2 pl-5 text-[0.9375rem] text-ink">
           <li>
             Set Instagram + TikTok bio link to{" "}
             <code className="rounded bg-surface px-1.5 py-0.5 text-xs">{SOCIAL_BIO_URL}</code>
           </li>
-          <li>
-            Activate MailerLite automation{" "}
-            <a
-              href="https://dashboard.mailerlite.com/automations/198834126848001911"
-              className="font-medium text-teal hover:underline"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Solo Safety Checklist Nurture
-            </a>
-          </li>
-          <li>Film &amp; post the 3 Reels below (same video → TikTok + Reels)</li>
+          <li>Upload the 3 ready PNG pins below to Pinterest</li>
+          <li>Post all 3 Reels (copy-paste packages below → CapCut → IG + TikTok)</li>
         </ol>
+        <p className="mt-3 text-xs text-ink-muted">
+          Nurture automation is live — signups already get email 1 and wait for day 2.
+        </p>
+      </section>
+
+      <section className="mt-8 space-y-6">
+        <h2 className="font-display text-lg font-semibold text-ink">Post all 3 Reels now</h2>
+        {REEL_POST_PACKAGES.map((pkg) => (
+          <article
+            key={pkg.id}
+            className="rounded-card border border-coral/40 bg-coral-soft/30 p-5"
+          >
+            <h3 className="font-display text-base font-semibold text-ink">
+              Reel #{pkg.reelNumber}: {pkg.title}
+            </h3>
+            <p className="mt-1 text-sm text-ink-muted">
+              {pkg.dayLabel} · {pkg.durationTarget}s · same file → Instagram Reels + TikTok
+            </p>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-[0.9375rem] text-ink">
+              {pkg.beforeYouPost.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+              CapCut overlays (in order)
+            </p>
+            <ol className="mt-2 list-decimal space-y-1 pl-5 font-mono text-xs text-ink-muted">
+              {pkg.overlaysInOrder.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ol>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+              Caption (copy all)
+            </p>
+            <pre className="mt-2 whitespace-pre-wrap rounded-card border border-border bg-surface p-3 text-xs text-ink">
+              {pkg.captionFull}
+            </pre>
+            <p className="mt-3 text-xs text-ink-muted">
+              First comment: <code className="text-ink">{pkg.firstComment}</code>
+            </p>
+          </article>
+        ))}
       </section>
 
       <section className="mt-10">

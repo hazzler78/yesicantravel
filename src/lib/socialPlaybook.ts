@@ -132,6 +132,15 @@ export const PINTEREST_PINS: PinterestPin[] = [
     utmCampaign: "pin_paris_rock_en_seine",
   },
   {
+    id: "pin-lisbon-web-summit",
+    title: "Web Summit Lisbon 2026 — safer solo hotels",
+    description: "Red metro line, Parque das Nações, and safety filters for women attending alone.",
+    targetPath: "/blog/web-summit-lisbon-2026-solo-women-hotels",
+    dimensions: "1000×1500",
+    headlineOnPin: "Web Summit · Lisbon solo stays",
+    utmCampaign: "pin_lisbon_web_summit",
+  },
+  {
     id: "pin-berlin-lollapalooza",
     title: "Lollapalooza Berlin — book safer stays",
     description: "Central Berlin hotels with safety filters for women travelling solo to the festival.",

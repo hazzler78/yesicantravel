@@ -62,6 +62,14 @@ export const BIO_LINKS: BioLink[] = [
     platforms: ["instagram", "tiktok", "pinterest"],
   },
   {
+    id: "blog-web-summit-lisbon",
+    label: "Web Summit Lisbon: safer solo hotels",
+    description: "Red metro line, Parque das Nações",
+    path: "/blog/web-summit-lisbon-2026-solo-women-hotels",
+    utm: { source: "instagram", medium: "bio", campaign: "blog_web_summit_lisbon" },
+    platforms: ["instagram", "tiktok", "pinterest"],
+  },
+  {
     id: "popular-cities",
     label: "Explore safe cities in Europe",
     description: "Paris, Berlin, Barcelona & more — live prices",

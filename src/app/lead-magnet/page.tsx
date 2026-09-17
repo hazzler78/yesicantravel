@@ -17,6 +17,21 @@ export const metadata: Metadata = {
       "Reception hours, map checks, and arriving after dark — a short checklist before you book.",
     url: `${BASE_URL}/lead-magnet`,
     type: "website",
+    images: [
+      {
+        url: `${BASE_URL}/pins/pin-lead-magnet.png`,
+        width: 1000,
+        height: 1500,
+        alt: "Free solo female safety checklist",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free Solo Female Safety Checklist",
+    description:
+      "Reception hours, map checks, and arriving after dark — a short checklist before you book.",
+    images: [`${BASE_URL}/pins/pin-lead-magnet.png`],
   },
   alternates: {
     canonical: `${BASE_URL}/lead-magnet`,

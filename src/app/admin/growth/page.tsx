@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { getWeeklyGrowthSnapshot, GROWTH_GOAL } from "@/lib/growthMetrics";
 import { getNurtureAutomationStatus } from "@/lib/mailerlite";
-import { SOCIAL_BIO_URL } from "@/lib/reelsThisWeek";
+import { SOCIAL_BIO_URL, PINTEREST_PROFILE_URL } from "@/lib/reelsThisWeek";
 
 export const dynamic = "force-dynamic";
 
@@ -106,9 +106,14 @@ export default async function GrowthDashboardPage() {
           </p>
         </article>
         <article className="rounded-xl border border-[var(--sand)] bg-white p-4">
-          <p className="text-sm text-[var(--navy-light)]">Profile bio URL</p>
-          <p className="mt-1 break-all font-mono text-sm font-semibold">{SOCIAL_BIO_URL}</p>
-          <p className="mt-1 text-xs text-[var(--navy-light)]">Paste into Instagram + TikTok</p>
+          <p className="text-sm text-[var(--navy-light)]">Profile links</p>
+          <p className="mt-2 text-xs font-semibold text-[var(--navy)]">IG / TikTok</p>
+          <p className="break-all font-mono text-xs font-semibold">{SOCIAL_BIO_URL}</p>
+          <p className="mt-2 text-xs font-semibold text-[var(--navy)]">Pinterest Website</p>
+          <p className="break-all font-mono text-xs font-semibold">{PINTEREST_PROFILE_URL}</p>
+          <p className="mt-1 text-xs text-[var(--navy-light)]">
+            Do not use /bio on Pinterest — they reject link-hub / noindex pages.
+          </p>
         </article>
       </section>
 
@@ -194,9 +199,10 @@ export default async function GrowthDashboardPage() {
           <section className="mt-8 rounded-xl border border-dashed border-[var(--sand)] bg-white/60 p-5">
             <h2 className="text-lg font-semibold">Weekly checklist</h2>
             <ul className="mt-3 space-y-2 text-sm text-[var(--navy-light)]">
-              <li>Set bio link to {SOCIAL_BIO_URL}</li>
-              <li>Post no-film carousel or 3 Reels — Social playbook</li>
-              <li>Upload 3 Pinterest PNG pins</li>
+              <li>Set IG/TikTok bio to {SOCIAL_BIO_URL}</li>
+              <li>Set Pinterest Website to {PINTEREST_PROFILE_URL} (not /bio)</li>
+              <li>Post no-film carousel or 3 Reels — Social playbook / post-now</li>
+              <li>Upload Pinterest PNG pins with pin destination URLs</li>
               <li>Review /bio visits + bio checklist signups below</li>
               <li>
                 Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / 13)} signups/week to hit{" "}

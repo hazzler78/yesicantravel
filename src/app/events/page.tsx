@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { getUpcomingEvents } from "@/data/events";
 import { Card } from "@/components/ui/Card";
+import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -165,6 +166,8 @@ export default function EventsPage() {
             ))}
           </div>
         )}
+
+        <LeadMagnetHomeCta embedded />
       </div>
     </div>
   );

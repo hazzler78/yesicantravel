@@ -1,12 +1,16 @@
 import Link from "next/link";
 import { Prisma } from "@prisma/client";
 import { getWeeklyGrowthSnapshot, GROWTH_GOAL } from "@/lib/growthMetrics";
+import { getNurtureAutomationStatus } from "@/lib/mailerlite";
+import { SOCIAL_BIO_URL } from "@/lib/reelsThisWeek";
 
 export const dynamic = "force-dynamic";
 
 export default async function GrowthDashboardPage() {
   let snapshot;
   let dbUnavailable = false;
+
+  const [automation] = await Promise.all([getNurtureAutomationStatus()]);
 
   try {
     snapshot = await getWeeklyGrowthSnapshot();
@@ -20,6 +24,32 @@ export default async function GrowthDashboardPage() {
 
   const goalEnd = new Date(GROWTH_GOAL.startDate);
   goalEnd.setUTCDate(goalEnd.getUTCDate() + GROWTH_GOAL.periodDays);
+
+  const blockers: Array<{ id: string; label: string; href: string; cta: string }> = [];
+  if (!automation.enabled) {
+    blockers.push({
+      id: "automation",
+      label: "MailerLite nurture automation is inactive — signups join the group but no emails send.",
+      href: automation.dashboardUrl,
+      cta: "Activate in MailerLite",
+    });
+  }
+  if (snapshot && snapshot.bioVisitsThisWeek === 0 && snapshot.socialLandingsThisWeek === 0) {
+    blockers.push({
+      id: "bio",
+      label: "No /bio or social UTM traffic this week — set Instagram/TikTok bio to yesicantravel.com/bio.",
+      href: SOCIAL_BIO_URL,
+      cta: "Open /bio",
+    });
+  }
+  if (snapshot && snapshot.signupsThisWeek === 0) {
+    blockers.push({
+      id: "reels",
+      label: "Zero signups this week — film & post the 3 Reels in the social playbook.",
+      href: "/admin/social-playbook",
+      cta: "Open Reels scripts",
+    });
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-10 text-[var(--navy)]">
@@ -41,6 +71,46 @@ export default async function GrowthDashboardPage() {
           ← Admin home
         </Link>
       </div>
+
+      {blockers.length > 0 && (
+        <section className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-5">
+          <h2 className="text-lg font-semibold text-amber-950">Blockers (fix these first)</h2>
+          <ul className="mt-3 space-y-3">
+            {blockers.map((b) => (
+              <li key={b.id} className="text-sm text-amber-950">
+                <p>{b.label}</p>
+                <a
+                  href={b.href}
+                  target={b.href.startsWith("http") ? "_blank" : undefined}
+                  rel={b.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="mt-1 inline-flex font-semibold text-[var(--ocean-teal)] underline-offset-2 hover:underline"
+                >
+                  {b.cta} →
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <section className="mt-6 grid gap-4 sm:grid-cols-2">
+        <article className="rounded-xl border border-[var(--sand)] bg-white p-4">
+          <p className="text-sm text-[var(--navy-light)]">MailerLite nurture automation</p>
+          <p
+            className={`mt-1 text-lg font-semibold ${automation.enabled ? "text-emerald-700" : "text-amber-700"}`}
+          >
+            {automation.enabled ? "Active" : "Inactive — activate required"}
+          </p>
+          <p className="mt-1 text-xs text-[var(--navy-light)]">
+            {automation.name ?? "Solo Safety Checklist Nurture"}
+          </p>
+        </article>
+        <article className="rounded-xl border border-[var(--sand)] bg-white p-4">
+          <p className="text-sm text-[var(--navy-light)]">Profile bio URL</p>
+          <p className="mt-1 break-all font-mono text-sm font-semibold">{SOCIAL_BIO_URL}</p>
+          <p className="mt-1 text-xs text-[var(--navy-light)]">Paste into Instagram + TikTok</p>
+        </article>
+      </section>
 
       {dbUnavailable ? (
         <p className="mt-8 rounded-xl border border-[var(--sand)] bg-white p-4 text-sm text-[var(--navy-light)]">
@@ -119,11 +189,14 @@ export default async function GrowthDashboardPage() {
           <section className="mt-8 rounded-xl border border-dashed border-[var(--sand)] bg-white/60 p-5">
             <h2 className="text-lg font-semibold">Weekly checklist</h2>
             <ul className="mt-3 space-y-2 text-sm text-[var(--navy-light)]">
-              <li>Post 3 core videos (TikTok + Reels) — use templates in Social playbook</li>
-              <li>Update bio link to yesicantravel.com/bio</li>
-              <li>Check MailerLite: new signups in nurture group + automation running</li>
+              <li>Activate MailerLite nurture automation (if still inactive)</li>
+              <li>Post 3 core videos (TikTok + Reels) — scripts in Social playbook</li>
+              <li>Set bio link to {SOCIAL_BIO_URL}</li>
               <li>Review GA4 Realtime + Clarity for drop-off on /lead-magnet</li>
-              <li>Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / 13)} signups/week to hit 50 in 90 days</li>
+              <li>
+                Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / 13)} signups/week to hit{" "}
+                {GROWTH_GOAL.targetLeads} in 90 days
+              </li>
             </ul>
             <div className="mt-4 flex flex-wrap gap-3">
               <Link
@@ -132,17 +205,19 @@ export default async function GrowthDashboardPage() {
               >
                 Social playbook
               </Link>
+              <a
+                href={automation.dashboardUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-lg border border-[var(--sand)] px-4 py-2 text-sm font-semibold"
+              >
+                MailerLite automation
+              </a>
               <Link
                 href="/bio"
                 className="rounded-lg border border-[var(--sand)] px-4 py-2 text-sm font-semibold"
               >
                 Preview /bio
-              </Link>
-              <Link
-                href="/lead-magnet"
-                className="rounded-lg border border-[var(--sand)] px-4 py-2 text-sm font-semibold"
-              >
-                Preview lead magnet
               </Link>
             </div>
           </section>

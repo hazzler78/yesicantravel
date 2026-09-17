@@ -185,6 +185,58 @@ export async function ensureSubscriberInNurtureGroups(
   return { ok: true, assignedGroups: assigned };
 }
 
+const NURTURE_AUTOMATION_ID = "198834126848001911";
+
+/** Status of the Solo Safety Checklist nurture automation (must be enabled in MailerLite UI). */
+export async function getNurtureAutomationStatus(): Promise<{
+  configured: boolean;
+  enabled: boolean;
+  name?: string;
+  dashboardUrl: string;
+  reason?: string;
+}> {
+  const dashboardUrl = `https://dashboard.mailerlite.com/automations/${NURTURE_AUTOMATION_ID}`;
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    return { configured: false, enabled: false, dashboardUrl, reason: "MAILERLITE_API_KEY missing" };
+  }
+
+  try {
+    const res = await fetch(`${MAILERLITE_API}/automations/${NURTURE_AUTOMATION_ID}`, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      return {
+        configured: false,
+        enabled: false,
+        dashboardUrl,
+        reason: `MailerLite ${res.status}`,
+      };
+    }
+    const json = (await res.json()) as {
+      data?: { id: string; name?: string; enabled?: boolean };
+    };
+    const data = json.data;
+    return {
+      configured: Boolean(data?.id),
+      enabled: Boolean(data?.enabled),
+      name: data?.name,
+      dashboardUrl,
+    };
+  } catch (error) {
+    return {
+      configured: false,
+      enabled: false,
+      dashboardUrl,
+      reason: (error as Error).message,
+    };
+  }
+}
+
 /** Group IDs to add on nurture signup — triggers MailerLite automation when configured. */
 export function getNurtureGroupIds(): string[] {
   const ids: string[] = [];

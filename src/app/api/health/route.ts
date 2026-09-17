@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getNurtureAutomationStatus } from "@/lib/mailerlite";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 10;
@@ -60,6 +61,10 @@ export async function GET() {
   );
   checks.mailerliteApiKey = Boolean(process.env.MAILERLITE_API_KEY);
   checks.mailerliteNurtureGroup = Boolean(process.env.MAILERLITE_NURTURE_GROUP_ID?.trim());
+
+  const nurtureAutomation = await getNurtureAutomationStatus();
+  checks.mailerliteAutomation = nurtureAutomation.configured;
+  checks.mailerliteAutomationEnabled = nurtureAutomation.enabled;
 
   if (process.env.DATABASE_URL) {
     try {

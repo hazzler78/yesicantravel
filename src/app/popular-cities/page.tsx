@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
 import { getDestinationBySlug } from "@/data/destinations";
 import { Card } from "@/components/ui/Card";
+import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 
 /** Default check-in 14 days from now, checkout +2 nights for result links */
 function getDefaultDates() {
@@ -95,6 +96,8 @@ export default function PopularCitiesPage() {
             );
           })}
         </ul>
+
+        <LeadMagnetHomeCta embedded />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
+import { DESTINATION_RELATED_GUIDES } from "@/lib/relatedGuides";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -155,6 +156,25 @@ export default async function DestinationPage({ params }: Props) {
             {dest.subheadline}
           </p>
         </header>
+
+        <LeadMagnetHomeCta embedded />
+
+        {DESTINATION_RELATED_GUIDES[dest.slug] && (
+          <aside className="mb-10 mt-4 rounded-card border border-teal/25 bg-teal-soft/20 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+              Solo guide
+            </p>
+            <Link
+              href={DESTINATION_RELATED_GUIDES[dest.slug].href}
+              className="mt-1 block font-display text-lg font-semibold text-ink hover:text-teal"
+            >
+              {DESTINATION_RELATED_GUIDES[dest.slug].label}
+            </Link>
+            <p className="mt-1 text-[0.9375rem] text-ink-muted">
+              {DESTINATION_RELATED_GUIDES[dest.slug].blurb}
+            </p>
+          </aside>
+        )}
 
         <section className="mb-10 rounded-card border border-border bg-surface p-5 shadow-card">
           <h2 className="mb-3 font-display text-lg font-semibold text-ink">
@@ -326,8 +346,6 @@ export default async function DestinationPage({ params }: Props) {
             Find safer stays in {dest.city}
           </Link>
         </div>
-
-        <LeadMagnetHomeCta embedded />
 
         {cityEvents.length > 0 && (
           <section className="mt-12 rounded-card border border-border bg-surface p-5 shadow-card">

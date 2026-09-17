@@ -185,9 +185,9 @@ export const destinations: Destination[] = [
     headline: "Amsterdam for solo female travellers",
     subheadline:
       "Small, flat and easy to cross on foot — with two things that catch visitors out: the trams stop just after midnight, and the red asphalt is a bike road, not a pavement. Here's how to stay somewhere calm and get home after the last tram.",
-    metaTitle: "Safe Hotels in Amsterdam for Solo Female Travellers | Area Guide",
+    metaTitle: "Is Amsterdam Safe for Solo Female Travellers? | Night & Stays",
     metaDescription:
-      "Where to stay in Amsterdam as a solo woman: neighbourhood guidance, night bus routes from Centraal, the tram cut-off, and stays with 24/7 reception near a station.",
+      "Is Amsterdam safe for solo female travellers? Honest night tips, neighbourhoods, night buses, and hotels with 24/7 reception — practical, not fear-based.",
     aiSearch: "central safe hotel Amsterdam Netherlands well-lit near station",
     knownFor: [
       "The UNESCO-listed canal ring, walkable end to end in under an hour",

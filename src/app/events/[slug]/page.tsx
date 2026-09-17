@@ -17,6 +17,7 @@ import { ShareButton } from "@/components/ShareButton";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
+import { EVENT_RELATED_GUIDES } from "@/lib/relatedGuides";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -39,8 +40,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const year = event.startDate.slice(0, 4);
   const eventNameWithYear = `${event.eventName} ${year}`;
 
-  const title = `${eventNameWithYear} – Safe Solo Stays for Women | Yes I Can Travel`;
-  const description = `Safe, women-reviewed hotels near ${eventNameWithYear}. 24/7 reception, safety filters & expert tips for solo female travelers. Book confidently and feel prepared.`;
+  // Keyword-aligned titles for pages already getting impressions (GSC).
+  const titleOverrides: Record<string, string> = {
+    "berlin-marathon-2026": `Berlin Marathon 2026 date & safer solo hotels | Yes I Can Travel`,
+    "lisbon-web-summit-2026": `Web Summit Lisbon 2026 hotels for solo women | Yes I Can Travel`,
+    "rock-en-seine-paris-2026": `Rock en Seine 2026 hotels for solo women | Yes I Can Travel`,
+  };
+  const descriptionOverrides: Record<string, string> = {
+    "berlin-marathon-2026": `Berlin Marathon 2026 (${event.dateRange}): where to stay as a solo woman near Brandenburg Gate — 24/7 reception, early start, free cancellation.`,
+    "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels on the red metro line and Parque das Nações for women attending alone.`,
+    "rock-en-seine-paris-2026": `Rock en Seine Paris: metro line 10 hotels, Boulogne, and late-night returns for solo women.`,
+  };
+
+  const title =
+    titleOverrides[event.slug] ??
+    `${eventNameWithYear} – Safe Solo Stays for Women | Yes I Can Travel`;
+  const description =
+    descriptionOverrides[event.slug] ??
+    `Safe, women-reviewed hotels near ${eventNameWithYear}. 24/7 reception, safety filters & expert tips for solo female travelers. Book confidently and feel prepared.`;
   const eventUrl = `${BASE_URL}/events/${event.slug}`;
   const past = isEventPast(event);
 
@@ -271,8 +288,27 @@ export default async function EventPage({ params }: Props) {
           )}
         </header>
 
+        {!past && <LeadMagnetHomeCta embedded />}
+
+        {EVENT_RELATED_GUIDES[event.slug] && (
+          <Card className="mt-4 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+              Solo stay guide
+            </p>
+            <Link
+              href={EVENT_RELATED_GUIDES[event.slug].href}
+              className="mt-1 block font-display text-lg font-semibold text-ink hover:text-teal"
+            >
+              {EVENT_RELATED_GUIDES[event.slug].label}
+            </Link>
+            <p className="mt-1 text-[0.9375rem] text-ink-muted">
+              {EVENT_RELATED_GUIDES[event.slug].blurb}
+            </p>
+          </Card>
+        )}
+
         {!past && (
-          <Card className="mt-8 p-5">
+          <Card className="mt-4 p-5">
             <h2 className="font-display text-lg font-semibold text-ink">Why book early</h2>
             <EventPriceBadge
               slug={slug}
@@ -395,8 +431,6 @@ export default async function EventPage({ params }: Props) {
             </div>
           </div>
         )}
-
-        <LeadMagnetHomeCta embedded />
 
         {related.length > 0 && (
           <section className="mt-10">

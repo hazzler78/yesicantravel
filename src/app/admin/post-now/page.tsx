@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SOCIAL_BIO_URL } from "@/lib/reelsThisWeek";
+import { SOCIAL_BIO_URL, PINTEREST_PROFILE_URL, PINTEREST_PROFILE_URL_FALLBACK } from "@/lib/reelsThisWeek";
 import { CAROUSEL_NO_FILM_PACKAGE, READY_CAROUSEL_SLIDES } from "@/lib/carouselNoFilmPackage";
 import { READY_PINS, PINS_ZIP_PATH, pinDestinationUrl } from "@/lib/readyPins";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
@@ -32,16 +32,36 @@ export default function PostNowPage() {
         <li className="rounded-card border border-coral/40 bg-coral-soft/30 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-coral">Step 1</p>
           <h2 className="mt-1 font-display text-lg font-semibold text-ink">
-            Set Instagram + TikTok bio
+            Set profile links (by platform)
           </h2>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <p className="mt-2 text-sm text-ink-muted">
+            Instagram + TikTok use /bio. Pinterest does <strong>not</strong> — use the checklist
+            page (or homepage) instead.
+          </p>
+
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            Instagram + TikTok
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
             <p className="min-w-0 flex-1 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">
               {SOCIAL_BIO_URL}
             </p>
-            <CopyTextButton text={SOCIAL_BIO_URL} label="Copy bio URL" />
+            <CopyTextButton text={SOCIAL_BIO_URL} label="Copy" />
+          </div>
+
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            Pinterest profile → Website
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <p className="min-w-0 flex-1 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">
+              {PINTEREST_PROFILE_URL}
+            </p>
+            <CopyTextButton text={PINTEREST_PROFILE_URL} label="Copy" />
           </div>
           <p className="mt-2 text-xs text-ink-muted">
-            /bio already has the checklist signup form.
+            If Pinterest still rejects it, use{" "}
+            <code className="text-ink">{PINTEREST_PROFILE_URL_FALLBACK}</code> and claim the domain
+            under Business settings. Pin destinations are separate — use the URLs in step 3.
           </p>
         </li>
 
@@ -73,7 +93,12 @@ export default function PostNowPage() {
 
         <li className="rounded-card border border-border bg-surface p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 3</p>
-          <h2 className="mt-1 font-display text-lg font-semibold text-ink">Pinterest pins</h2>
+          <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+            Pinterest pins (destination ≠ /bio)
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Each pin links to a specific blog or checklist page — not the /bio hub.
+          </p>
           <a
             href={PINS_ZIP_PATH}
             download

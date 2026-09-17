@@ -139,8 +139,14 @@ export const THIS_WEEK_REELS: ReelShootScript[] = [
   },
 ];
 
-/** Copy-paste bio link for Instagram / TikTok profile */
+/** Copy-paste bio / profile links by platform. */
 export const SOCIAL_BIO_URL = "https://yesicantravel.com/bio";
+
+/** Pinterest profile "Website" field — not /bio (Pinterest rejects link-hub / noindex pages). */
+export const PINTEREST_PROFILE_URL = "https://yesicantravel.com/lead-magnet";
+
+/** Fallback brand homepage if claim/verification needs the root domain. */
+export const PINTEREST_PROFILE_URL_FALLBACK = "https://yesicantravel.com";
 
 export const CAPCUT_STYLE_NOTES = [
   "Aspect: 9:16",

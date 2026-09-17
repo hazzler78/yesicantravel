@@ -11,6 +11,7 @@
     "prisma:push": "prisma db push",
     "seed:blog": "node scripts/seed-first-seo-blog.js",
     "seed:blog:amsterdam": "node scripts/seed-amsterdam-seo-blog.js",
+    "seed:blog:berlin-marathon": "node scripts/seed-berlin-marathon-seo-blog.js",
     "mailerlite:backfill-nurture": "node scripts/backfill-mailerlite-nurture.js"
   },
   "dependencies": {

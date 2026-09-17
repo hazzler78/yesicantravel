@@ -46,6 +46,14 @@ export const BIO_LINKS: BioLink[] = [
     platforms: ["instagram", "tiktok", "pinterest"],
   },
   {
+    id: "blog-berlin-marathon",
+    label: "Berlin Marathon 2026 solo stays",
+    description: "Race-weekend hotels + safety filters",
+    path: "/blog/berlin-marathon-2026-solo-women-hotels",
+    utm: { source: "instagram", medium: "bio", campaign: "blog_berlin_marathon" },
+    platforms: ["instagram", "tiktok", "pinterest"],
+  },
+  {
     id: "popular-cities",
     label: "Explore safe cities in Europe",
     description: "Paris, Berlin, Barcelona & more — live prices",

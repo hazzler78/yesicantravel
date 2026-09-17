@@ -10,7 +10,7 @@ import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
 import { CAROUSEL_NO_FILM_PACKAGE, READY_CAROUSEL_SLIDES } from "@/lib/carouselNoFilmPackage";
-import { READY_PINS, pinDestinationUrl } from "@/lib/readyPins";
+import { READY_PINS, pinDestinationUrl, PINS_ZIP_PATH } from "@/lib/readyPins";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
 export const metadata: Metadata = {
@@ -241,6 +241,13 @@ export default function SocialPlaybookPage() {
         <p className="mt-1 text-sm text-ink-muted">
           PNG 1000×1500 — download and upload to Pinterest; paste the destination URL with UTM.
         </p>
+        <a
+          href={PINS_ZIP_PATH}
+          download
+          className="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-control bg-coral px-4 text-sm font-semibold text-white hover:bg-coral-hover"
+        >
+          Download all {READY_PINS.length} pins (ZIP)
+        </a>
         <div className="mt-4 space-y-4">
           {READY_PINS.map((pin) => (
             <article key={pin.id} className="rounded-card border border-border bg-surface p-4">

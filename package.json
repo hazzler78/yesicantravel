@@ -16,6 +16,7 @@
     "seed:blog:web-summit-lisbon": "node scripts/seed-lisbon-web-summit-seo-blog.js",
     "seed:blog:milan": "node scripts/seed-milan-seo-blog.js",
     "generate:carousel": "node scripts/generate-carousel-slides.js",
+    "generate:seo-pins": "node scripts/generate-seo-pins.js",
     "pins:png": "node scripts/convert-pins-to-png.js",
     "mailerlite:backfill-nurture": "node scripts/backfill-mailerlite-nurture.js"
   },

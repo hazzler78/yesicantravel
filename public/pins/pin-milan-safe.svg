@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1500" viewBox="0 0 1000 1500" role="img">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F7F4EF"/>
+      <stop offset="100%" stop-color="#E8F4F3"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="1500" fill="url(#bg)"/>
+  <rect x="60" y="60" width="880" height="1380" rx="32" fill="#FFFFFF" stroke="#D4E8E6" stroke-width="3"/>
+  <text x="500" y="180" text-anchor="middle" font-family="Georgia, serif" font-size="28" fill="#0D7377" letter-spacing="4">YES I CAN TRAVEL</text>
+  <text x="500" y="320" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#1A2332">Is Milan safe for</text>
+  <text x="500" y="400" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="#1A2332">solo female travellers?</text>
+  <circle cx="220" cy="630" r="14" fill="#0D7377"/>
+  <text x="260" y="640" font-family="system-ui, sans-serif" font-size="30" fill="#1A2332">Brera &amp; Porta Nuova</text>
+  <circle cx="220" cy="730" r="14" fill="#0D7377"/>
+  <text x="260" y="740" font-family="system-ui, sans-serif" font-size="30" fill="#1A2332">Metro nights explained</text>
+  <circle cx="220" cy="830" r="14" fill="#0D7377"/>
+  <text x="260" y="840" font-family="system-ui, sans-serif" font-size="30" fill="#1A2332">Hotel filters that help</text>
+  <rect x="250" y="1120" width="500" height="88" rx="16" fill="#E07A5F"/>
+  <text x="500" y="1176" text-anchor="middle" font-family="system-ui, sans-serif" font-size="32" font-weight="700" fill="#FFFFFF">Read the guide</text>
+  <text x="500" y="1320" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" fill="#5A6570">yesicantravel.com/blog</text>
+</svg>

@@ -469,9 +469,9 @@ export const destinations: Destination[] = [
     headline: "Milan for solo female travellers",
     subheadline:
       "A working city rather than a museum, compact in the centre and easy to cross by metro — as long as you know it shuts around 00:30. Here's where to stay and how the night network fills the gap.",
-    metaTitle: "Safe Hotels in Milan for Solo Female Travellers | Area Guide",
+    metaTitle: "Is Milan Safe for Solo Female Travellers? | Stay Areas",
     metaDescription:
-      "Where to stay in Milan as a solo woman: neighbourhood guidance, metro closing times and night buses, airport transfers, and stays with 24/7 reception.",
+      "Is Milan safe for solo female travellers? Honest neighbourhood guidance (Brera, Porta Nuova), metro nights, and hotels with 24/7 reception.",
     aiSearch: "central safe hotel Milan Italy well-lit near metro",
     knownFor: [
       "The Duomo and the Galleria Vittorio Emanuele II",

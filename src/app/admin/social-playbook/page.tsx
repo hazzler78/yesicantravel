@@ -9,6 +9,7 @@ import {
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
+import { CAROUSEL_NO_FILM_PACKAGE } from "@/lib/carouselNoFilmPackage";
 import { READY_PINS, pinDestinationUrl } from "@/lib/readyPins";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
@@ -34,9 +35,39 @@ export default function SocialPlaybookPage() {
           </li>
           <li>Upload the 3 ready PNG pins below to Pinterest</li>
           <li>Post all 3 Reels (copy-paste packages below → CapCut → IG + TikTok)</li>
+          <li>
+            Or post the no-film carousel today if you cannot shoot video yet
+          </li>
         </ol>
         <p className="mt-3 text-xs text-ink-muted">
           Nurture automation is live — signups already get email 1 and wait for day 2.
+        </p>
+      </section>
+
+      <section className="mt-8 rounded-card border border-coral/40 bg-coral-soft/30 p-5">
+        <h2 className="font-display text-lg font-semibold text-ink">
+          No-film carousel (post in 10 min)
+        </h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          {CAROUSEL_NO_FILM_PACKAGE.platformNote} · {CAROUSEL_NO_FILM_PACKAGE.canvaSize}
+        </p>
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-[0.9375rem] text-ink">
+          {CAROUSEL_NO_FILM_PACKAGE.slides.map((s) => (
+            <li key={s.slide}>
+              <span className="font-semibold whitespace-pre-line">{s.headline}</span>
+              <span className="block text-sm text-ink-muted">{s.sub}</span>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+          Caption (copy all)
+        </p>
+        <pre className="mt-2 whitespace-pre-wrap rounded-card border border-border bg-surface p-3 text-xs text-ink">
+          {CAROUSEL_NO_FILM_PACKAGE.caption}
+        </pre>
+        <p className="mt-3 text-xs text-ink-muted">
+          First comment:{" "}
+          <code className="text-ink">{CAROUSEL_NO_FILM_PACKAGE.firstComment}</code>
         </p>
       </section>
 

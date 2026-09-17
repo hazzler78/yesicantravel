@@ -14,6 +14,7 @@
     "seed:blog:berlin-marathon": "node scripts/seed-berlin-marathon-seo-blog.js",
     "seed:blog:rock-en-seine": "node scripts/seed-rock-en-seine-seo-blog.js",
     "seed:blog:web-summit-lisbon": "node scripts/seed-lisbon-web-summit-seo-blog.js",
+    "seed:blog:milan": "node scripts/seed-milan-seo-blog.js",
     "pins:png": "node scripts/convert-pins-to-png.js",
     "mailerlite:backfill-nurture": "node scripts/backfill-mailerlite-nurture.js"
   },

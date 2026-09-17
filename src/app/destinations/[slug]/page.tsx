@@ -11,6 +11,7 @@ import { getUpcomingEventsInCity } from "@/data/events";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
+import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -325,6 +326,8 @@ export default async function DestinationPage({ params }: Props) {
             Find safer stays in {dest.city}
           </Link>
         </div>
+
+        <LeadMagnetHomeCta embedded />
 
         {cityEvents.length > 0 && (
           <section className="mt-12 rounded-card border border-border bg-surface p-5 shadow-card">

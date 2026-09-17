@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ContentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 
 export const dynamic = "force-dynamic";
 
@@ -78,6 +79,8 @@ export default async function BlogIndexPage() {
             </article>
           ))}
         </div>
+
+        <LeadMagnetHomeCta embedded />
       </div>
     </div>
   );

@@ -11,6 +11,8 @@ export type ReelShootScript = {
   durationSeconds: string;
   hookOnScreen: string;
   voiceoverOrText: string[];
+  /** CapCut text overlays — paste one per beat, large white + navy shadow */
+  capCutOverlays: string[];
   brollShots: string[];
   caption: string;
   hashtags: string[];
@@ -31,6 +33,13 @@ export const THIS_WEEK_REELS: ReelShootScript[] = [
       "I want 24/7 reception, a well-lit entrance, and free cancellation.",
       "Yes I Can Travel shows those signals first — so you decide with clarity.",
       "Free checklist in bio.",
+    ],
+    capCutOverlays: [
+      "Price first? Think again.",
+      "24/7 reception",
+      "Well-lit entrance",
+      "Free cancellation",
+      "Checklist in bio →",
     ],
     brollShots: [
       "Phone scroll on a hotel list (blurred competitor UI OK)",
@@ -62,6 +71,13 @@ export const THIS_WEEK_REELS: ReelShootScript[] = [
       "Two: Does the map pin match a walkable, lit street?",
       "Three: Can I cancel if plans change?",
       "Save this. Then grab the full checklist in bio.",
+    ],
+    capCutOverlays: [
+      "3 things before I book",
+      "1 · Reception hours",
+      "2 · Map pin truth",
+      "3 · Free cancellation",
+      "Save + checklist in bio",
     ],
     brollShots: [
       "Text overlay 1 / 2 / 3 with cuts",
@@ -95,6 +111,13 @@ export const THIS_WEEK_REELS: ReelShootScript[] = [
       "And yes — check 24/7 reception before you book late arrivals.",
       "Free safety checklist linked in bio.",
     ],
+    capCutOverlays: [
+      "Not the aesthetic pack list",
+      "Offline hotel address",
+      "Charger + one trusted contact",
+      "Check 24/7 reception",
+      "Free checklist in bio",
+    ],
     brollShots: [
       "Packing bag flat lay (passport, charger, phone)",
       "Screenshot / offline maps gesture",
@@ -118,3 +141,12 @@ export const THIS_WEEK_REELS: ReelShootScript[] = [
 
 /** Copy-paste bio link for Instagram / TikTok profile */
 export const SOCIAL_BIO_URL = "https://yesicantravel.com/bio";
+
+export const CAPCUT_STYLE_NOTES = [
+  "Aspect: 9:16",
+  "Font: bold sans (Montserrat / CapCut Bold)",
+  "Text: white fill, soft navy (#1a2332) shadow or stroke",
+  "Safe margins: keep overlays in centre third",
+  "Music: trending calm beat, duck under VO if any",
+  "End card 2s: yesicantravel.com/bio",
+] as const;

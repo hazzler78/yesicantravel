@@ -7,7 +7,7 @@ import {
   VIDEO_TEMPLATES,
 } from "@/lib/socialPlaybook";
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
-import { SOCIAL_BIO_URL, THIS_WEEK_REELS } from "@/lib/reelsThisWeek";
+import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
 export const metadata: Metadata = {
@@ -50,6 +50,13 @@ export default function SocialPlaybookPage() {
         <p className="mt-1 text-sm text-ink-muted">
           Shoot in one session. CapCut: text on screen + music. CTA always points to bio → checklist.
         </p>
+        <ul className="mt-3 flex flex-wrap gap-2 text-xs text-ink-muted">
+          {CAPCUT_STYLE_NOTES.map((note) => (
+            <li key={note} className="rounded-full border border-border bg-surface px-2.5 py-1">
+              {note}
+            </li>
+          ))}
+        </ul>
         <div className="mt-4 space-y-6">
           {THIS_WEEK_REELS.map((reel) => (
             <article key={reel.id} className="rounded-card border border-border bg-surface p-4">
@@ -63,6 +70,12 @@ export default function SocialPlaybookPage() {
               <p className="mt-1 text-xs text-ink-muted">{reel.durationSeconds}s · Say: {reel.ctaSpoken}</p>
               <ol className="mt-3 list-decimal space-y-1 pl-5 text-sm text-ink-muted">
                 {reel.voiceoverOrText.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ol>
+              <p className="mt-3 text-xs font-medium text-ink">CapCut overlays (paste in order)</p>
+              <ol className="mt-1 list-decimal space-y-0.5 pl-5 font-mono text-xs text-ink-muted">
+                {reel.capCutOverlays.map((line) => (
                   <li key={line}>{line}</li>
                 ))}
               </ol>

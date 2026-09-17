@@ -8,6 +8,7 @@ import {
 } from "@/lib/socialPlaybook";
 import { BIO_LINKS, bioLinkHref } from "@/lib/socialUtm";
 import { SOCIAL_BIO_URL, THIS_WEEK_REELS, CAPCUT_STYLE_NOTES } from "@/lib/reelsThisWeek";
+import { REEL_ONE_POST_PACKAGE } from "@/lib/reelOnePostPackage";
 import { NURTURE_EMAILS } from "@/lib/nurtureEmailCopy";
 
 export const metadata: Metadata = {
@@ -22,6 +23,35 @@ export default function SocialPlaybookPage() {
       <p className="mt-2 text-[0.9375rem] text-ink-muted">
         Internal reference — this week&apos;s Reels scripts, nurture emails, UTM links, and cadence.
       </p>
+
+      <section className="mt-8 rounded-card border border-coral/40 bg-coral-soft/30 p-5">
+        <h2 className="font-display text-lg font-semibold text-ink">Post Reel #1 now</h2>
+        <p className="mt-1 text-sm text-ink-muted">
+          {REEL_ONE_POST_PACKAGE.durationTarget}s · same file → Instagram Reels + TikTok
+        </p>
+        <ol className="mt-3 list-decimal space-y-2 pl-5 text-[0.9375rem] text-ink">
+          {REEL_ONE_POST_PACKAGE.beforeYouPost.map((step) => (
+            <li key={step}>{step}</li>
+          ))}
+        </ol>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+          CapCut overlays (in order)
+        </p>
+        <ol className="mt-2 list-decimal space-y-1 pl-5 font-mono text-xs text-ink-muted">
+          {REEL_ONE_POST_PACKAGE.overlaysInOrder.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ol>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+          Caption (copy all)
+        </p>
+        <pre className="mt-2 whitespace-pre-wrap rounded-card border border-border bg-surface p-3 text-xs text-ink">
+          {REEL_ONE_POST_PACKAGE.captionFull}
+        </pre>
+        <p className="mt-3 text-xs text-ink-muted">
+          First comment: <code className="text-ink">{REEL_ONE_POST_PACKAGE.firstComment}</code>
+        </p>
+      </section>
 
       <section className="mt-8 rounded-card border border-teal/30 bg-teal-soft/40 p-5">
         <h2 className="font-display text-lg font-semibold text-ink">Do this week</h2>

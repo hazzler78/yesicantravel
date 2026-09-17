@@ -23,6 +23,8 @@ export type WeeklyGrowthSnapshot = {
   onPace: boolean;
   bioVisitsThisWeek: number;
   socialLandingsThisWeek: number;
+  /** Checklist signups submitted on /bio this week */
+  bioSignupsThisWeek: number;
   signupsBySource: Array<{ source: string; count: number }>;
 };
 
@@ -85,6 +87,7 @@ export async function getWeeklyGrowthSnapshot(
     signupsInGoalPeriod,
     pageVisitsThisWeek,
     signupsBySourceRaw,
+    bioSignupsThisWeek,
   ] = await Promise.all([
     prisma.leadProfile.count({
       where: { consentMarketing: true, createdAt: { gte: weekStart, lt: weekEnd } },
@@ -104,6 +107,13 @@ export async function getWeeklyGrowthSnapshot(
         source: { not: null },
       },
       _count: { _all: true },
+    }),
+    prisma.leadEvent.count({
+      where: {
+        type: "lead_magnet_download",
+        createdAt: { gte: weekStart, lt: weekEnd },
+        pageUrl: "/bio",
+      },
     }),
   ]);
 
@@ -128,6 +138,7 @@ export async function getWeeklyGrowthSnapshot(
     onPace: signupsInGoalPeriod >= expectedByNow * 0.85,
     bioVisitsThisWeek: pageVisitsThisWeek.filter(isBioVisit).length,
     socialLandingsThisWeek: pageVisitsThisWeek.filter(isSocialLanding).length,
+    bioSignupsThisWeek,
     signupsBySource: signupsBySourceRaw
       .map((row) => ({
         source: row.source ?? "unknown",

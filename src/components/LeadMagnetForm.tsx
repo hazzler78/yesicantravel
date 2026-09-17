@@ -1,11 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
 
-export default function LeadMagnetForm() {
+type LeadMagnetFormProps = {
+  /** Page path for analytics (e.g. /bio, /destinations/milan) */
+  pagePath?: string;
+};
+
+export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
+  const uid = useId();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -17,10 +23,15 @@ export default function LeadMagnetForm() {
     setMessage("");
 
     try {
+      const resolvedPath =
+        pagePath ??
+        (typeof window !== "undefined" ? window.location.pathname : "/lead-magnet");
+
       const payload = {
         email: email.trim(),
         firstName: firstName.trim() || undefined,
         source: "lead_magnet" as const,
+        pageUrl: resolvedPath,
       };
 
       const saveRes = await fetch("/api/customer", {
@@ -53,7 +64,7 @@ export default function LeadMagnetForm() {
         <PrimaryLink href="/checklist" variant="coral" size="md">
           Open your checklist
         </PrimaryLink>
-        <p className="text-[0.8125rem] text-ink-muted">
+        <p className="mt-1 text-[0.8125rem] text-ink-muted">
           Prefer email? Watch your inbox for the same checklist and follow-up tips.{" "}
           <Link href="/popular-cities" className="font-medium text-teal hover:underline">
             Or start browsing cities
@@ -67,7 +78,7 @@ export default function LeadMagnetForm() {
   return (
     <form onSubmit={onSubmit} className="mt-4 space-y-3">
       <TextField
-        id="lead-first-name"
+        id={`${uid}-first-name`}
         label="First name (optional)"
         type="text"
         value={firstName}
@@ -75,7 +86,7 @@ export default function LeadMagnetForm() {
         placeholder="First name"
       />
       <TextField
-        id="lead-email"
+        id={`${uid}-email`}
         label="Email address"
         type="email"
         required

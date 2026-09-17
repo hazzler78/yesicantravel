@@ -52,6 +52,13 @@ export default function SocialPlaybookPage() {
           {CAROUSEL_NO_FILM_PACKAGE.platformNote} · Set bio to{" "}
           <code className="text-xs">{CAROUSEL_NO_FILM_PACKAGE.bioMustBe}</code> first.
         </p>
+        <a
+          href="/carousel/yesicantravel-carousel.zip"
+          download
+          className="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-control bg-coral px-4 text-sm font-semibold text-white hover:bg-coral-hover"
+        >
+          Download all 7 slides (ZIP)
+        </a>
         <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {READY_CAROUSEL_SLIDES.map((slide) => (
             <a

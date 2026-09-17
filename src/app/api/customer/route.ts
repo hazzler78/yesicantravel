@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
       checkin,
       checkout,
       source,
+      pageUrl: bodyPageUrl,
     } = body as {
       email?: string;
       firstName?: string;
@@ -30,10 +31,17 @@ export async function POST(request: NextRequest) {
       checkin?: string;
       checkout?: string;
       source?: "lead_magnet" | "booking" | "newsletter";
+      pageUrl?: string;
     };
 
     const isLeadMagnet = source === "lead_magnet";
     const campaignName = isLeadMagnet ? "solo_female_checklist" : "newsletter_signup";
+    const pageUrl =
+      typeof bodyPageUrl === "string" && bodyPageUrl.startsWith("/")
+        ? bodyPageUrl.slice(0, 200)
+        : isLeadMagnet
+          ? "/lead-magnet"
+          : undefined;
 
     if (!email || typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
@@ -54,7 +62,7 @@ export async function POST(request: NextRequest) {
       type: isLeadMagnet ? LeadEventType.lead_magnet_download : LeadEventType.newsletter_signup,
       eventName: isLeadMagnet ? "lead_magnet_download" : "newsletter_signup",
       leadProfileId: leadProfile?.id,
-      pageUrl: isLeadMagnet ? "/lead-magnet" : undefined,
+      pageUrl,
       metadata: {
         hotelId,
         checkin,
@@ -63,6 +71,7 @@ export async function POST(request: NextRequest) {
         utmSource: attribution.source,
         utmMedium: attribution.medium,
         utmCampaign: attribution.campaign,
+        fromBio: pageUrl === "/bio" || attribution.medium === "bio",
       },
     });
 

@@ -43,7 +43,7 @@ export default function BioPage() {
           <p className="mt-1 text-[0.8125rem] text-ink-muted">
             Instant access + email tips. No spam.
           </p>
-          <LeadMagnetForm />
+          <LeadMagnetForm pagePath="/bio" />
         </section>
 
         <nav className="mt-6 space-y-3" aria-label="Featured links">

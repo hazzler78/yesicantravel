@@ -149,7 +149,7 @@ export default async function GrowthDashboardPage() {
             </p>
           </section>
 
-          <section className="mt-6 grid gap-4 md:grid-cols-3">
+          <section className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <article className="rounded-xl border border-[var(--sand)] bg-white p-4">
               <p className="text-sm text-[var(--navy-light)]">Signups this week</p>
               <p className="text-2xl font-semibold">{snapshot.signupsThisWeek}</p>
@@ -161,6 +161,11 @@ export default async function GrowthDashboardPage() {
               <p className="text-sm text-[var(--navy-light)]">/bio visits this week</p>
               <p className="text-2xl font-semibold">{snapshot.bioVisitsThisWeek}</p>
               <p className="mt-1 text-xs text-[var(--navy-light)]">Link-in-bio traffic</p>
+            </article>
+            <article className="rounded-xl border border-[var(--sand)] bg-white p-4">
+              <p className="text-sm text-[var(--navy-light)]">/bio checklist signups</p>
+              <p className="text-2xl font-semibold">{snapshot.bioSignupsThisWeek}</p>
+              <p className="mt-1 text-xs text-[var(--navy-light)]">Captured on the bio page</p>
             </article>
             <article className="rounded-xl border border-[var(--sand)] bg-white p-4">
               <p className="text-sm text-[var(--navy-light)]">Social landings this week</p>
@@ -189,10 +194,10 @@ export default async function GrowthDashboardPage() {
           <section className="mt-8 rounded-xl border border-dashed border-[var(--sand)] bg-white/60 p-5">
             <h2 className="text-lg font-semibold">Weekly checklist</h2>
             <ul className="mt-3 space-y-2 text-sm text-[var(--navy-light)]">
-              <li>Activate MailerLite nurture automation (if still inactive)</li>
-              <li>Post 3 core videos (TikTok + Reels) — scripts in Social playbook</li>
               <li>Set bio link to {SOCIAL_BIO_URL}</li>
-              <li>Review GA4 Realtime + Clarity for drop-off on /lead-magnet</li>
+              <li>Post no-film carousel or 3 Reels — Social playbook</li>
+              <li>Upload 3 Pinterest PNG pins</li>
+              <li>Review /bio visits + bio checklist signups below</li>
               <li>
                 Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / 13)} signups/week to hit{" "}
                 {GROWTH_GOAL.targetLeads} in 90 days

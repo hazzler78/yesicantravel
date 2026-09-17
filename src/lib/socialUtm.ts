@@ -54,6 +54,14 @@ export const BIO_LINKS: BioLink[] = [
     platforms: ["instagram", "tiktok", "pinterest"],
   },
   {
+    id: "blog-rock-en-seine",
+    label: "Rock en Seine: safer solo hotels",
+    description: "Metro line 10, Boulogne, late returns",
+    path: "/blog/rock-en-seine-paris-solo-women-hotels",
+    utm: { source: "instagram", medium: "bio", campaign: "blog_rock_en_seine" },
+    platforms: ["instagram", "tiktok", "pinterest"],
+  },
+  {
     id: "popular-cities",
     label: "Explore safe cities in Europe",
     description: "Paris, Berlin, Barcelona & more — live prices",

@@ -126,7 +126,7 @@ export const PINTEREST_PINS: PinterestPin[] = [
     id: "pin-paris-rock-en-seine",
     title: "Rock en Seine 2026 — safe hotels for solo women",
     description: "Metro line 10 hotels, neighbourhood guides & safety tips for solo female travellers.",
-    targetPath: "/events/rock-en-seine-paris-2026",
+    targetPath: "/blog/rock-en-seine-paris-solo-women-hotels",
     dimensions: "1000×1500",
     headlineOnPin: "Rock en Seine · Paris solo guide",
     utmCampaign: "pin_paris_rock_en_seine",

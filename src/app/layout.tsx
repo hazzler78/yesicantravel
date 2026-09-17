@@ -7,6 +7,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import Chatbot from "../components/Chatbot";
 import AttributionBootstrap from "../components/AttributionBootstrap";
+import GlobalPageVisitTracker from "@/components/analytics/GlobalPageVisitTracker";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { textSizeBootstrapScript } from "@/components/layout/TextSizeControl";
@@ -175,6 +176,7 @@ pintrk('page');`}
           <Chatbot />
         </Suspense>
         <AttributionBootstrap />
+        <GlobalPageVisitTracker />
         <Analytics />
         <SpeedInsights />
       </body>

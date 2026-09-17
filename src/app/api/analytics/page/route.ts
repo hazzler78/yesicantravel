@@ -7,7 +7,21 @@ type PageVisitBody = {
   sessionId?: string;
 };
 
-/** Log page visits for /bio and UTM-tagged social landings (weekly growth metrics). */
+/** Funnel pages we always persist (even without UTM) so checkout traffic is queryable in DB. */
+function isFunnelPath(path: string): boolean {
+  return (
+    path === "/" ||
+    path === "/bio" ||
+    path === "/checkout" ||
+    path === "/confirmation" ||
+    path === "/results" ||
+    path.startsWith("/hotel/") ||
+    path.startsWith("/destinations/") ||
+    path.startsWith("/events/")
+  );
+}
+
+/** Log page visits for social/UTM landings + key funnel paths (checkout included). */
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as PageVisitBody;
@@ -26,7 +40,7 @@ export async function POST(request: NextRequest) {
       Boolean(attribution.campaign) ||
       path === "/bio";
 
-    if (!hasSocialSignal) {
+    if (!hasSocialSignal && !isFunnelPath(path)) {
       return NextResponse.json({ ok: true, skipped: true });
     }
 
@@ -43,6 +57,7 @@ export async function POST(request: NextRequest) {
           utmMedium: attribution.medium,
           utmCampaign: attribution.campaign,
           landingPage: attribution.landingPage,
+          funnel: isFunnelPath(path),
         },
       },
     });

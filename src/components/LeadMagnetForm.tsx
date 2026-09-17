@@ -17,6 +17,8 @@ export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
+  const onChecklistPage = pagePath === "/checklist";
+
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setStatus("loading");
@@ -46,7 +48,11 @@ export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
       }
 
       setStatus("success");
-      setMessage("You’re in. Open your checklist below — tips will also arrive by email.");
+      setMessage(
+        onChecklistPage
+          ? "You’re in. Tips will arrive by email — keep using the checklist below."
+          : "You’re in. Open your checklist below — tips will also arrive by email."
+      );
       setEmail("");
       setFirstName("");
     } catch {
@@ -61,15 +67,29 @@ export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
         <p role="status" className="text-[0.9375rem] font-medium text-ink">
           {message}
         </p>
-        <PrimaryLink href="/checklist" variant="coral" size="md">
-          Open your checklist
-        </PrimaryLink>
-        <p className="mt-1 text-[0.8125rem] text-ink-muted">
-          Prefer email? Watch your inbox for the same checklist and follow-up tips.{" "}
-          <Link href="/popular-cities" className="font-medium text-teal hover:underline">
-            Or start browsing cities
-          </Link>
-          .
+        {!onChecklistPage && (
+          <PrimaryLink href="/checklist" variant="coral" size="md">
+            Open your checklist
+          </PrimaryLink>
+        )}
+        <p className="text-[0.8125rem] text-ink-muted">
+          {onChecklistPage ? (
+            <>
+              Next:{" "}
+              <Link href="/popular-cities" className="font-medium text-teal hover:underline">
+                browse safer cities
+              </Link>
+              .
+            </>
+          ) : (
+            <>
+              Prefer email? Watch your inbox for the same checklist and follow-up tips.{" "}
+              <Link href="/popular-cities" className="font-medium text-teal hover:underline">
+                Or start browsing cities
+              </Link>
+              .
+            </>
+          )}
         </p>
       </div>
     );
@@ -95,7 +115,11 @@ export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
         placeholder="you@example.com"
       />
       <PrimaryButton type="submit" variant="coral" size="md" disabled={status === "loading"}>
-        {status === "loading" ? "Sending…" : "Send me the checklist"}
+        {status === "loading"
+          ? "Sending…"
+          : onChecklistPage
+            ? "Email me the tips"
+            : "Send me the checklist"}
       </PrimaryButton>
       {message && (
         <p role="status" className="text-[0.8125rem] text-coral">

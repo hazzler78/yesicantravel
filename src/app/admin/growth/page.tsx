@@ -37,17 +37,17 @@ export default async function GrowthDashboardPage() {
   if (snapshot && snapshot.bioVisitsThisWeek === 0 && snapshot.socialLandingsThisWeek === 0) {
     blockers.push({
       id: "bio",
-      label: "No /bio or social UTM traffic this week — set Instagram/TikTok bio to yesicantravel.com/bio.",
-      href: SOCIAL_BIO_URL,
-      cta: "Open /bio",
+      label: "No /bio or social UTM traffic this week — set Instagram/TikTok bio and post the carousel.",
+      href: "/admin/post-now",
+      cta: "Open post-now pack",
     });
   }
   if (snapshot && snapshot.signupsThisWeek === 0) {
     blockers.push({
       id: "reels",
-      label: "Zero signups this week — film & post the 3 Reels in the social playbook.",
-      href: "/admin/social-playbook",
-      cta: "Open Reels scripts",
+      label: "Zero signups this week — post carousel/pins/Reels from the post-now pack.",
+      href: "/admin/post-now",
+      cta: "Open post-now pack",
     });
   }
 
@@ -205,8 +205,14 @@ export default async function GrowthDashboardPage() {
             </ul>
             <div className="mt-4 flex flex-wrap gap-3">
               <Link
-                href="/admin/social-playbook"
+                href="/admin/post-now"
                 className="rounded-lg bg-[var(--ocean-teal)] px-4 py-2 text-sm font-semibold text-white"
+              >
+                Post now
+              </Link>
+              <Link
+                href="/admin/social-playbook"
+                className="rounded-lg border border-[var(--sand)] px-4 py-2 text-sm font-semibold"
               >
                 Social playbook
               </Link>

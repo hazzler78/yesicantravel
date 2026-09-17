@@ -14,6 +14,14 @@ type AdminModule = {
 
 const modules: AdminModule[] = [
   {
+    id: "post-now",
+    title: "Post now (traffic blockers)",
+    description:
+      "Bio URL, carousel ZIP, Pinterest ZIP, and Reel #1 — the actions that unblock the 50-lead goal.",
+    href: "/admin/post-now",
+    cta: "Open post-now pack",
+  },
+  {
     id: "search-analytics",
     title: "Search Analytics",
     description:

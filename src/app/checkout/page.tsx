@@ -8,6 +8,7 @@ import { track } from "@vercel/analytics";
 import { ArrowLeft, ImageOff } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
+import { trackClientPurchase } from "@/lib/trackClientPurchase";
 import { pinterestTrack } from "@/lib/pinterest";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { BookingSuccess } from "@/components/checkout/BookingSuccess";
@@ -397,21 +398,52 @@ function CheckoutContent() {
         setBooking(data);
         sessionStorage.removeItem(STORAGE_KEY);
         sessionStorage.removeItem(CLIENT_REF_KEY);
-        sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
+        {
+          const booked = data as Record<string, unknown>;
+          sessionStorage.setItem(
+            `liteapi_booking_${(data as { bookingId?: string }).bookingId}`,
+            JSON.stringify({
+              ...booked,
+              holder: {
+                email: guest.email,
+                phone: guest.phone,
+                firstName: guest.firstName,
+                lastName: guest.lastName,
+              },
+            })
+          );
+        }
         setStep("done");
         sessionStorage.setItem(CHECKOUT_COMPLETED_KEY, "1");
+        const booked = data as {
+          bookingId?: string;
+          price?: number;
+          currency?: string;
+          hotel?: { hotelId?: string; name?: string };
+          status?: string;
+        };
         trackFunnelEvent("BookingSuccess", {
-          bookingId: (data as { bookingId?: string }).bookingId,
+          bookingId: booked.bookingId,
           hotelId,
           checkin,
           checkout,
           adults,
           paymentMethod: "card",
         });
+        if (booked.bookingId && typeof booked.price === "number" && booked.price > 0) {
+          trackClientPurchase({
+            bookingId: booked.bookingId,
+            value: booked.price,
+            currency: booked.currency ?? "EUR",
+            hotelId: booked.hotel?.hotelId ?? hotelId ?? undefined,
+            email: guest.email,
+            phone: guest.phone,
+          });
+        }
         pinterestTrack("checkout", {
-          event_id: (data as { bookingId?: string }).bookingId ?? undefined,
-          currency: (data as { currency?: string }).currency ?? undefined,
-          value: (data as { price?: number }).price ?? undefined,
+          event_id: booked.bookingId ?? undefined,
+          currency: booked.currency ?? undefined,
+          value: booked.price ?? undefined,
           order_quantity: travellerCount,
         });
         saveCustomerForSuggestions({
@@ -424,11 +456,11 @@ function CheckoutContent() {
           checkout: checkout ?? undefined,
         });
         ingestBookingRevenue({
-          bookingId: (data as { bookingId?: string }).bookingId,
-          status: String((data as { status?: string }).status ?? "confirmed"),
-          hotelName: (data as { hotel?: { name?: string } }).hotel?.name,
-          grossRevenue: (data as { price?: number }).price ?? 0,
-          currency: (data as { currency?: string }).currency ?? "EUR",
+          bookingId: booked.bookingId,
+          status: String(booked.status ?? "confirmed"),
+          hotelName: booked.hotel?.name,
+          grossRevenue: booked.price ?? 0,
+          currency: booked.currency ?? "EUR",
           leadEmail: guest.email,
         });
       } catch (e) {
@@ -568,21 +600,44 @@ function CheckoutContent() {
         if (!bookRes.ok) throw new Error(bookJson.error ?? "Booking failed");
         const data = bookJson.data;
         setBooking(data);
-        sessionStorage.setItem(`liteapi_booking_${(data as { bookingId?: string }).bookingId}`, JSON.stringify(data));
+        sessionStorage.setItem(
+          `liteapi_booking_${(data as { bookingId?: string }).bookingId}`,
+          JSON.stringify({
+            ...(data as Record<string, unknown>),
+            holder: guestPayload,
+          })
+        );
         setStep("done");
         sessionStorage.setItem(CHECKOUT_COMPLETED_KEY, "1");
+        const booked = data as {
+          bookingId?: string;
+          price?: number;
+          currency?: string;
+          hotel?: { hotelId?: string; name?: string };
+          status?: string;
+        };
         trackFunnelEvent("BookingSuccess", {
-          bookingId: (data as { bookingId?: string }).bookingId,
+          bookingId: booked.bookingId,
           hotelId,
           checkin,
           checkout,
           adults,
           paymentMethod: "account",
         });
+        if (booked.bookingId && typeof booked.price === "number" && booked.price > 0) {
+          trackClientPurchase({
+            bookingId: booked.bookingId,
+            value: booked.price,
+            currency: booked.currency ?? "EUR",
+            hotelId: booked.hotel?.hotelId ?? hotelId ?? undefined,
+            email: guestPayload.email,
+            phone: guestPayload.phone,
+          });
+        }
         pinterestTrack("checkout", {
-          event_id: (data as { bookingId?: string }).bookingId ?? undefined,
-          currency: (data as { currency?: string }).currency ?? undefined,
-          value: (data as { price?: number }).price ?? undefined,
+          event_id: booked.bookingId ?? undefined,
+          currency: booked.currency ?? undefined,
+          value: booked.price ?? undefined,
           order_quantity: travellerCount,
         });
         saveCustomerForSuggestions({
@@ -595,11 +650,11 @@ function CheckoutContent() {
           checkout: checkout ?? undefined,
         });
         ingestBookingRevenue({
-          bookingId: (data as { bookingId?: string }).bookingId,
-          status: String((data as { status?: string }).status ?? "confirmed"),
-          hotelName: (data as { hotel?: { name?: string } }).hotel?.name,
-          grossRevenue: (data as { price?: number }).price ?? 0,
-          currency: (data as { currency?: string }).currency ?? "EUR",
+          bookingId: booked.bookingId,
+          status: String(booked.status ?? "confirmed"),
+          hotelName: booked.hotel?.name,
+          grossRevenue: booked.price ?? 0,
+          currency: booked.currency ?? "EUR",
           leadEmail: guestPayload.email,
         });
         return;
@@ -653,17 +708,31 @@ function CheckoutContent() {
   }
 
   if (step === "done" && booking) {
-    const bookingId = (booking as { bookingId?: string }).bookingId;
+    const booked = booking as {
+      bookingId?: string;
+      hotelConfirmationCode?: string;
+      price?: number;
+      currency?: string;
+      hotel?: { hotelId?: string };
+    };
+    const bookingId = booked.bookingId;
+    const confirmQs = new URLSearchParams();
+    if (bookingId) confirmQs.set("bookingId", bookingId);
+    if (typeof booked.price === "number") confirmQs.set("value", String(booked.price));
+    if (booked.currency) confirmQs.set("currency", booked.currency);
+    if (booked.hotel?.hotelId || hotelId) {
+      confirmQs.set("hotelId", booked.hotel?.hotelId || hotelId!);
+    }
     return (
       <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
         <BookingSuccess
           bookingId={bookingId}
-          hotelConfirmationCode={(booking as { hotelConfirmationCode?: string }).hotelConfirmationCode}
+          hotelConfirmationCode={booked.hotelConfirmationCode}
           email={email || undefined}
           actions={
             <>
               <PrimaryLink
-                href={`/confirmation?bookingId=${bookingId}`}
+                href={`/confirmation?${confirmQs.toString()}`}
                 variant="teal"
                 fullWidth={false}
               >

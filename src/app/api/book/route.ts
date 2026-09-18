@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { book, LiteAPIError } from "@/lib/liteapi";
+import { sendServerPurchaseEvent } from "@/lib/metaCapiServer";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +38,43 @@ export async function POST(request: NextRequest) {
       guests,
       clientReference: typeof clientReference === "string" ? clientReference : undefined,
     });
+
+    // Server-side Purchase so Meta still gets the conversion if the browser
+    // never opens /confirmation (common after payment return).
+    try {
+      const booking = (data as { data?: Record<string, unknown> })?.data ?? data;
+      const bookingObj = booking as {
+        bookingId?: string;
+        price?: number;
+        currency?: string;
+        hotel?: { hotelId?: string };
+      };
+      const bookingId = bookingObj.bookingId;
+      const price = bookingObj.price;
+      if (bookingId && typeof price === "number" && price > 0) {
+        const forwarded = request.headers.get("x-forwarded-for");
+        void sendServerPurchaseEvent(
+          {
+            bookingId,
+            value: price,
+            currency: bookingObj.currency ?? "EUR",
+            hotelId: bookingObj.hotel?.hotelId,
+            email,
+            phone: String(phone).trim(),
+          },
+          {
+            eventSourceUrl: request.headers.get("origin")
+              ? `${request.headers.get("origin")}/checkout`
+              : "https://yesicantravel.com/checkout",
+            clientIp: forwarded?.split(",")[0]?.trim(),
+            userAgent: request.headers.get("user-agent") ?? undefined,
+          }
+        );
+      }
+    } catch {
+      // never fail the booking because of analytics
+    }
+
     return NextResponse.json(data);
   } catch (e) {
     const err = e as LiteAPIError & Error;

@@ -44,7 +44,10 @@ export async function POST(request: NextRequest) {
       fbc: userDataInput.fbc,
     };
     if (userDataInput.email) user_data.em = [sha256(userDataInput.email)];
-    if (userDataInput.phone) user_data.ph = [sha256(userDataInput.phone)];
+    if (userDataInput.phone) {
+      const digits = userDataInput.phone.replace(/\D/g, "");
+      if (digits) user_data.ph = [sha256(digits)];
+    }
 
     const payload: Record<string, unknown> = {
       data: [

@@ -3,30 +3,28 @@
 import { useEffect, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { track } from "@vercel/analytics";
-import {
-  Check,
-  Clock,
-  ImageOff,
-  Info,
-  Lock,
-  MapPin,
-  ThumbsUp,
-  TrainFront,
-  TriangleAlert,
-  Venus,
-} from "lucide-react";
+import { Check, ImageOff, Lock, MapPin, TriangleAlert } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
 import { normalizeFacilityNames, deriveSafetyBadges } from "@/lib/safetyBadges";
-import { deriveStaySignals, formatDistance } from "@/lib/staySignals";
+import {
+  deriveStaySignals,
+  type PointOfInterest,
+} from "@/lib/staySignals";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { HotelGallery } from "@/components/hotel/HotelGallery";
 import { BackToResultsLink } from "@/components/hotel/BackToResultsLink";
+import { RoomPhotoStrip } from "@/components/hotel/RoomPhotoStrip";
+import {
+  AboutStayCard,
+  FacilitiesCard,
+  GuestReviewsSection,
+  PeaceOfMindCard,
+} from "@/components/hotel/HotelTrustSections";
 import { HotelLocationCard } from "@/components/HotelLocationCard";
 import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
-import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
@@ -53,7 +51,7 @@ interface Rate {
 interface RoomGroup {
   mappedRoomId: number;
   roomName: string;
-  firstImage?: string;
+  photos: string[];
   rates: Rate[];
 }
 
@@ -62,6 +60,12 @@ interface Facility {
   name?: string;
   groupId?: number;
   group?: string;
+}
+
+interface SentimentAnalysis {
+  pros?: string[];
+  cons?: string[];
+  categories?: Array<{ name?: string; rating?: number; description?: string }>;
 }
 
 interface HotelDetail {
@@ -79,6 +83,12 @@ interface HotelDetail {
   hotelFacilities?: string[];
   location?: { latitude?: number; longitude?: number; lat?: number; lng?: number };
   rooms?: Array<{ id: number; roomName: string; photos?: Array<{ url: string }> }>;
+  poi?: PointOfInterest[] | null;
+  checkinCheckoutTimes?: {
+    checkin_start?: string | null;
+    checkin_end?: string | null;
+  } | null;
+  sentiment_analysis?: SentimentAnalysis | null;
 }
 
 interface ReviewItem {
@@ -95,12 +105,6 @@ interface ReviewItem {
 interface ReviewsPayload {
   data?: ReviewItem[] | { reviews?: ReviewItem[]; sentimentAnalysis?: SentimentAnalysis };
   sentimentAnalysis?: SentimentAnalysis;
-}
-
-interface SentimentAnalysis {
-  pros?: string[];
-  cons?: string[];
-  categories?: Array<{ name?: string; rating?: number; description?: string }>;
 }
 
 function stripHtml(html: string): string {
@@ -165,8 +169,6 @@ function HotelContent() {
     });
   }, [hotelId, checkin, checkout, occupancyKey, party.adults, party.childAges.length, requestedRooms]);
 
-  // Fetch reviews in parallel with the main hotel/rates call — they're non-blocking social proof.
-  // LiteAPI review response shape varies; be defensive.
   useEffect(() => {
     if (!hotelId) return;
     let cancelled = false;
@@ -186,7 +188,7 @@ function HotelContent() {
         }
         if (!sent && json.sentimentAnalysis) sent = json.sentimentAnalysis;
         setReviews(items);
-        setSentiment(sent);
+        if (sent) setSentiment(sent);
       })
       .catch(() => {})
       .finally(() => {
@@ -233,7 +235,12 @@ function HotelContent() {
         if (!hotelRes.ok) throw new Error(hotelJson.error ?? "Hotel fetch failed");
         if (!ratesRes.ok) throw new Error(ratesJson.error ?? "Rates fetch failed");
 
-        setHotel(hotelJson.data);
+        const hotelData = (hotelJson.data ?? hotelJson) as HotelDetail;
+        setHotel(hotelData);
+        // Hotel payload often already includes AI sentiment — show it before reviews return.
+        if (hotelData.sentiment_analysis) {
+          setSentiment((current) => current ?? hotelData.sentiment_analysis ?? null);
+        }
 
         const data = ratesJson.data ?? [];
         const rateData = data.find((d: { hotelId: string }) => d.hotelId === hotelId);
@@ -247,14 +254,13 @@ function HotelContent() {
             }
             allRates.push({
               ...r,
-              // Prebook must use the bookable id: prefer per-rate offerId when the API sends it, else roomType offerId (LiteAPI default).
               offerId: r.offerId ?? rt.offerId,
             });
           }
         }
 
         const roomMap = new Map<number, Record<string, unknown>>();
-        for (const r of hotelJson.data?.rooms ?? []) {
+        for (const r of hotelData.rooms ?? []) {
           roomMap.set(r.id, r);
         }
 
@@ -267,13 +273,18 @@ function HotelContent() {
 
         const groups: RoomGroup[] = [];
         byRoom.forEach((rates, mappedRoomId) => {
-          const roomInfo = roomMap.get(mappedRoomId);
-          const roomName = rates[0]?.name ?? (roomInfo as { roomName?: string })?.roomName ?? `Room ${mappedRoomId}`;
-          const photos = (roomInfo as { photos?: Array<{ url: string }> })?.photos;
+          const roomInfo = roomMap.get(mappedRoomId) as
+            | { roomName?: string; photos?: Array<{ url: string }> }
+            | undefined;
+          const roomName =
+            rates[0]?.name ?? roomInfo?.roomName ?? `Room ${mappedRoomId}`;
+          const photos = (roomInfo?.photos ?? [])
+            .map((photo) => photo.url)
+            .filter((url, index, all): url is string => Boolean(url) && all.indexOf(url) === index);
           groups.push({
             mappedRoomId,
             roomName,
-            firstImage: photos?.[0]?.url,
+            photos,
             rates,
           });
         });
@@ -397,12 +408,15 @@ function HotelContent() {
     rateNames: roomGroups.flatMap((group) => group.rates.map((rate) => rate.name)),
   });
   const description = hotel.hotelDescription ? stripHtml(hotel.hotelDescription) : "";
-  const descriptionShort = description.length > 420 ? `${description.slice(0, 420).trim()}…` : description;
-  const reviewScores = reviews.map((r) => r.averageScore).filter((s): s is number => typeof s === "number" && !Number.isNaN(s));
-  const reviewAvg = reviewScores.length > 0 ? reviewScores.reduce((a, b) => a + b, 0) / reviewScores.length : null;
-  // The property's own aggregate is more representative than the sampled reviews.
-  const guestScore = typeof hotel.rating === "number" && hotel.rating > 0 ? hotel.rating : reviewAvg;
-  const reviewsToShow = reviews.filter((r) => (r.pros && r.pros.trim()) || (r.cons && r.cons.trim())).slice(0, 5);
+  const reviewScores = reviews
+    .map((r) => r.averageScore)
+    .filter((s): s is number => typeof s === "number" && !Number.isNaN(s));
+  const reviewAvg =
+    reviewScores.length > 0
+      ? reviewScores.reduce((a, b) => a + b, 0) / reviewScores.length
+      : null;
+  const guestScore =
+    typeof hotel.rating === "number" && hotel.rating > 0 ? hotel.rating : reviewAvg;
 
   const allRates = roomGroups.flatMap((group) => group.rates);
   const cheapest = allRates.reduce<{ amount: number; currency: string } | null>((lowest, rate) => {
@@ -434,7 +448,10 @@ function HotelContent() {
               {hotel.address && (
                 <p className="flex items-center gap-1.5 text-[0.9375rem] text-ink-muted">
                   <MapPin className="h-4 w-4 shrink-0" aria-hidden />
-                  <a href="#stay-location" className="hover:text-teal hover:underline hover:underline-offset-4">
+                  <a
+                    href="#stay-location"
+                    className="hover:text-teal hover:underline hover:underline-offset-4"
+                  >
                     {hotel.address}
                   </a>
                 </p>
@@ -451,62 +468,22 @@ function HotelContent() {
               </div>
             )}
 
-            {(safetyBadges.length > 0 || stay.nearestTransit || stay.latestCheckIn) && (
-              <Card className="mt-5 p-5">
-                <h2 className="font-display text-base font-semibold text-ink">
-                  Getting in and getting around
-                </h2>
+            {/* Trust before rooms — the conversion-critical order. */}
+            <PeaceOfMindCard
+              stay={stay}
+              safetyBadges={safetyBadges}
+              hasFreeCancellation={hasFreeCancellation}
+            />
 
-                {(stay.nearestTransit || stay.latestCheckIn) && (
-                  <ul className="mt-3 space-y-2 text-[0.9375rem] text-ink">
-                    {stay.nearestTransit && (
-                      <li className="flex items-start gap-2">
-                        <TrainFront className="mt-1 h-4 w-4 shrink-0 text-teal" aria-hidden />
-                        <span>
-                          <span className="tnum font-semibold">
-                            {formatDistance(stay.nearestTransit.distanceKm)}
-                          </span>{" "}
-                          to {stay.nearestTransit.name}
-                        </span>
-                      </li>
-                    )}
-                    {stay.latestCheckIn && (
-                      <li className="flex items-start gap-2">
-                        <Clock className="mt-1 h-4 w-4 shrink-0 text-teal" aria-hidden />
-                        <span>
-                          Check-in until{" "}
-                          <span className="tnum font-semibold">{stay.latestCheckIn}</span>
-                          {stay.roundTheClockReception && " — reception is staffed around the clock"}
-                        </span>
-                      </li>
-                    )}
-                  </ul>
-                )}
+            <GuestReviewsSection
+              guestScore={guestScore}
+              reviewCount={hotel.reviewCount}
+              sentiment={sentiment}
+              reviews={reviews}
+              loading={reviewsLoading}
+            />
 
-                {(safetyBadges.length > 0 || stay.matches.includes("womenOnlyRoom")) && (
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {stay.matches.includes("womenOnlyRoom") && (
-                      <SafetyBadge label="Women-only room" tone="positive" icon={Venus} />
-                    )}
-                    <SafetyBadgeList badges={safetyBadges} max={8} />
-                  </div>
-                )}
-
-                <p className="mt-3 text-xs text-ink-muted">
-                  Taken from what this property publishes. We don&apos;t inspect properties in
-                  person.
-                </p>
-              </Card>
-            )}
-
-            {descriptionShort && (
-              <Card className="mt-4 p-5">
-                <h2 className="font-display text-base font-semibold text-ink">About this stay</h2>
-                <p className="mt-2 whitespace-pre-line text-[0.9375rem] leading-relaxed text-ink-muted">
-                  {descriptionShort}
-                </p>
-              </Card>
-            )}
+            <AboutStayCard description={description} />
 
             <div id="stay-location" className="mt-4 scroll-mt-24">
               <HotelLocationCard
@@ -518,29 +495,20 @@ function HotelContent() {
               />
             </div>
 
-            <h2 id="rooms" className="mt-8 font-display text-xl font-semibold tracking-tight text-ink">
+            <h2
+              id="rooms"
+              className="mt-8 font-display text-xl font-semibold tracking-tight text-ink"
+            >
               Choose your room
             </h2>
+            <p className="mt-1 text-[0.9375rem] text-ink-muted">
+              Swipe room photos to see the space — then pick a rate that fits your dates.
+            </p>
             <div className="mt-4 space-y-4">
               {roomGroups.map((group) => (
                 <Card key={group.mappedRoomId} className="overflow-hidden">
                   <div className="flex flex-col sm:flex-row">
-                    <div className="aspect-[4/3] w-full shrink-0 bg-surface-muted sm:aspect-auto sm:w-44">
-                      {group.firstImage ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
-                        <img
-                          src={group.firstImage}
-                          alt=""
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-ink-muted">
-                          <ImageOff className="h-5 w-5" aria-hidden />
-                        </div>
-                      )}
-                    </div>
+                    <RoomPhotoStrip roomName={group.roomName} photos={group.photos} />
                     <div className="min-w-0 flex-1 p-4">
                       <h3 className="font-display text-base font-semibold text-ink">
                         {group.roomName}
@@ -549,11 +517,12 @@ function HotelContent() {
                         {group.rates.map((rate, index) => {
                           const total = rate.retailRate?.total?.[0];
                           const amount = total?.amount ?? 0;
-                          const currency = total?.currency ?? "EUR";
-                          const refundable = rate.cancellationPolicies?.refundableTag === "RFN";
+                          const rateCurrency = total?.currency ?? "EUR";
+                          const refundable =
+                            rate.cancellationPolicies?.refundableTag === "RFN";
                           return (
                             <div
-                              key={index}
+                              key={`${rate.offerId}-${index}`}
                               className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-surface-muted/60 p-3"
                             >
                               <div className="min-w-0">
@@ -573,7 +542,7 @@ function HotelContent() {
                               <div className="flex items-center gap-3">
                                 <div className="text-right">
                                   <p className="tnum font-display text-lg font-semibold text-ink">
-                                    {formatStayTotal(amount, currency)}
+                                    {formatStayTotal(amount, rateCurrency)}
                                   </p>
                                   <p className="text-xs text-ink-muted">
                                     total · {nights} {nights === 1 ? "night" : "nights"}
@@ -598,6 +567,9 @@ function HotelContent() {
 
               {roomGroups.length === 0 && (
                 <Card className="p-6 text-center">
+                  <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-muted text-ink-muted">
+                    <ImageOff className="h-5 w-5" aria-hidden />
+                  </div>
                   <p className="text-[0.9375rem] text-ink-muted">
                     No rooms available for {occupancySummary(party, requestedRooms)}. Hotels quote
                     room occupancy, not a headcount — four adults in one room is not the same as two
@@ -607,127 +579,7 @@ function HotelContent() {
               )}
             </div>
 
-            {(sentiment?.pros?.length || sentiment?.cons?.length || reviewsToShow.length > 0 || reviewsLoading) && (
-              <Card className="mt-4 p-5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h2 className="font-display text-base font-semibold text-ink">What guests say</h2>
-                  {guestScore != null && (
-                    <span className="text-[0.8125rem] text-ink-muted">
-                      <span className="tnum font-semibold text-ink">{guestScore.toFixed(1)}/10</span>
-                      {hotel.reviewCount != null && hotel.reviewCount > 0 && (
-                        <> · {hotel.reviewCount.toLocaleString("en-GB")} reviews</>
-                      )}
-                    </span>
-                  )}
-                </div>
-
-                {reviewsLoading && reviewsToShow.length === 0 && (
-                  <p className="mt-3 text-[0.9375rem] text-ink-muted">Loading reviews…</p>
-                )}
-
-                {((sentiment?.pros?.length ?? 0) > 0 || (sentiment?.cons?.length ?? 0) > 0) && (
-                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {(sentiment?.pros?.length ?? 0) > 0 && (
-                      <div className="rounded-control bg-positive-soft p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-positive">
-                          Guests liked
-                        </p>
-                        <ul className="mt-2 space-y-1.5 text-[0.9375rem] text-ink">
-                          {sentiment!.pros!.slice(0, 4).map((item, index) => (
-                            <li key={index} className="flex gap-2">
-                              <ThumbsUp className="mt-1 h-3.5 w-3.5 shrink-0 text-positive" aria-hidden />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {(sentiment?.cons?.length ?? 0) > 0 && (
-                      <div className="rounded-control bg-surface-muted p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
-                          Worth knowing
-                        </p>
-                        <ul className="mt-2 space-y-1.5 text-[0.9375rem] text-ink">
-                          {sentiment!.cons!.slice(0, 4).map((item, index) => (
-                            <li key={index} className="flex gap-2">
-                              <Info className="mt-1 h-3.5 w-3.5 shrink-0 text-ink-muted" aria-hidden />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {reviewsToShow.length > 0 && (
-                  <div className="mt-5 space-y-4">
-                    {reviewsToShow.map((review, index) => (
-                      <div
-                        key={index}
-                        className="border-t border-border pt-4 first:border-t-0 first:pt-0"
-                      >
-                        <div className="flex items-center gap-2 text-xs text-ink-muted">
-                          {review.name && <span className="font-semibold text-ink">{review.name}</span>}
-                          {review.country && <span>· {review.country}</span>}
-                          {typeof review.averageScore === "number" && (
-                            <span className="tnum ml-auto rounded bg-teal-soft px-2 py-0.5 font-semibold text-teal">
-                              {review.averageScore.toFixed(1)}/10
-                            </span>
-                          )}
-                        </div>
-                        {review.headline && (
-                          <p className="mt-1.5 text-[0.9375rem] font-semibold text-ink">
-                            {review.headline}
-                          </p>
-                        )}
-                        {review.pros && (
-                          <p className="mt-1 flex gap-2 text-[0.9375rem] text-ink">
-                            <ThumbsUp className="mt-1 h-3.5 w-3.5 shrink-0 text-positive" aria-hidden />
-                            <span>{review.pros}</span>
-                          </p>
-                        )}
-                        {review.cons && (
-                          <p className="mt-1 flex gap-2 text-[0.9375rem] text-ink-muted">
-                            <Info className="mt-1 h-3.5 w-3.5 shrink-0" aria-hidden />
-                            <span>{review.cons}</span>
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {!reviewsLoading &&
-                  reviewsToShow.length === 0 &&
-                  !sentiment?.pros?.length &&
-                  !sentiment?.cons?.length && (
-                    <p className="mt-3 text-[0.9375rem] text-ink-muted">
-                      No reviews yet for this property.
-                    </p>
-                  )}
-              </Card>
-            )}
-
-            {facilityNames.length > 0 && (
-              <Card className="mt-4 p-5">
-                <h2 className="font-display text-base font-semibold text-ink">Facilities</h2>
-                <ul className="mt-3 grid gap-x-6 gap-y-2 text-[0.9375rem] text-ink sm:grid-cols-2">
-                  {facilityNames.slice(0, 30).map((facility) => (
-                    <li key={facility} className="flex items-start gap-2">
-                      <Check className="mt-1 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
-                      <span>{facility}</span>
-                    </li>
-                  ))}
-                </ul>
-                {facilityNames.length > 30 && (
-                  <p className="mt-3 text-xs text-ink-muted">
-                    +{facilityNames.length - 30} more listed by the hotel.
-                  </p>
-                )}
-              </Card>
-            )}
-
+            <FacilitiesCard facilities={facilityNames} />
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:h-fit">
@@ -739,7 +591,8 @@ function HotelContent() {
                 {formatStayDate(checkin)} – {formatStayDate(checkout)}
               </p>
               <p className="text-[0.9375rem] text-ink-muted">
-                {nights} {nights === 1 ? "night" : "nights"} · {occupancySummary(party, requestedRooms)}
+                {nights} {nights === 1 ? "night" : "nights"} ·{" "}
+                {occupancySummary(party, requestedRooms)}
               </p>
 
               {cheapest && (
@@ -768,13 +621,15 @@ function HotelContent() {
                     Free cancellation available on some rates
                   </li>
                 )}
+                {safetyBadges.slice(0, 3).map((badge) => (
+                  <li key={badge} className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-teal" aria-hidden />
+                    {badge}
+                  </li>
+                ))}
                 <li className="flex items-start gap-2">
                   <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
                   Card details handled by Stripe, never stored by us
-                </li>
-                <li className="flex items-start gap-2">
-                  <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-positive" aria-hidden />
-                  Booking confirmed directly with the property
                 </li>
               </ul>
             </Card>

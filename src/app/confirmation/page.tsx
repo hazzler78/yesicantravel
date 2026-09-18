@@ -4,8 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { track } from "@vercel/analytics";
 import { CalendarDays, Check, MapPin } from "lucide-react";
-import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
-import { sendMetaCapiEvent } from "@/lib/metaCapi";
+import { trackClientPurchase } from "@/lib/trackClientPurchase";
 import { pinterestTrack } from "@/lib/pinterest";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { BookingSuccess } from "@/components/checkout/BookingSuccess";
@@ -23,6 +22,7 @@ interface Booking {
   price?: number;
   currency?: string;
   hotel?: { hotelId?: string; name?: string };
+  holder?: { email?: string; phone?: string };
   cancellationPolicies?: {
     refundableTag?: string;
     cancelPolicyInfos?: Array<{ cancelTime?: string }>;
@@ -46,10 +46,21 @@ function ConfirmationContent() {
 
   useEffect(() => {
     if (!bookingId) return;
+
+    const urlValue = Number(searchParams.get("value"));
+    const urlCurrency = searchParams.get("currency") || undefined;
+    const urlHotelId = searchParams.get("hotelId") || undefined;
+
     const stored = sessionStorage.getItem(`liteapi_booking_${bookingId}`);
     if (stored) {
       try {
         const b = JSON.parse(stored) as Booking;
+        // Fill gaps from confirmation URL if the stored payload is thin.
+        if (b.price == null && Number.isFinite(urlValue) && urlValue > 0) b.price = urlValue;
+        if (!b.currency && urlCurrency) b.currency = urlCurrency;
+        if (!b.hotel?.hotelId && urlHotelId) {
+          b.hotel = { ...(b.hotel ?? {}), hotelId: urlHotelId };
+        }
         setBooking(b);
         if (b.hotel?.hotelId) {
           fetch(`/api/hotel?hotelId=${encodeURIComponent(b.hotel.hotelId)}`)
@@ -57,13 +68,20 @@ function ConfirmationContent() {
             .then((j) => setHotelDetail(j.data))
             .catch(() => {});
         }
+        return;
       } catch {
-        setBooking({ bookingId });
+        // fall through
       }
-    } else {
-      setBooking({ bookingId });
     }
-  }, [bookingId]);
+
+    // No session payload (email link / other device) — still track if URL has value.
+    setBooking({
+      bookingId,
+      price: Number.isFinite(urlValue) && urlValue > 0 ? urlValue : undefined,
+      currency: urlCurrency,
+      hotel: urlHotelId ? { hotelId: urlHotelId } : undefined,
+    });
+  }, [bookingId, searchParams]);
 
   useEffect(() => {
     if (bookingId) {
@@ -72,49 +90,42 @@ function ConfirmationContent() {
   }, [bookingId]);
 
   useEffect(() => {
-    if (booking && booking.price != null) {
-      const purchaseEventId =
-        booking.bookingId != null
-          ? `purchase_${booking.bookingId}`
-          : generateMetaEventId("purchase");
-      const purchaseData = {
-        value: booking.price,
-        currency: booking.currency ?? "USD",
-        content_ids: booking.hotel?.hotelId ? [booking.hotel.hotelId] : undefined,
-        content_type: "product",
-      };
-      fbqTrack("Purchase", purchaseData, { eventId: purchaseEventId });
-      void sendMetaCapiEvent({
-        eventName: "Purchase",
-        eventId: purchaseEventId,
-        eventSourceUrl: window.location.href,
-        customData: purchaseData,
-      });
-      pinterestTrack("checkout", {
-        event_id: booking.bookingId ?? bookingId ?? undefined,
-        value: booking.price,
-        currency: booking.currency ?? "USD",
-        order_quantity: 1,
-      });
-      fetch("/api/automation/ingest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          kind: "event",
-          event: {
-            type: "booking_completed",
-            eventName: "confirmation_purchase",
-            eventId: purchaseEventId,
-            pageUrl: window.location.href,
-            metadata: {
-              bookingId: booking.bookingId ?? bookingId ?? undefined,
-              value: booking.price,
-              currency: booking.currency ?? "USD",
-            },
+    if (!booking?.bookingId || booking.price == null || !(booking.price > 0)) return;
+
+    trackClientPurchase({
+      bookingId: booking.bookingId,
+      value: booking.price,
+      currency: booking.currency ?? "EUR",
+      hotelId: booking.hotel?.hotelId,
+      email: booking.holder?.email,
+      phone: booking.holder?.phone,
+    });
+
+    pinterestTrack("checkout", {
+      event_id: booking.bookingId,
+      value: booking.price,
+      currency: booking.currency ?? "EUR",
+      order_quantity: 1,
+    });
+
+    fetch("/api/automation/ingest", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        kind: "event",
+        event: {
+          type: "booking_completed",
+          eventName: "confirmation_purchase",
+          eventId: `purchase_${booking.bookingId}`,
+          pageUrl: window.location.href,
+          metadata: {
+            bookingId: booking.bookingId,
+            value: booking.price,
+            currency: booking.currency ?? "EUR",
           },
-        }),
-      }).catch(() => {});
-    }
+        },
+      }),
+    }).catch(() => {});
   }, [booking]);
 
   if (!bookingId) {

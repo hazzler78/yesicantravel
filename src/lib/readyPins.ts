@@ -115,6 +115,16 @@ export const READY_PINS: ReadyPin[] = [
     pinDescription:
       "Is Barcelona safe for solo women? Eixample vs Raval, metro nights, pickpocket tips — practical guide.",
   },
+  {
+    id: "pin-ade-2026",
+    title: "Amsterdam Dance Event 2026 solo women hotels",
+    filePath: "/pins/pin-ade-2026.png",
+    publicUrl: `${ORIGIN}/pins/pin-ade-2026.png`,
+    destinationPath: "/blog/amsterdam-dance-event-2026-solo-women-hotels",
+    utmCampaign: "pin_ade_2026",
+    pinDescription:
+      "ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception.",
+  },
 ];
 
 export const PINS_ZIP_PATH = "/pins/yesicantravel-pins.zip";

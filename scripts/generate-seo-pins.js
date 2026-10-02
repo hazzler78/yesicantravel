@@ -65,6 +65,14 @@ const PINS = [
     cta: "Read the guide",
     urlLine: "yesicantravel.com/blog",
   },
+  {
+    id: "pin-ade-2026",
+    brand: "YES I CAN TRAVEL",
+    titleLines: ["Amsterdam Dance Event", "2026 solo hotels"],
+    bullets: ["21-25 October 2026", "Centre bases for nights out", "24/7 reception filter"],
+    cta: "See stay guide",
+    urlLine: "yesicantravel.com/blog",
+  },
 ];
 
 function escapeXml(s) {

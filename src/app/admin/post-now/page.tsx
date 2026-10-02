@@ -58,8 +58,12 @@ export default function PostNowPage() {
             count as Instagram in growth metrics.
           </p>
 
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
-            TikTok
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-coral">
+            TikTok (@yesicantravel) — empty today
+          </p>
+          <p className="mt-1 text-sm text-ink-muted">
+            Profile has no bio and 0 followers. Set avatar + bio link below, then post the
+            carousel or Reel #1 — otherwise TikTok stays a dead channel.
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <p className="min-w-0 flex-1 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">

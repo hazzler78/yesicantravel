@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 /**
- * One-screen posting pack for the 90-day lead goal.
+ * One-screen posting pack for the 10-lead growth sprint.
  * Bio → carousel/pins → Reels. Nothing else.
  */
 export default function PostNowPage() {
@@ -21,7 +21,7 @@ export default function PostNowPage() {
   return (
     <div className="mx-auto max-w-xl px-4 py-10 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
-        90-day growth · do today
+        10-lead sprint · do today
       </p>
       <h1 className="mt-2 font-display text-2xl font-semibold text-ink">Post now</h1>
       <p className="mt-2 text-sm text-ink-muted">

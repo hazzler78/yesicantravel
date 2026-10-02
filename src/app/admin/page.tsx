@@ -17,7 +17,7 @@ const modules: AdminModule[] = [
     id: "post-now",
     title: "Post now (traffic blockers)",
     description:
-      "Bio URL, carousel ZIP, Pinterest ZIP, and Reel #1 — the actions that unblock the 50-lead goal.",
+      "Bio URL, carousel ZIP, Pinterest ZIP, and Reel #1 — the actions that unblock the 10-lead sprint.",
     href: "/admin/post-now",
     cta: "Open post-now pack",
   },
@@ -31,15 +31,15 @@ const modules: AdminModule[] = [
   },
   {
     id: "growth",
-    title: "90-day growth metrics",
-    description: "Weekly signups, /bio visits, and social clicks toward the 50-lead goal.",
+    title: "10-lead growth metrics",
+    description: "Weekly signups, /bio visits, and social clicks toward 10 leads by 1 Nov.",
     href: "/admin/growth",
     cta: "Open growth dashboard",
   },
   {
     id: "social-playbook",
     title: "Social & traffic playbook",
-    description: "90-day posting cadence, video templates, Pinterest pins, and UTM bio links.",
+    description: "Posting cadence, video templates, Pinterest pins, and UTM bio links.",
     href: "/admin/social-playbook",
     cta: "Open playbook",
   },

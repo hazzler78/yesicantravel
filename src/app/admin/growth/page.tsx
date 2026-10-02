@@ -56,7 +56,7 @@ export default async function GrowthDashboardPage() {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--ocean-teal)]">
-            90-day growth goal
+            10-lead growth sprint
           </p>
           <h1 className="mt-1 text-3xl font-bold">Weekly lead metrics</h1>
           <p className="mt-2 text-sm text-[var(--navy-light)]">
@@ -206,7 +206,7 @@ export default async function GrowthDashboardPage() {
               <li>Review /bio visits + bio checklist signups below</li>
               <li>
                 Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / 13)} signups/week to hit{" "}
-                {GROWTH_GOAL.targetLeads} in 90 days
+                {GROWTH_GOAL.targetLeads} by 1 Nov
               </li>
             </ul>
             <div className="mt-4 flex flex-wrap gap-3">

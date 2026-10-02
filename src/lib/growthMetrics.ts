@@ -1,11 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
-/** 90-day lead goal — aligned with Cursor growth objective. */
+/** 10-lead sprint — aligned with Cursor growth objective (replaces 50/90). */
 export const GROWTH_GOAL = {
-  targetLeads: 50,
-  periodDays: 90,
-  /** Goal tracking starts when infrastructure went live. */
-  startDate: new Date("2026-09-02T00:00:00.000Z"),
+  targetLeads: 10,
+  periodDays: 37,
+  /** Starts the day of the first external lead (Nicolette via ChatGPT → London). */
+  startDate: new Date("2026-09-26T00:00:00.000Z"),
 } as const;
 
 const SOCIAL_SOURCES = new Set(["instagram", "tiktok", "facebook", "pinterest"]);

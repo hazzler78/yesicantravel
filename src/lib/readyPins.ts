@@ -156,6 +156,36 @@ export const READY_PINS: ReadyPin[] = [
       "Is Okinawa safe for solo women? Naha vs west-coast resorts, Yui Rail until 23:30 — practical guide.",
   },
   {
+    id: "pin-barcelona-destination",
+    title: "Is Barcelona safe for solo female travellers?",
+    filePath: "/pins/pin-barcelona-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-barcelona-safe.png`,
+    destinationPath: "/destinations/barcelona",
+    utmCampaign: "pin_barcelona_destination",
+    pinDescription:
+      "Is Barcelona safe for solo female travellers? Eixample vs Raval, metro nights — plus free checklist.",
+  },
+  {
+    id: "pin-paris-destination",
+    title: "Is Paris safe for solo female travellers?",
+    filePath: "/pins/pin-paris-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-paris-safe.png`,
+    destinationPath: "/destinations/paris",
+    utmCampaign: "pin_paris_destination",
+    pinDescription:
+      "Is Paris safe for solo female travellers? Marais, metro nights — plus free checklist.",
+  },
+  {
+    id: "pin-berlin-destination",
+    title: "Is Berlin safe for solo female travellers?",
+    filePath: "/pins/pin-berlin-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-berlin-safe.png`,
+    destinationPath: "/destinations/berlin",
+    utmCampaign: "pin_berlin_destination",
+    pinDescription:
+      "Is Berlin safe for women at night? Calm districts, night U-Bahn — plus free checklist.",
+  },
+  {
     id: "pin-safest-cities",
     title: "Safest cities in Europe for solo female travellers",
     filePath: "/pins/pin-safest-cities.png",

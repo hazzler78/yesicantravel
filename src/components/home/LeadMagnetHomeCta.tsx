@@ -3,6 +3,7 @@ import { ListChecks } from "lucide-react";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
+import { PinterestReferralBanner } from "@/components/PinterestReferralBanner";
 
 type LeadMagnetHomeCtaProps = {
   /** Omit outer section padding when nested inside another page container */
@@ -37,6 +38,7 @@ export function LeadMagnetHomeCta({
         </span>
         <div className="min-w-0 flex-1">
           <AiReferralBanner />
+          <PinterestReferralBanner />
           <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
             {headline}
           </h2>

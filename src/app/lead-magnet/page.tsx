@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/Card";
 import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
+import { PinterestReferralBanner } from "@/components/PinterestReferralBanner";
 import { prisma } from "@/lib/prisma";
 
 const BASE_URL = "https://yesicantravel.com";
@@ -137,6 +138,7 @@ export default async function LeadMagnetPage() {
 
         <Card className="h-fit p-5">
           <AiReferralBanner />
+          <PinterestReferralBanner />
           <h2 className="font-display text-lg font-semibold text-ink">Where should we send it?</h2>
           <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
             Unlock the checklist instantly. Optional tips by email — unsubscribe any time.

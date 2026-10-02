@@ -4,6 +4,7 @@ import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { PinterestReferralBanner } from "@/components/PinterestReferralBanner";
+import { SocialReferralBanner } from "@/components/SocialReferralBanner";
 
 type LeadMagnetHomeCtaProps = {
   /** Omit outer section padding when nested inside another page container */
@@ -39,6 +40,7 @@ export function LeadMagnetHomeCta({
         <div className="min-w-0 flex-1">
           <AiReferralBanner />
           <PinterestReferralBanner />
+          <SocialReferralBanner />
           <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
             {headline}
           </h2>

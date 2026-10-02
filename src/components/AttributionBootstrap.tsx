@@ -33,11 +33,20 @@ export default function AttributionBootstrap() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const referrer = document.referrer || undefined;
-    const aiSource = sourceFromReferrer(referrer);
+    const refSource = sourceFromReferrer(referrer);
+    const isAi =
+      refSource?.includes("chatgpt") ||
+      refSource?.includes("perplexity") ||
+      refSource?.includes("gemini") ||
+      refSource?.includes("copilot") ||
+      refSource?.includes("claude") ||
+      refSource?.includes("you.com");
 
     const payload: Record<string, unknown> = {
-      source: params.get("utm_source") ?? aiSource ?? undefined,
-      medium: params.get("utm_medium") ?? (aiSource ? "ai_referral" : undefined),
+      source: params.get("utm_source") ?? refSource ?? undefined,
+      medium:
+        params.get("utm_medium") ??
+        (isAi ? "ai_referral" : refSource ? "social" : undefined),
       campaign: params.get("utm_campaign") ?? undefined,
       utmTerm: params.get("utm_term") ?? undefined,
       utmContent: params.get("utm_content") ?? undefined,

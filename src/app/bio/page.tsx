@@ -7,9 +7,10 @@ import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
+import { SocialReferralBanner } from "@/components/SocialReferralBanner";
 
 export const metadata: Metadata = {
-  title: "Links — Yes I Can Travel",
+  title: { absolute: "Free solo safety checklist | Yes I Can Travel" },
   description:
     "Free safety checklist, city guides, and event stays for women travelling solo in Europe.",
   robots: { index: false, follow: false },
@@ -40,11 +41,12 @@ export default function BioPage() {
           aria-labelledby="bio-checklist-heading"
         >
           <AiReferralBanner />
+          <SocialReferralBanner />
           <h2 id="bio-checklist-heading" className="font-display text-lg font-semibold text-ink">
             Free solo safety checklist
           </h2>
           <p className="mt-1 text-[0.8125rem] text-ink-muted">
-            Instant access + email tips. No spam.
+            Reception hours, late arrival, what to check before you book — instant access.
           </p>
           <LeadMagnetForm pagePath="/bio" compact />
         </section>

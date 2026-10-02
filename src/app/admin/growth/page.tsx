@@ -37,7 +37,8 @@ export default async function GrowthDashboardPage() {
   if (snapshot && snapshot.bioVisitsThisWeek === 0 && snapshot.socialLandingsThisWeek === 0) {
     blockers.push({
       id: "bio",
-      label: "No /bio or social UTM traffic this week — set Instagram/TikTok bio and post the carousel.",
+      label:
+        "No /bio clicks this week. IG bio is set — swap to the UTM link, finish empty TikTok (@yesicantravel), and push the latest carousel/Reel so people actually tap.",
       href: "/admin/post-now",
       cta: "Open post-now pack",
     });
@@ -45,7 +46,8 @@ export default async function GrowthDashboardPage() {
   if (snapshot && snapshot.signupsThisWeek === 0) {
     blockers.push({
       id: "reels",
-      label: "Zero signups this week — post carousel/pins/Reels from the post-now pack.",
+      label:
+        "Zero signups this week — Pinterest pins are live; next lift is IG/TikTok taps into /bio and checklist.",
       href: "/admin/post-now",
       cta: "Open post-now pack",
     });

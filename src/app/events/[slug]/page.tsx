@@ -49,6 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "munich-oktoberfest-2026": `Oktoberfest 2026 hotels for solo women (Safe Space tip)`,
     "amsterdam-dance-event-2026": `ADE 2026 solo women hotels — centre bases & late nights`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival 2026–27: safe solo stays`,
+    "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: safe solo hotels`,
   };
   const descriptionOverrides: Record<string, string> = {
     "berlin-marathon-2026": `Berlin Marathon 2026 (${event.dateRange}): where to stay as a solo woman near Brandenburg Gate — 24/7 reception, early start, free cancellation.`,
@@ -57,6 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "munich-oktoberfest-2026": `Oktoberfest 2026 solo stays: Theresienwiese vs Glockenbach, Safe Space hours, U-Bahn exits, and 24/7 reception filters.`,
     "amsterdam-dance-event-2026": `ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception. Free checklist.`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival canal route stays for solo women — Jordaan & canal ring, night buses, 24/7 reception.`,
+    "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: Innere Stadt bases, evening walks, and hotels with 24/7 reception for solo women.`,
   };
 
   const title =

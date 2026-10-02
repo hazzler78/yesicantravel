@@ -205,7 +205,7 @@ export default async function GrowthDashboardPage() {
               <li>Upload Pinterest PNG pins with pin destination URLs</li>
               <li>Review /bio visits + bio checklist signups below</li>
               <li>
-                Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / 13)} signups/week to hit{" "}
+                Target: ~{Math.ceil(GROWTH_GOAL.targetLeads / Math.max(1, Math.ceil(GROWTH_GOAL.periodDays / 7)))} signups/week to hit{" "}
                 {GROWTH_GOAL.targetLeads} by 1 Nov
               </li>
             </ul>

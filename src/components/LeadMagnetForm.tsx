@@ -78,6 +78,27 @@ export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnet
     }
   };
 
+  const nativeShare = async () => {
+    if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+      await copyShareLink();
+      return;
+    }
+    try {
+      await navigator.share({
+        title: "Free solo female safety checklist",
+        text: "Free practical checklist for women travelling solo — reception hours, late arrival, what to check before you book.",
+        url: SHARE_CHECKLIST_URL,
+      });
+    } catch {
+      // User cancelled or share failed — fall back to copy
+      await copyShareLink();
+    }
+  };
+
+  const whatsappShareHref = `https://wa.me/?text=${encodeURIComponent(
+    `Free solo safety checklist for women travelling alone: ${SHARE_CHECKLIST_URL}`
+  )}`;
+
   if (status === "success") {
     return (
       <div className="mt-4 space-y-3 rounded-card border border-teal/30 bg-teal-soft/30 p-4">
@@ -96,13 +117,30 @@ export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnet
           <p className="mt-1 text-[0.8125rem] text-ink-muted">
             Share the same free checklist — one tap.
           </p>
-          <button
-            type="button"
-            onClick={copyShareLink}
-            className="mt-2 inline-flex min-h-[40px] items-center justify-center rounded-control border border-teal/40 bg-surface px-3 text-sm font-semibold text-teal hover:bg-teal-soft/40"
-          >
-            {copied ? "Link copied" : "Copy share link"}
-          </button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={nativeShare}
+              className="inline-flex min-h-[40px] items-center justify-center rounded-control border border-teal/40 bg-teal px-3 text-sm font-semibold text-ink-inverse hover:bg-teal/90"
+            >
+              Share with a friend
+            </button>
+            <a
+              href={whatsappShareHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-[40px] items-center justify-center rounded-control border border-teal/40 bg-surface px-3 text-sm font-semibold text-teal hover:bg-teal-soft/40"
+            >
+              WhatsApp
+            </a>
+            <button
+              type="button"
+              onClick={copyShareLink}
+              className="inline-flex min-h-[40px] items-center justify-center rounded-control border border-border bg-surface px-3 text-sm font-semibold text-ink-muted hover:bg-surface-muted"
+            >
+              {copied ? "Link copied" : "Copy link"}
+            </button>
+          </div>
         </div>
         <p className="text-[0.8125rem] text-ink-muted">
           {onChecklistPage ? (

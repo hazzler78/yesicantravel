@@ -790,6 +790,70 @@ export const events: Event[] = [
     venueNotes: "Start and finish at Straße des 17. Juni, Brandenburg Gate",
     whyNow:
       "Around 45,000 runners plus supporters, with an early start time — staying inside the S-Bahn ring near the Tiergarten saves a stressful pre-dawn journey.",
+    knownFor: [
+      "Sunday 27 September 2026 start and finish at Brandenburg Gate",
+      "Flat, fast course that often hosts world records",
+      "Early morning start — plan a hotel with 24/7 reception",
+      "Supporters lining Straße des 17. Juni and the Tiergarten",
+    ],
+    neighbourhoods: [
+      {
+        name: "Mitte / Brandenburg Gate",
+        description:
+          "Closest to the start/finish on Straße des 17. Juni. Lit, busy, and walkable to the Tiergarten. Book early — race weekend fills these blocks first.",
+        verdict: "recommended",
+      },
+      {
+        name: "Prenzlauer Berg",
+        description:
+          "Residential, well lit, and on the S-Bahn/U-Bahn for a short hop to the course. Calmer for sleep the night before an early start.",
+        verdict: "recommended",
+      },
+      {
+        name: "Charlottenburg / Zoo",
+        description:
+          "West of the Tiergarten with good S-Bahn links and plenty of 24/7 reception hotels. Practical if you want a quieter base than Mitte.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around Alexanderplatz late at night",
+        description:
+          "Busy and transit-rich, but the plaza itself can feel chaotic after midnight with heavy drinking. Fine for daytime; prefer a staffed hotel and a short U-Bahn hop rather than a long walk back alone after celebrations.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Race morning starts early — confirm 24/7 reception and late/early check-in when you book so you are not locked out before dawn.",
+      "U-Bahn and S-Bahn run through the night on weekends; on Sunday race day, check BVG for race-related closures around the course.",
+      "Pick a hotel inside the S-Bahn ring so you are not depending on a long pre-dawn rideshare when streets near the Tiergarten are restricted.",
+      "Share your live location with someone at home for race morning, and save your hotel address offline.",
+      "After the finish, streets around Brandenburg Gate get crowded. Step aside for a drink of water and a clear route back rather than joining the densest flow.",
+    ],
+    gettingAround:
+      "Berlin Brandenburg Airport (BER) connects to the centre on the Airport Express and S-Bahn in under an hour. For race weekend, stay inside the Ringbahn near the Tiergarten or Mitte so you can walk or take one short U-/S-Bahn hop to Straße des 17. Juni. Weekend nights the U-Bahn runs 24 hours; confirm race-day diversions in the BVG app.",
+    faqs: [
+      {
+        question: "When is the Berlin Marathon 2026?",
+        answer:
+          "The BMW Berlin Marathon 2026 is on Sunday 27 September 2026. Start and finish are at Straße des 17. Juni by the Brandenburg Gate.",
+      },
+      {
+        question: "What is the official Berlin Marathon 2026 date?",
+        answer:
+          "Sunday 27 September 2026. It is a one-day road race; arrive the day before if you need race-number pickup or an easy pre-dawn start.",
+      },
+      {
+        question: "Where should a solo woman stay for the Berlin Marathon?",
+        answer:
+          "Mitte near Brandenburg Gate, Prenzlauer Berg, or Charlottenburg/Zoo keep you inside the S-Bahn ring with lit streets and 24/7 reception options. Avoid depending on a long airport-to-course transfer on race morning.",
+      },
+      {
+        question: "Is Berlin safe for a solo woman on marathon weekend?",
+        answer:
+          "Central Berlin is busy and well lit for a major race weekend. The practical risks are early-morning logistics and crowded finish areas, not the course itself. Filter for 24/7 reception and share your race-morning plan with someone you trust.",
+      },
+    ],
+    contentVerified: true,
   },
   {
     id: "amsterdam-dance-event-2026",

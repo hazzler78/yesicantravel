@@ -943,23 +943,28 @@ function ResultsContent() {
               Array.from({ length: 4 }).map((_, index) => <HotelCardSkeleton key={index} />)}
 
             {!loading &&
-              filteredAndSortedHotels.map((hotel) => (
-                <HotelCard
-                  key={hotel.id}
-                  hotel={hotel}
-                  signals={hotel.signals}
-                  href={hotelHref(hotel.id)}
-                  nights={nights}
-                  onShowOnMap={
-                    typeof hotel.lat === "number" && typeof hotel.lng === "number"
-                      ? () => showHotelOnMap(hotel.id)
-                      : undefined
-                  }
-                  onSelect={() => {
-                    rememberHotelNavigation(hotel.id);
-                    track("Rates Viewed", { hotelId: hotel.id });
-                  }}
-                />
+              filteredAndSortedHotels.map((hotel, index) => (
+                <div key={hotel.id} className="space-y-4">
+                  <HotelCard
+                    hotel={hotel}
+                    signals={hotel.signals}
+                    href={hotelHref(hotel.id)}
+                    nights={nights}
+                    onShowOnMap={
+                      typeof hotel.lat === "number" && typeof hotel.lng === "number"
+                        ? () => showHotelOnMap(hotel.id)
+                        : undefined
+                    }
+                    onSelect={() => {
+                      rememberHotelNavigation(hotel.id);
+                      track("Rates Viewed", { hotelId: hotel.id });
+                    }}
+                  />
+                  {/* Mid-browse capture — /results is the highest-traffic page in the sprint */}
+                  {index === 1 && (
+                    <LeadMagnetInlineCta pagePath="/results" className="mt-0" />
+                  )}
+                </div>
               ))}
 
             {!loading && filteredAndSortedHotels.length === 0 && (

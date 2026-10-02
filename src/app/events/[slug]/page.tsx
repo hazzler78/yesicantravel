@@ -43,7 +43,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // Keyword-aligned titles for pages already getting impressions (GSC).
   // Do NOT append "| Yes I Can Travel" — the root layout template adds it.
   const titleOverrides: Record<string, string> = {
-    "berlin-marathon-2026": `Berlin Marathon 2026 date & safer solo hotels`,
+    "berlin-marathon-2026": `Berlin Marathon 2026 date: Sunday 27 Sept — safer solo hotels`,
     "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels for solo women`,
     "rock-en-seine-paris-2026": `Rock en Seine 2026 hotels for solo women`,
     "munich-oktoberfest-2026": `Oktoberfest 2026 hotels for solo women (Safe Space tip)`,
@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: safe solo hotels`,
   };
   const descriptionOverrides: Record<string, string> = {
-    "berlin-marathon-2026": `Berlin Marathon 2026 (${event.dateRange}): where to stay as a solo woman near Brandenburg Gate — 24/7 reception, early start, free cancellation.`,
+    "berlin-marathon-2026": `BMW Berlin Marathon 2026 is Sunday 27 September. Where to stay as a solo woman near Brandenburg Gate — 24/7 reception, early start, free cancellation.`,
     "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels on the red metro line and Parque das Nações for women attending alone. Free solo checklist included.`,
     "rock-en-seine-paris-2026": `Rock en Seine Paris: metro line 10 hotels, Boulogne, and late-night returns for solo women.`,
     "munich-oktoberfest-2026": `Oktoberfest 2026 solo stays: Theresienwiese vs Glockenbach, Safe Space hours, U-Bahn exits, and 24/7 reception filters.`,

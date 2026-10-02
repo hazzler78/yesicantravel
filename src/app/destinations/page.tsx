@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getLinkableDestinations } from "@/data/destinations";
+import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { Card } from "@/components/ui/Card";
 
 const BASE_URL = "https://yesicantravel.com";
@@ -121,6 +122,8 @@ export default function DestinationsPage() {
             </li>
           ))}
         </ul>
+
+        <LeadMagnetHomeCta embedded />
 
         <p className="mt-10 text-[0.9375rem] text-ink-muted">
           Looking for a specific date instead?{" "}

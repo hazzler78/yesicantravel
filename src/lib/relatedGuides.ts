@@ -53,4 +53,9 @@ export const DESTINATION_RELATED_GUIDES: Record<
     label: "Is Berlin safe for solo female travellers?",
     blurb: "24h weekend U-Bahn, calm districts, and what to filter before you book.",
   },
+  barcelona: {
+    href: "/blog/is-barcelona-safe-for-solo-female-travellers",
+    label: "Is Barcelona safe for solo female travellers?",
+    blurb: "Theft vs violence, Eixample vs Raval, metro nights, and hotel filters that help.",
+  },
 };

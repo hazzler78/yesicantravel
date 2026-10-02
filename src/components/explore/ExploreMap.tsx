@@ -263,6 +263,14 @@ export function ExploreMap({ initialStay = "all" }: { initialStay?: StayType }) 
             {loading ? "Loading stays…" : status}
           </p>
           {error && <p className="mt-1 text-xs text-[var(--color-coral)]">{error}</p>}
+          <p className="mt-2 border-t border-[var(--color-border)] pt-2 text-[0.8125rem]">
+            <Link
+              href="/lead-magnet?utm_source=explore&utm_medium=map&utm_campaign=checklist"
+              className="font-medium text-teal underline-offset-4 hover:underline"
+            >
+              Free solo safety checklist →
+            </Link>
+          </p>
         </div>
       </div>
     </div>

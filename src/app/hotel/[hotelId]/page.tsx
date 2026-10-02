@@ -23,6 +23,7 @@ import {
   PeaceOfMindCard,
 } from "@/components/hotel/HotelTrustSections";
 import { HotelLocationCard } from "@/components/HotelLocationCard";
+import { LeadMagnetInlineCta } from "@/components/home/LeadMagnetInlineCta";
 import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
@@ -580,6 +581,9 @@ function HotelContent() {
             </div>
 
             <FacilitiesCard facilities={facilityNames} />
+
+            {/* High-intent hotel traffic — soft checklist capture after rooms */}
+            <LeadMagnetInlineCta pagePath="/hotel" className="mt-8" />
           </div>
 
           <aside className="lg:sticky lg:top-24 lg:h-fit">

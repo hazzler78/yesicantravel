@@ -7,6 +7,9 @@ import { redirectedDestinationSlugs } from "@/lib/legacyRedirects";
 
 const BASE_URL = "https://yesicantravel.com";
 
+/** Always rebuild from DB so newly published posts appear without a redeploy. */
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Skip destination slugs that 301 to event pages — submitting them
   // causes "Page with redirect" entries in GSC Coverage and wastes crawl budget.

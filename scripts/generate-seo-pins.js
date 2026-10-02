@@ -57,6 +57,14 @@ const PINS = [
     cta: "Read the guide",
     urlLine: "yesicantravel.com/blog",
   },
+  {
+    id: "pin-barcelona-safe",
+    brand: "YES I CAN TRAVEL",
+    titleLines: ["Is Barcelona safe for", "solo female travellers?"],
+    bullets: ["Eixample & Gracia", "Metro nights explained", "Plan for pickpockets"],
+    cta: "Read the guide",
+    urlLine: "yesicantravel.com/blog",
+  },
 ];
 
 function escapeXml(s) {

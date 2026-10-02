@@ -105,6 +105,16 @@ export const READY_PINS: ReadyPin[] = [
     pinDescription:
       "Is Berlin safe for women at night? 24h weekend U-Bahn, calm districts — practical guide.",
   },
+  {
+    id: "pin-barcelona-safe",
+    title: "Is Barcelona safe for solo female travellers?",
+    filePath: "/pins/pin-barcelona-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-barcelona-safe.png`,
+    destinationPath: "/blog/is-barcelona-safe-for-solo-female-travellers",
+    utmCampaign: "pin_barcelona_safe",
+    pinDescription:
+      "Is Barcelona safe for solo women? Eixample vs Raval, metro nights, pickpocket tips — practical guide.",
+  },
 ];
 
 export const PINS_ZIP_PATH = "/pins/yesicantravel-pins.zip";

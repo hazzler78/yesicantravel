@@ -91,9 +91,9 @@ export const destinations: Destination[] = [
     headline: "Barcelona for solo female travellers",
     subheadline:
       "A walkable, late-running city where the main risk to plan around is theft, not violence. Here's which neighbourhoods put you near a staffed reception and a metro entrance, and how to get back after midnight.",
-    metaTitle: "Safe Hotels in Barcelona for Solo Female Travellers | Area Guide",
+    metaTitle: "Is Barcelona Safe for Solo Female Travellers? (Honest Guide)",
     metaDescription:
-      "Where to stay in Barcelona as a solo woman: neighbourhood-by-neighbourhood guidance, metro closing times, pickpocket hotspots to know, and stays with 24/7 reception.",
+      "Is Barcelona safe for solo female travellers? Yes — plan for pickpocketing. Eixample & Gràcia stays, metro hours, and 24/7 reception filters.",
     aiSearch: "central safe hotel Barcelona Spain well-lit 24-hour reception",
     knownFor: [
       "Gaudí's Sagrada Família, Casa Batlló and Park Güell",

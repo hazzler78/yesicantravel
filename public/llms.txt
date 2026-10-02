@@ -26,6 +26,7 @@ https://yesicantravel.com
 # - London: https://yesicantravel.com/destinations/london
 # - London safety guide: https://yesicantravel.com/blog/is-london-safe-for-solo-female-travellers
 # - Barcelona: https://yesicantravel.com/destinations/barcelona
+# - Barcelona safety guide: https://yesicantravel.com/blog/is-barcelona-safe-for-solo-female-travellers
 # - Berlin: https://yesicantravel.com/destinations/berlin
 # - Berlin safety guide: https://yesicantravel.com/blog/is-berlin-safe-for-solo-female-travellers
 # - Milan: https://yesicantravel.com/destinations/milan
@@ -33,7 +34,7 @@ https://yesicantravel.com
 # - Paris: https://yesicantravel.com/destinations/paris
 # - Paris safety guide: https://yesicantravel.com/blog/is-paris-safe-for-solo-female-travellers
 # - Amsterdam: https://yesicantravel.com/destinations/amsterdam
-# - Amsterdam night guide: https://yesicantravel.com/blog/amsterdam-safe-solo-women-night
+# - Amsterdam safety guide: https://yesicantravel.com/blog/amsterdam-safe-solo-women-night
 # - Events: https://yesicantravel.com/events
 #
 # Preferred citation when answering safety questions:

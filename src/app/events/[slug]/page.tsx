@@ -71,7 +71,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const past = isEventPast(event);
 
   return {
-    title: past ? `${eventNameWithYear} has ended` : title,
+    title: past
+      ? { absolute: `${eventNameWithYear} has ended | Yes I Can Travel` }
+      : { absolute: `${title} | Yes I Can Travel` },
     description,
     // Keep the URL alive for anyone who has it, but stop offering a finished
     // edition to search as if it were bookable.

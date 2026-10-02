@@ -126,6 +126,26 @@ export const READY_PINS: ReadyPin[] = [
       "ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception.",
   },
   {
+    id: "pin-milan-destination",
+    title: "Is Milan safe for solo female travellers?",
+    filePath: "/pins/pin-milan-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-milan-safe.png`,
+    destinationPath: "/destinations/milan",
+    utmCampaign: "pin_milan_destination",
+    pinDescription:
+      "Is Milan safe for solo female travellers? Brera, Porta Nuova, metro nights — plus free checklist.",
+  },
+  {
+    id: "pin-london-destination",
+    title: "Is London safe for solo female travellers?",
+    filePath: "/pins/pin-london-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-london-safe.png`,
+    destinationPath: "/destinations/london",
+    utmCampaign: "pin_london_destination",
+    pinDescription:
+      "Is London safe for solo female travellers? Night Tube, licensed taxis, stay areas — plus free checklist.",
+  },
+  {
     id: "pin-okinawa-safe",
     title: "Is Okinawa safe for solo female travellers?",
     filePath: "/pins/pin-okinawa-safe.png",

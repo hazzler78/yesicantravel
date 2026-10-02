@@ -111,9 +111,13 @@ export default function PostNowPage() {
           </p>
           <ul className="mt-2 space-y-2 text-xs text-ink-muted">
             {READY_PINS.filter((pin) =>
-              ["pin-barcelona-safe", "pin-ade-2026", "pin-okinawa-safe", "pin-milan-safe"].includes(
-                pin.id
-              )
+              [
+                "pin-barcelona-safe",
+                "pin-ade-2026",
+                "pin-okinawa-safe",
+                "pin-milan-safe",
+                "pin-safest-cities",
+              ].includes(pin.id)
             ).map((pin) => (
               <li key={pin.id} className="rounded-control border border-coral/30 bg-coral-soft/20 p-2">
                 <span className="font-medium text-ink">{pin.title}</span>

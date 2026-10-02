@@ -135,6 +135,16 @@ export const READY_PINS: ReadyPin[] = [
     pinDescription:
       "Is Okinawa safe for solo women? Naha vs west-coast resorts, Yui Rail until 23:30 — practical guide.",
   },
+  {
+    id: "pin-safest-cities",
+    title: "Safest cities in Europe for solo female travellers",
+    filePath: "/pins/pin-safest-cities.png",
+    publicUrl: `${ORIGIN}/pins/pin-safest-cities.png`,
+    destinationPath: "/blog/safest-cities-europe-solo-female-travellers",
+    utmCampaign: "pin_safest_cities",
+    pinDescription:
+      "Safest European cities for solo women: Amsterdam, Berlin, Milan, Barcelona, London, Paris — plus free checklist.",
+  },
 ];
 
 export const PINS_ZIP_PATH = "/pins/yesicantravel-pins.zip";

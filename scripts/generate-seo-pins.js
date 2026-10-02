@@ -81,6 +81,14 @@ const PINS = [
     cta: "Read the guide",
     urlLine: "yesicantravel.com/blog",
   },
+  {
+    id: "pin-safest-cities",
+    brand: "YES I CAN TRAVEL",
+    titleLines: ["Safest cities Europe", "for solo women"],
+    bullets: ["Amsterdam to Paris shortlist", "24/7 reception filter", "Free checklist included"],
+    cta: "Read the guide",
+    urlLine: "yesicantravel.com/blog",
+  },
 ];
 
 function escapeXml(s) {

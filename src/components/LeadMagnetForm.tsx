@@ -5,6 +5,9 @@ import Link from "next/link";
 import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
 
+const SHARE_CHECKLIST_URL =
+  "https://yesicantravel.com/lead-magnet?utm_source=share&utm_medium=referral&utm_campaign=post_signup";
+
 type LeadMagnetFormProps = {
   /** Page path for analytics (e.g. /bio, /destinations/milan) */
   pagePath?: string;
@@ -19,6 +22,7 @@ export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnet
   const [showName, setShowName] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const onChecklistPage = pagePath === "/checklist";
 
@@ -64,6 +68,16 @@ export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnet
     }
   };
 
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(SHARE_CHECKLIST_URL);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
   if (status === "success") {
     return (
       <div className="mt-4 space-y-3 rounded-card border border-teal/30 bg-teal-soft/30 p-4">
@@ -75,6 +89,21 @@ export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnet
             Open your checklist
           </PrimaryLink>
         )}
+        <div className="rounded-control border border-border/80 bg-surface/80 p-3">
+          <p className="text-[0.8125rem] font-medium text-ink">
+            Know another woman planning a solo trip?
+          </p>
+          <p className="mt-1 text-[0.8125rem] text-ink-muted">
+            Share the same free checklist — one tap.
+          </p>
+          <button
+            type="button"
+            onClick={copyShareLink}
+            className="mt-2 inline-flex min-h-[40px] items-center justify-center rounded-control border border-teal/40 bg-surface px-3 text-sm font-semibold text-teal hover:bg-teal-soft/40"
+          >
+            {copied ? "Link copied" : "Copy share link"}
+          </button>
+        </div>
         <p className="text-[0.8125rem] text-ink-muted">
           {onChecklistPage ? (
             <>

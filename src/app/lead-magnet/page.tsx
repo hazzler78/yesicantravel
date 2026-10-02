@@ -136,7 +136,7 @@ export default async function LeadMagnetPage() {
           <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
             Unlock the checklist instantly. Optional tips by email — unsubscribe any time.
           </p>
-          <LeadMagnetForm />
+          <LeadMagnetForm pagePath="/lead-magnet" compact />
         </Card>
       </div>
     </div>

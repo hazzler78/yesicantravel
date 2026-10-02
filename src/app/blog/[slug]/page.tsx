@@ -10,6 +10,7 @@ import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { prisma } from "@/lib/prisma";
 import { BLOG_TO_DESTINATION_SLUG } from "@/lib/relatedGuides";
 import { getDestinationBySlug } from "@/data/destinations";
+import { ogImageForPath } from "@/lib/readyPins";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -33,10 +34,39 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   if (!post) return {};
 
+  const title = post.seoTitle ?? post.title;
+  const description = post.seoDescription ?? post.excerpt ?? "";
+  const canonical = `https://yesicantravel.com/blog/${post.slug}`;
+  const ogImage = ogImageForPath(`/blog/${post.slug}`);
+
   return {
-    title: post.seoTitle ?? post.title,
-    description: post.seoDescription ?? post.excerpt ?? "",
-    alternates: { canonical: `https://yesicantravel.com/blog/${post.slug}` },
+    title,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      url: canonical,
+      type: "article",
+      ...(ogImage
+        ? {
+            images: [
+              {
+                url: ogImage,
+                width: 1000,
+                height: 1500,
+                alt: post.title,
+              },
+            ],
+          }
+        : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(ogImage ? { images: [ogImage] } : {}),
+    },
   };
 }
 

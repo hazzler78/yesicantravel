@@ -29,7 +29,7 @@ export function LeadMagnetInlineCta({
           <p className="mt-0.5 text-sm text-ink-muted">
             Reception hours, late arrival, and what to check before you book.
           </p>
-          <LeadMagnetForm pagePath={pagePath} />
+          <LeadMagnetForm pagePath={pagePath} compact />
         </div>
       </div>
     </aside>

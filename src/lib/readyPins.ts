@@ -156,3 +156,10 @@ export function pinDestinationUrl(pin: ReadyPin): string {
   url.searchParams.set("utm_campaign", pin.utmCampaign);
   return url.toString();
 }
+
+/** Absolute OG/Pinterest image for a blog path, if we have a matching pin. */
+export function ogImageForPath(path: string): string | undefined {
+  const normalized = path.startsWith("/") ? path : `/${path}`;
+  const pin = READY_PINS.find((p) => p.destinationPath === normalized);
+  return pin?.publicUrl;
+}

@@ -8,12 +8,15 @@ import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
 type LeadMagnetFormProps = {
   /** Page path for analytics (e.g. /bio, /destinations/milan) */
   pagePath?: string;
+  /** Email-only — fewer fields on inline CTAs */
+  compact?: boolean;
 };
 
-export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
+export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnetFormProps) {
   const uid = useId();
   const [email, setEmail] = useState("");
   const [firstName, setFirstName] = useState("");
+  const [showName, setShowName] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -98,22 +101,34 @@ export default function LeadMagnetForm({ pagePath }: LeadMagnetFormProps) {
   return (
     <form onSubmit={onSubmit} className="mt-4 space-y-3">
       <TextField
-        id={`${uid}-first-name`}
-        label="First name (optional)"
-        type="text"
-        value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
-        placeholder="First name"
-      />
-      <TextField
         id={`${uid}-email`}
         label="Email address"
         type="email"
         required
+        autoComplete="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="you@example.com"
       />
+      {!compact && (showName || firstName) ? (
+        <TextField
+          id={`${uid}-first-name`}
+          label="First name (optional)"
+          type="text"
+          autoComplete="given-name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          placeholder="First name"
+        />
+      ) : !compact ? (
+        <button
+          type="button"
+          className="text-[0.8125rem] font-medium text-teal underline-offset-4 hover:underline"
+          onClick={() => setShowName(true)}
+        >
+          Add first name (optional)
+        </button>
+      ) : null}
       <PrimaryButton type="submit" variant="coral" size="md" disabled={status === "loading"}>
         {status === "loading"
           ? "Sending…"

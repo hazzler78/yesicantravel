@@ -26,7 +26,7 @@ export function LeadMagnetHomeCta({ embedded = false }: LeadMagnetHomeCtaProps) 
             Reception hours, arrival after dark, and what to check before you book —
             short enough to actually use. Instant access + email tips.
           </p>
-          <LeadMagnetForm />
+          <LeadMagnetForm compact />
           <p className="mt-3 text-[0.8125rem] text-ink-muted">
             Prefer a dedicated page?{" "}
             <Link href="/lead-magnet" className="font-medium text-teal hover:underline">

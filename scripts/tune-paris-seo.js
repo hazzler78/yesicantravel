@@ -5,9 +5,9 @@ async function main() {
   const paris = await p.contentItem.updateMany({
     where: { slug: "is-paris-safe-for-solo-female-travellers" },
     data: {
-      seoTitle: "Is Paris Safe for Solo Female Travellers? Honest 2026 Guide",
+      seoTitle: "Is Paris Safe for Solo Women? Where to Stay in 2026",
       seoDescription:
-        "Is Paris safe for solo female travellers? Marais & Saint-Germain, metro nights, scams to ignore, 24/7 reception — plus free checklist.",
+        "Is Paris safe for solo female travellers? Where to stay: Marais & Saint-Germain, metro nights, scams to ignore — plus free checklist.",
     },
   });
   console.log(JSON.stringify({ paris: paris.count }));

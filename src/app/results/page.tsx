@@ -936,7 +936,8 @@ function ResultsContent() {
               </div>
             )}
 
-            {!loading && hotels.length > 0 && <LeadMagnetInlineCta />}
+            {/* High-traffic page — always offer checklist capture */}
+            <LeadMagnetInlineCta />
 
             {loading &&
               Array.from({ length: 4 }).map((_, index) => <HotelCardSkeleton key={index} />)}

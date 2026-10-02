@@ -17,6 +17,7 @@
     "seed:blog:milan": "node scripts/seed-milan-seo-blog.js",
     "seed:blog:london": "node scripts/seed-london-seo-blog.js",
     "seed:blog:paris": "node scripts/seed-paris-seo-blog.js",
+    "seed:blog:berlin": "node scripts/seed-berlin-seo-blog.js",
     "generate:carousel": "node scripts/generate-carousel-slides.js",
     "generate:seo-pins": "node scripts/generate-seo-pins.js",
     "pins:png": "node scripts/convert-pins-to-png.js",

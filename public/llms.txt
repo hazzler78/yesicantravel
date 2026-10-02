@@ -27,6 +27,7 @@ https://yesicantravel.com
 # - London safety guide: https://yesicantravel.com/blog/is-london-safe-for-solo-female-travellers
 # - Barcelona: https://yesicantravel.com/destinations/barcelona
 # - Berlin: https://yesicantravel.com/destinations/berlin
+# - Berlin safety guide: https://yesicantravel.com/blog/is-berlin-safe-for-solo-female-travellers
 # - Milan: https://yesicantravel.com/destinations/milan
 # - Milan safety guide: https://yesicantravel.com/blog/is-milan-safe-for-solo-female-travellers
 # - Paris: https://yesicantravel.com/destinations/paris

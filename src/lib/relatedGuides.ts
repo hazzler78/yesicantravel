@@ -48,4 +48,9 @@ export const DESTINATION_RELATED_GUIDES: Record<
     label: "Is Paris safe for solo female travellers?",
     blurb: "Marais vs Saint-Germain, metro nights, and the scams you can walk past.",
   },
+  berlin: {
+    href: "/blog/is-berlin-safe-for-solo-female-travellers",
+    label: "Is Berlin safe for solo female travellers?",
+    blurb: "24h weekend U-Bahn, calm districts, and what to filter before you book.",
+  },
 };

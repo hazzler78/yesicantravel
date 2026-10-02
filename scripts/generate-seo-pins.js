@@ -49,6 +49,14 @@ const PINS = [
     cta: "Read the guide",
     urlLine: "yesicantravel.com/blog",
   },
+  {
+    id: "pin-berlin-safe",
+    brand: "YES I CAN TRAVEL",
+    titleLines: ["Is Berlin safe for", "solo female travellers?"],
+    bullets: ["24h weekend U-Bahn", "Prenzlauer Berg & Mitte", "Night bus weekdays"],
+    cta: "Read the guide",
+    urlLine: "yesicantravel.com/blog",
+  },
 ];
 
 function escapeXml(s) {

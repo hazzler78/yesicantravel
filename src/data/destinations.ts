@@ -374,9 +374,9 @@ export const destinations: Destination[] = [
     headline: "Berlin for solo female travellers",
     subheadline:
       "Spread out, relaxed and unusually good for anyone out late — the U-Bahn and S-Bahn simply don't stop at weekends. Here's how the night network works and which districts suit a solo trip.",
-    metaTitle: "Safe Hotels in Berlin for Solo Female Travellers | Area Guide",
+    metaTitle: "Is Berlin Safe for Solo Female Travellers at Night? | Stays",
     metaDescription:
-      "Where to stay in Berlin as a solo woman: district guidance, 24-hour weekend U-Bahn and night buses, ticket rules, and stays with 24/7 reception near transport.",
+      "Is Berlin safe for women at night? Weekend 24h U-Bahn, Prenzlauer Berg & Mitte, and hotels with 24/7 reception — practical, not fear-based.",
     aiSearch: "central safe hotel Berlin Germany well-lit near U-Bahn",
     knownFor: [
       "The Brandenburg Gate, Reichstag dome and Museum Island",

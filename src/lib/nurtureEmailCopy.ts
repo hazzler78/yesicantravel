@@ -11,6 +11,8 @@ export type NurtureEmailCopy = {
   bodyParagraphs: string[];
   ctaLabel: string;
   ctaUrl: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaUrl?: string;
 };
 
 export const NURTURE_EMAILS: NurtureEmailCopy[] = [
@@ -29,6 +31,9 @@ export const NURTURE_EMAILS: NurtureEmailCopy[] = [
     ],
     ctaLabel: "Open your checklist",
     ctaUrl: "https://yesicantravel.com/checklist",
+    secondaryCtaLabel: "Share the checklist",
+    secondaryCtaUrl:
+      "https://yesicantravel.com/lead-magnet?utm_source=email&utm_medium=nurture&utm_campaign=day0_share",
   },
   {
     day: 2,
@@ -117,6 +122,13 @@ export function nurtureEmailHtml(email: NurtureEmailCopy): string {
               <p style="margin:24px 0 0;">
                 <a href="${escapeHtml(email.ctaUrl)}" style="display:inline-block;background:#e07a5f;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:14px 22px;border-radius:8px;">${escapeHtml(email.ctaLabel)}</a>
               </p>
+              ${
+                email.secondaryCtaLabel && email.secondaryCtaUrl
+                  ? `<p style="margin:16px 0 0;">
+                <a href="${escapeHtml(email.secondaryCtaUrl)}" style="display:inline-block;background:#0d7377;color:#ffffff;text-decoration:none;font-weight:600;font-size:15px;padding:12px 20px;border-radius:8px;">${escapeHtml(email.secondaryCtaLabel)}</a>
+              </p>`
+                  : ""
+              }
               <p style="margin:28px 0 0;font-size:12px;line-height:1.5;color:#6b7280;">
                 Travel confidently. Unsubscribe anytime via the link below.
               </p>

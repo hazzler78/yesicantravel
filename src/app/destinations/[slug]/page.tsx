@@ -23,8 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dest = getDestinationBySlug(slug);
   if (!dest) return { title: "Destination not found" };
 
+  // Absolute title: layout template ("%s | Yes I Can Travel") truncates the exact
+  // GSC query in SERPs ("is milan safe for solo female travellers").
   return {
-    title: dest.metaTitle,
+    title: { absolute: dest.metaTitle },
     description: dest.metaDescription,
     openGraph: {
       title: dest.metaTitle,

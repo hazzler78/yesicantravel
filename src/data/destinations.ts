@@ -91,7 +91,7 @@ export const destinations: Destination[] = [
     headline: "Barcelona for solo female travellers",
     subheadline:
       "A walkable, late-running city where the main risk to plan around is theft, not violence. Here's which neighbourhoods put you near a staffed reception and a metro entrance, and how to get back after midnight.",
-    metaTitle: "Is Barcelona Safe for Solo Female Travellers? Honest 2026 Guide",
+    metaTitle: "Is Barcelona Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
       "Is Barcelona safe for solo female travellers? Where to stay: Eixample & Gràcia, metro hours, pickpocketing plan, 24/7 reception — plus free checklist.",
     aiSearch: "central safe hotel Barcelona Spain well-lit 24-hour reception",
@@ -185,9 +185,9 @@ export const destinations: Destination[] = [
     headline: "Amsterdam for solo female travellers",
     subheadline:
       "Small, flat and easy to cross on foot — with two things that catch visitors out: the trams stop just after midnight, and the red asphalt is a bike road, not a pavement. Here's how to stay somewhere calm and get home after the last tram.",
-    metaTitle: "Is Amsterdam Safe for Solo Female Travellers? Night Guide 2026",
+    metaTitle: "Is Amsterdam Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
-      "Is Amsterdam safe at night for women travelling solo? Night buses after midnight, calm neighbourhoods, and 24/7 reception hotels — practical, not fear-based.",
+      "Is Amsterdam safe for solo female travellers — including at night? Night buses after midnight, calm neighbourhoods, 24/7 reception. Free checklist.",
     aiSearch: "central safe hotel Amsterdam Netherlands well-lit near station",
     knownFor: [
       "The UNESCO-listed canal ring, walkable end to end in under an hour",
@@ -280,7 +280,7 @@ export const destinations: Destination[] = [
     headline: "Paris for solo female travellers",
     subheadline:
       "A city built for walking alone, with an excellent late metro and a well-rehearsed set of street scams. Here's where to base yourself, how the last train really works, and which approaches to ignore.",
-    metaTitle: "Is Paris Safe for Solo Female Travellers? Honest 2026 Guide",
+    metaTitle: "Is Paris Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
       "Is Paris safe for solo female travellers? Where to stay: Marais & Saint-Germain, metro nights, scams to ignore, 24/7 reception — plus free checklist.",
     aiSearch: "central safe hotel Paris France well-lit 24-hour reception",
@@ -374,7 +374,7 @@ export const destinations: Destination[] = [
     headline: "Berlin for solo female travellers",
     subheadline:
       "Spread out, relaxed and unusually good for anyone out late — the U-Bahn and S-Bahn simply don't stop at weekends. Here's how the night network works and which districts suit a solo trip.",
-    metaTitle: "Is Berlin Safe for Women at Night? Solo Female Guide 2026",
+    metaTitle: "Is Berlin Safe for Women at Night? Solo Female Guide | Yes I Can Travel",
     metaDescription:
       "Is Berlin safe for women at night? Weekend 24h U-Bahn, Prenzlauer Berg & Mitte, hotels with 24/7 reception — practical, not fear-based. Free checklist included.",
     aiSearch: "central safe hotel Berlin Germany well-lit near U-Bahn",
@@ -469,9 +469,9 @@ export const destinations: Destination[] = [
     headline: "Milan for solo female travellers",
     subheadline:
       "A working city rather than a museum, compact in the centre and easy to cross by metro — as long as you know it shuts around 00:30. Here's where to stay and how the night network fills the gap.",
-    metaTitle: "Is Milan Safe for Solo Female Travellers? Honest 2026 Guide",
+    metaTitle: "Is Milan Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
-      "Is Milan safe for solo female travellers? Where to stay: Brera & Porta Nuova, metro nights to ~00:30, 24/7 reception — plus free checklist.",
+      "Is Milan safe for solo female travellers? Honest answer: Brera & Porta Nuova, metro to ~00:30, 24/7 reception hotels. Free checklist included.",
     aiSearch: "central safe hotel Milan Italy well-lit near metro",
     knownFor: [
       "The Duomo and the Galleria Vittorio Emanuele II",
@@ -564,7 +564,7 @@ export const destinations: Destination[] = [
     headline: "London for solo female travellers",
     subheadline:
       "Enormous, well policed and staffed at every station — with one rule that genuinely matters: never get into a minicab you didn't book. Here's how the night network works and where to base yourself.",
-    metaTitle: "Is London Safe for Solo Female Travellers? Honest 2026 Guide",
+    metaTitle: "Is London Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
       "Is London safe for solo female travellers? Night Tube, licensed taxis vs minicabs, stay areas, and hotels with 24/7 reception — plus free checklist.",
     aiSearch: "central safe hotel London UK well-lit near tube station",
@@ -814,7 +814,7 @@ export const destinations: Destination[] = [
     headline: "Okinawa for solo female travellers",
     subheadline:
       "Japan's southern islands are among the easier places in Asia to travel alone — as long as you know the monorail stops around 23:30 and a car is what the rest of the island actually runs on.",
-    metaTitle: "Is Okinawa Safe for Solo Female Travellers? Honest 2026 Guide",
+    metaTitle: "Is Okinawa Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
       "Is Okinawa safe for solo female travellers? Yui Rail until 23:30, Naha vs west-coast resorts, taxis, and 24/7 reception — plus free checklist.",
     aiSearch: "safe hotel Naha Okinawa Japan well-lit near monorail",

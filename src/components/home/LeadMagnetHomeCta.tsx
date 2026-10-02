@@ -42,11 +42,10 @@ export function LeadMagnetHomeCta({
           </h2>
           <p className="mt-1 text-[0.9375rem] text-ink-muted">{supporting}</p>
           <LeadMagnetForm compact pagePath={pagePath} />
-          {!embedded && (
-            <div className="mt-4">
-              <AskChatGptCta compact />
-            </div>
-          )}
+          {/* Always show — destinations use embedded=true; ChatGPT→London is the only proven lead path */}
+          <div className="mt-4">
+            <AskChatGptCta compact />
+          </div>
           <p className="mt-3 text-[0.8125rem] text-ink-muted">
             Prefer a dedicated page?{" "}
             <Link href="/lead-magnet" className="font-medium text-teal hover:underline">

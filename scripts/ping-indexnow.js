@@ -26,9 +26,11 @@ const URLS = [
   "https://yesicantravel.com/destinations/barcelona",
   "https://yesicantravel.com/destinations/berlin",
   "https://yesicantravel.com/destinations/paris",
+  "https://yesicantravel.com/destinations/london",
   "https://yesicantravel.com/destinations/las-vegas",
   "https://yesicantravel.com/destinations/okinawa",
   "https://yesicantravel.com/events/berlin-marathon-2026",
+  "https://yesicantravel.com/events/amsterdam-light-festival-2026",
   "https://yesicantravel.com/llms.txt",
   "https://yesicantravel.com/sitemap.xml",
 ];

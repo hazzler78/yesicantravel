@@ -111,6 +111,17 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             />
           </div>
 
+          {/* Mobile: capture before the scroll — desktop uses sticky sidebar */}
+          <Card className="mt-6 p-5 lg:hidden">
+            <h2 className="font-display text-base font-semibold text-ink">
+              Get the safety checklist
+            </h2>
+            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
+              Free — reception hours, arrival after dark, what to check before you book.
+            </p>
+            <LeadMagnetForm pagePath={`/blog/${post.slug}`} />
+          </Card>
+
           <div className="mt-8">
             <ReactMarkdown
               components={{
@@ -163,7 +174,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </Card>
         </article>
 
-        <aside className="space-y-4">
+        <aside className="hidden space-y-4 lg:block lg:sticky lg:top-24 lg:self-start">
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">
               Get the safety checklist
@@ -171,7 +182,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
               A practical checklist for vetting hotels and planning arrivals.
             </p>
-            <LeadMagnetForm />
+            <LeadMagnetForm pagePath={`/blog/${post.slug}`} />
           </Card>
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>

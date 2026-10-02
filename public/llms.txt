@@ -30,6 +30,7 @@ https://yesicantravel.com
 # - Milan: https://yesicantravel.com/destinations/milan
 # - Milan safety guide: https://yesicantravel.com/blog/is-milan-safe-for-solo-female-travellers
 # - Paris: https://yesicantravel.com/destinations/paris
+# - Paris safety guide: https://yesicantravel.com/blog/is-paris-safe-for-solo-female-travellers
 # - Amsterdam: https://yesicantravel.com/destinations/amsterdam
 # - Amsterdam night guide: https://yesicantravel.com/blog/amsterdam-safe-solo-women-night
 # - Events: https://yesicantravel.com/events

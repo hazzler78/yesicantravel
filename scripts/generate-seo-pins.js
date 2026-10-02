@@ -41,6 +41,14 @@ const PINS = [
     cta: "Read the guide",
     urlLine: "yesicantravel.com/blog",
   },
+  {
+    id: "pin-paris-safe",
+    brand: "YES I CAN TRAVEL",
+    titleLines: ["Is Paris safe for", "solo female travellers?"],
+    bullets: ["Marais & Saint-Germain", "Metro nights", "Scams you can walk past"],
+    cta: "Read the guide",
+    urlLine: "yesicantravel.com/blog",
+  },
 ];
 
 function escapeXml(s) {

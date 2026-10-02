@@ -43,4 +43,9 @@ export const DESTINATION_RELATED_GUIDES: Record<
     label: "Is London safe for solo female travellers?",
     blurb: "Night Tube, licensed taxis vs minicabs, and neighbourhoods that work alone.",
   },
+  paris: {
+    href: "/blog/is-paris-safe-for-solo-female-travellers",
+    label: "Is Paris safe for solo female travellers?",
+    blurb: "Marais vs Saint-Germain, metro nights, and the scams you can walk past.",
+  },
 };

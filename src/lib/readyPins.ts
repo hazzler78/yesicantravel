@@ -85,6 +85,16 @@ export const READY_PINS: ReadyPin[] = [
     pinDescription:
       "Is London safe for solo female travellers? Night Tube, licensed taxis, stay areas — practical guide.",
   },
+  {
+    id: "pin-paris-safe",
+    title: "Is Paris safe for solo female travellers?",
+    filePath: "/pins/pin-paris-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-paris-safe.png`,
+    destinationPath: "/blog/is-paris-safe-for-solo-female-travellers",
+    utmCampaign: "pin_paris_safe",
+    pinDescription:
+      "Is Paris safe for solo female travellers? Marais, metro nights, scams to ignore — practical guide.",
+  },
 ];
 
 export const PINS_ZIP_PATH = "/pins/yesicantravel-pins.zip";

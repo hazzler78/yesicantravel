@@ -157,7 +157,11 @@ export default async function DestinationPage({ params }: Props) {
           </p>
         </header>
 
-        <LeadMagnetHomeCta embedded />
+        <LeadMagnetHomeCta
+          embedded
+          city={dest.city}
+          pagePath={`/destinations/${dest.slug}`}
+        />
 
         {DESTINATION_RELATED_GUIDES[dest.slug] && (
           <aside className="mb-10 mt-4 rounded-card border border-teal/25 bg-teal-soft/20 p-5">

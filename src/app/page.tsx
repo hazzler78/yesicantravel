@@ -12,14 +12,14 @@ export const metadata: Metadata = {
     absolute: "Yes I Can Travel – Safe stays for solo female travellers",
   },
   description:
-    "Safety-first hotel search for women travelling alone. 24/7 reception filters, honest city guides, and a free solo safety checklist — Europe & worldwide.",
+    "Yes I Can Travel: safety-first hotel search for female solo travellers. 24/7 reception filters, honest city guides, and a free solo safety checklist.",
   alternates: {
     canonical: "https://yesicantravel.com/",
   },
   openGraph: {
     title: "Yes I Can Travel – Safe stays for solo female travellers",
     description:
-      "Safety-first hotel search for women travelling alone. 24/7 reception, honest guides, free checklist.",
+      "Yes I Can Travel: safety-first hotel search for women travelling alone. 24/7 reception, honest guides, free checklist.",
     url: "https://yesicantravel.com/",
   },
 };

@@ -9,7 +9,9 @@ import { prisma } from "@/lib/prisma";
 const BASE_URL = "https://yesicantravel.com";
 
 export const metadata: Metadata = {
-  title: "Free Solo Female Safety Checklist | Yes I Can Travel",
+  title: {
+    absolute: "Free Solo Female Safety Checklist | Yes I Can Travel",
+  },
   description:
     "Free practical checklist for women travelling solo: hotel filters, arrival after dark, and pre-booking checks. No scare tactics — just clarity.",
   openGraph: {

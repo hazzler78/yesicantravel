@@ -298,7 +298,11 @@ export default async function EventPage({ params }: Props) {
         </header>
 
         {/* Past events still get residual/social traffic — always offer checklist */}
-        <LeadMagnetHomeCta embedded />
+        <LeadMagnetHomeCta
+          embedded
+          city={event.city}
+          pagePath={`/events/${event.slug}`}
+        />
 
         {EVENT_RELATED_GUIDES[event.slug] && (
           <Card className="mt-4 p-5">

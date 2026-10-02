@@ -78,6 +78,14 @@ export const BIO_LINKS: BioLink[] = [
     platforms: ["instagram", "tiktok", "pinterest"],
   },
   {
+    id: "blog-london-safe",
+    label: "Is London safe for solo women?",
+    description: "Night Tube, taxis, stay areas",
+    path: "/blog/is-london-safe-for-solo-female-travellers",
+    utm: { source: "instagram", medium: "bio", campaign: "blog_london_safe" },
+    platforms: ["instagram", "tiktok", "pinterest"],
+  },
+  {
     id: "popular-cities",
     label: "Explore safe cities in Europe",
     description: "Paris, Berlin, Barcelona & more — live prices",

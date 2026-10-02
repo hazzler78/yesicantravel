@@ -38,4 +38,9 @@ export const DESTINATION_RELATED_GUIDES: Record<
     label: "Amsterdam safe at night for solo women",
     blurb: "Neighbourhood tips, late trams, and hotel filters that reduce unknowns.",
   },
+  london: {
+    href: "/blog/is-london-safe-for-solo-female-travellers",
+    label: "Is London safe for solo female travellers?",
+    blurb: "Night Tube, licensed taxis vs minicabs, and neighbourhoods that work alone.",
+  },
 };

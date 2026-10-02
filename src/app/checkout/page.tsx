@@ -689,9 +689,11 @@ function CheckoutContent() {
     return (
       <CheckoutMessage
         title="This checkout link is incomplete"
-        body="Pick your room again and we'll take you straight back here."
+        body="Pick your room again and we'll take you straight back here. Or grab the free solo safety checklist while you replan."
         actionHref="/"
         actionLabel="Start a new search"
+        secondaryHref="/lead-magnet?utm_source=checkout&utm_medium=incomplete&utm_campaign=checklist"
+        secondaryLabel="Get the free checklist"
       />
     );
   }
@@ -700,9 +702,14 @@ function CheckoutContent() {
     return (
       <CheckoutMessage
         title="We couldn't complete this booking"
-        body={error ?? "Something went wrong on the way to the property."}
+        body={
+          (error ?? "Something went wrong on the way to the property.") +
+          " You can retry the stay — or take the free checklist while you decide."
+        }
         actionHref={hotelStayHref}
         actionLabel="Back to the stay"
+        secondaryHref="/lead-magnet?utm_source=checkout&utm_medium=error&utm_campaign=checklist"
+        secondaryLabel="Get the free checklist"
       />
     );
   }

@@ -6,10 +6,19 @@ type CheckoutMessageProps = {
   body: string;
   actionHref: string;
   actionLabel: string;
+  secondaryHref?: string;
+  secondaryLabel?: string;
 };
 
 /** Shared dead-end screen for the checkout's missing-parameter and error states. */
-export function CheckoutMessage({ title, body, actionHref, actionLabel }: CheckoutMessageProps) {
+export function CheckoutMessage({
+  title,
+  body,
+  actionHref,
+  actionLabel,
+  secondaryHref,
+  secondaryLabel,
+}: CheckoutMessageProps) {
   return (
     <div className="mx-auto max-w-xl px-4 py-16 sm:px-6">
       <div className="rounded-card border border-border bg-surface p-8 text-center shadow-card">
@@ -18,8 +27,16 @@ export function CheckoutMessage({ title, body, actionHref, actionLabel }: Checko
         </span>
         <h1 className="mt-4 font-display text-xl font-semibold text-ink">{title}</h1>
         <p className="mx-auto mt-2 max-w-md text-[0.9375rem] text-ink-muted">{body}</p>
-        <div className="mt-6 flex justify-center">
+        <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <SecondaryLink href={actionHref}>{actionLabel}</SecondaryLink>
+          {secondaryHref && secondaryLabel ? (
+            <a
+              href={secondaryHref}
+              className="text-[0.9375rem] font-medium text-teal underline-offset-4 hover:underline"
+            >
+              {secondaryLabel}
+            </a>
+          ) : null}
         </div>
       </div>
     </div>

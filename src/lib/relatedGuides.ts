@@ -22,6 +22,11 @@ export const EVENT_RELATED_GUIDES: Record<
     label: "Berlin Marathon 2026 solo stays",
     blurb: "Race-weekend neighbourhoods, early starts, and safety filters.",
   },
+  "amsterdam-dance-event-2026": {
+    href: "/blog/amsterdam-dance-event-2026-solo-women-hotels",
+    label: "ADE 2026 solo hotels",
+    blurb: "21–25 Oct dates, centre bases, and late-night returns for women going alone.",
+  },
 };
 
 export const DESTINATION_RELATED_GUIDES: Record<

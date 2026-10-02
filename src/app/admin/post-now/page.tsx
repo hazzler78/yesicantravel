@@ -106,7 +106,30 @@ export default function PostNowPage() {
           >
             Download {READY_PINS.length} pins (ZIP)
           </a>
-          <ul className="mt-4 space-y-2 text-xs text-ink-muted">
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-coral">
+            Pin these first (fresh SEO)
+          </p>
+          <ul className="mt-2 space-y-2 text-xs text-ink-muted">
+            {READY_PINS.filter((pin) =>
+              ["pin-barcelona-safe", "pin-ade-2026", "pin-okinawa-safe", "pin-milan-safe"].includes(
+                pin.id
+              )
+            ).map((pin) => (
+              <li key={pin.id} className="rounded-control border border-coral/30 bg-coral-soft/20 p-2">
+                <span className="font-medium text-ink">{pin.title}</span>
+                <br />
+                <span className="break-all font-mono">{pinDestinationUrl(pin)}</span>
+                <br />
+                <a href={pin.publicUrl} className="text-teal hover:underline" target="_blank" rel="noreferrer">
+                  Open PNG
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            All pins
+          </p>
+          <ul className="mt-2 space-y-2 text-xs text-ink-muted">
             {READY_PINS.map((pin) => (
               <li key={pin.id}>
                 <span className="font-medium text-ink">{pin.title}</span>

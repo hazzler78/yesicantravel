@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { prisma } from "@/lib/prisma";
+import { BLOG_TO_DESTINATION_SLUG } from "@/lib/relatedGuides";
+import { getDestinationBySlug } from "@/data/destinations";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -85,12 +87,35 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     },
   };
 
+  const destinationSlug = BLOG_TO_DESTINATION_SLUG[post.slug];
+  const destinationFaqs = destinationSlug
+    ? getDestinationBySlug(destinationSlug)?.faqs
+    : undefined;
+  const faqJsonLd =
+    destinationFaqs && destinationFaqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: destinationFaqs.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: f.answer },
+          })),
+        }
+      : null;
+
   return (
     <div className="bg-canvas">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
       />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:py-14">
         <article className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">

@@ -69,3 +69,14 @@ export const DESTINATION_RELATED_GUIDES: Record<
     blurb: "Naha vs west-coast resorts, Yui Rail until 23:30, and what to filter before you book.",
   },
 };
+
+/** Blog slug → destination slug (reuse destination FAQs for FAQPage rich results). */
+export const BLOG_TO_DESTINATION_SLUG: Record<string, string> = {
+  "is-milan-safe-for-solo-female-travellers": "milan",
+  "is-barcelona-safe-for-solo-female-travellers": "barcelona",
+  "is-okinawa-safe-for-solo-female-travellers": "okinawa",
+  "is-london-safe-for-solo-female-travellers": "london",
+  "is-paris-safe-for-solo-female-travellers": "paris",
+  "is-berlin-safe-for-solo-female-travellers": "berlin",
+  "amsterdam-safe-solo-women-night": "amsterdam",
+};

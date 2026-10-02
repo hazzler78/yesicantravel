@@ -12,6 +12,7 @@ import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
 import { Card } from "@/components/ui/Card";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { HotelLocationCard } from "@/components/HotelLocationCard";
+import { LeadMagnetInlineCta } from "@/components/home/LeadMagnetInlineCta";
 
 interface Booking {
   bookingId?: string;
@@ -243,6 +244,8 @@ function ConfirmationContent() {
           <li>Check the cancellation terms above before changing your plans.</li>
         </ul>
       </Card>
+
+      <LeadMagnetInlineCta pagePath="/confirmation" className="mt-4" />
     </div>
   );
 }

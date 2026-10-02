@@ -5,6 +5,7 @@ import { SOCIAL_POSTING_CADENCE } from "@/lib/socialPlaybook";
 import { SOCIAL_LINKS } from "@/components/brand/SocialIcons";
 import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { AiReferralBanner } from "@/components/AiReferralBanner";
 
 export const metadata: Metadata = {
   title: "Links — Yes I Can Travel",
@@ -37,6 +38,7 @@ export default function BioPage() {
           className="mt-8 rounded-card border border-teal/25 bg-teal-soft/40 p-4"
           aria-labelledby="bio-checklist-heading"
         >
+          <AiReferralBanner />
           <h2 id="bio-checklist-heading" className="font-display text-lg font-semibold text-ink">
             Free solo safety checklist
           </h2>

@@ -4,6 +4,7 @@ import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { Card } from "@/components/ui/Card";
 import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
+import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { prisma } from "@/lib/prisma";
 
 const BASE_URL = "https://yesicantravel.com";
@@ -142,6 +143,7 @@ export default async function LeadMagnetPage() {
           </p>
           <LeadMagnetForm pagePath="/lead-magnet" compact />
         </Card>
+        <AskChatGptCta className="mt-4" />
       </div>
     </div>
   );

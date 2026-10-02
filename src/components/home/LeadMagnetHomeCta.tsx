@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ListChecks } from "lucide-react";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
+import { AskChatGptCta } from "@/components/AskChatGptCta";
 
 type LeadMagnetHomeCtaProps = {
   /** Omit outer section padding when nested inside another page container */
@@ -41,6 +42,11 @@ export function LeadMagnetHomeCta({
           </h2>
           <p className="mt-1 text-[0.9375rem] text-ink-muted">{supporting}</p>
           <LeadMagnetForm compact pagePath={pagePath} />
+          {!embedded && (
+            <div className="mt-4">
+              <AskChatGptCta compact />
+            </div>
+          )}
           <p className="mt-3 text-[0.8125rem] text-ink-muted">
             Prefer a dedicated page?{" "}
             <Link href="/lead-magnet" className="font-medium text-teal hover:underline">

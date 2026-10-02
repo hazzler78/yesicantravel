@@ -10,6 +10,7 @@ import {
 } from "@/lib/readyPins";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
 import { CopyTextButton } from "@/components/admin/CopyTextButton";
+import { AI_SOLO_PROMPT, chatgptPrefillUrl } from "@/lib/aiSharePrompt";
 
 export const metadata: Metadata = {
   title: "Post now — growth",
@@ -196,8 +197,33 @@ export default function PostNowPage() {
           </details>
         </li>
 
-        <li className="rounded-card border border-border bg-surface p-5">
+        <li className="rounded-card border border-teal/30 bg-teal-soft/20 p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 4</p>
+          <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+            Recreate the ChatGPT lead path
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            Nicolette arrived via ChatGPT → London. Share this prefilled prompt in Stories / DMs /
+            comments so more people ask ChatGPT the same way.
+          </p>
+          <pre className="mt-3 max-h-40 overflow-auto whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
+            {AI_SOLO_PROMPT}
+          </pre>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <CopyTextButton text={AI_SOLO_PROMPT} label="Copy AI prompt" />
+            <a
+              href={chatgptPrefillUrl()}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-[40px] items-center justify-center rounded-control bg-teal px-3 text-sm font-semibold text-ink-inverse hover:bg-teal/90"
+            >
+              Open in ChatGPT
+            </a>
+          </div>
+        </li>
+
+        <li className="rounded-card border border-border bg-surface p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 5</p>
           <h2 className="mt-1 font-display text-lg font-semibold text-ink">
             MailerLite day-0 share line (optional, 30s)
           </h2>
@@ -226,7 +252,7 @@ https://yesicantravel.com/lead-magnet?utm_source=email&utm_medium=nurture&utm_ca
         </li>
 
         <li className="rounded-card border border-border bg-surface p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 5</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 6</p>
           <h2 className="mt-1 font-display text-lg font-semibold text-ink">
             Reel #1 (when you can film)
           </h2>

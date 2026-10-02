@@ -6,6 +6,7 @@ import { SOCIAL_LINKS } from "@/components/brand/SocialIcons";
 import PageVisitTracker from "@/components/analytics/PageVisitTracker";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
+import { AskChatGptCta } from "@/components/AskChatGptCta";
 
 export const metadata: Metadata = {
   title: "Links — Yes I Can Travel",
@@ -47,6 +48,10 @@ export default function BioPage() {
           </p>
           <LeadMagnetForm pagePath="/bio" compact />
         </section>
+
+        <div className="mt-4">
+          <AskChatGptCta compact />
+        </div>
 
         <nav className="mt-6 space-y-3" aria-label="Featured links">
           {BIO_LINKS_BELOW_FORM.map((link) => (

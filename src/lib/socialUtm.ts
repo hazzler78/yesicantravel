@@ -47,10 +47,10 @@ export const BIO_LINKS: BioLink[] = [
   },
   {
     id: "blog-berlin-marathon",
-    label: "Berlin Marathon 2026 solo stays",
-    description: "Race-weekend hotels + safety filters",
-    path: "/blog/berlin-marathon-2026-solo-women-hotels",
-    utm: { source: "instagram", medium: "bio", campaign: "blog_berlin_marathon" },
+    label: "ADE 2026: safer solo hotels",
+    description: "21–25 Oct — centre bases & late nights",
+    path: "/blog/amsterdam-dance-event-2026-solo-women-hotels",
+    utm: { source: "instagram", medium: "bio", campaign: "blog_ade_2026" },
     platforms: ["instagram", "tiktok", "pinterest"],
   },
   {

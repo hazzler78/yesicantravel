@@ -41,20 +41,27 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const eventNameWithYear = `${event.eventName} ${year}`;
 
   // Keyword-aligned titles for pages already getting impressions (GSC).
+  // Do NOT append "| Yes I Can Travel" — the root layout template adds it.
   const titleOverrides: Record<string, string> = {
-    "berlin-marathon-2026": `Berlin Marathon 2026 date & safer solo hotels | Yes I Can Travel`,
-    "lisbon-web-summit-2026": `Web Summit Lisbon 2026 hotels for solo women | Yes I Can Travel`,
-    "rock-en-seine-paris-2026": `Rock en Seine 2026 hotels for solo women | Yes I Can Travel`,
+    "berlin-marathon-2026": `Berlin Marathon 2026 date & safer solo hotels`,
+    "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels for solo women`,
+    "rock-en-seine-paris-2026": `Rock en Seine 2026 hotels for solo women`,
+    "munich-oktoberfest-2026": `Oktoberfest 2026 hotels for solo women (Safe Space tip)`,
+    "amsterdam-dance-event-2026": `ADE 2026 solo women hotels — centre bases & late nights`,
+    "amsterdam-light-festival-2026": `Amsterdam Light Festival 2026–27: safe solo stays`,
   };
   const descriptionOverrides: Record<string, string> = {
     "berlin-marathon-2026": `Berlin Marathon 2026 (${event.dateRange}): where to stay as a solo woman near Brandenburg Gate — 24/7 reception, early start, free cancellation.`,
-    "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels on the red metro line and Parque das Nações for women attending alone.`,
+    "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels on the red metro line and Parque das Nações for women attending alone. Free solo checklist included.`,
     "rock-en-seine-paris-2026": `Rock en Seine Paris: metro line 10 hotels, Boulogne, and late-night returns for solo women.`,
+    "munich-oktoberfest-2026": `Oktoberfest 2026 solo stays: Theresienwiese vs Glockenbach, Safe Space hours, U-Bahn exits, and 24/7 reception filters.`,
+    "amsterdam-dance-event-2026": `ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception. Free checklist.`,
+    "amsterdam-light-festival-2026": `Amsterdam Light Festival canal route stays for solo women — Jordaan & canal ring, night buses, 24/7 reception.`,
   };
 
   const title =
     titleOverrides[event.slug] ??
-    `${eventNameWithYear} – Safe Solo Stays for Women | Yes I Can Travel`;
+    `${eventNameWithYear} – Safe Solo Stays for Women`;
   const description =
     descriptionOverrides[event.slug] ??
     `Safe, women-reviewed hotels near ${eventNameWithYear}. 24/7 reception, safety filters & expert tips for solo female travelers. Book confidently and feel prepared.`;
@@ -62,7 +69,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const past = isEventPast(event);
 
   return {
-    title: past ? `${eventNameWithYear} has ended | Yes I Can Travel` : title,
+    title: past ? `${eventNameWithYear} has ended` : title,
     description,
     // Keep the URL alive for anyone who has it, but stop offering a finished
     // edition to search as if it were bookable.

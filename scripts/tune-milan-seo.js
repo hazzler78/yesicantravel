@@ -1,14 +1,13 @@
 const { PrismaClient } = require("@prisma/client");
-
 const p = new PrismaClient();
 
 async function main() {
   const milan = await p.contentItem.updateMany({
     where: { slug: "is-milan-safe-for-solo-female-travellers" },
     data: {
-      seoTitle: "Is Milan Safe for Solo Female Travellers in 2026? Areas + Hotels",
+      seoTitle: "Is Milan Safe for Solo Women? Where to Stay in 2026",
       seoDescription:
-        "Is Milan safe for solo female travellers? Brera & Porta Nuova, metro until ~00:30, 24/7 reception filters — plus free checklist. Honest 2026 guide.",
+        "Is Milan safe for solo female travellers? Where to stay: Brera & Porta Nuova, metro nights, 24/7 reception — plus free checklist.",
     },
   });
   console.log(JSON.stringify({ milan: milan.count }));

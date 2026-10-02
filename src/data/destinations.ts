@@ -280,9 +280,9 @@ export const destinations: Destination[] = [
     headline: "Paris for solo female travellers",
     subheadline:
       "A city built for walking alone, with an excellent late metro and a well-rehearsed set of street scams. Here's where to base yourself, how the last train really works, and which approaches to ignore.",
-    metaTitle: "Is Paris Safe for Solo Female Travellers? Honest 2026 Guide",
+    metaTitle: "Is Paris Safe for Solo Women? Where to Stay in 2026",
     metaDescription:
-      "Is Paris safe for solo female travellers? Marais & Saint-Germain, metro nights, scams to ignore, 24/7 reception stays — plus free checklist.",
+      "Is Paris safe for solo female travellers? Where to stay: Marais & Saint-Germain, metro nights, scams to ignore, 24/7 reception — plus free checklist.",
     aiSearch: "central safe hotel Paris France well-lit 24-hour reception",
     knownFor: [
       "The Louvre, Musée d'Orsay and a museum pass that pays for itself in two days",

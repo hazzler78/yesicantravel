@@ -33,6 +33,14 @@ const PINS = [
     cta: "See stay guide",
     urlLine: "yesicantravel.com/blog",
   },
+  {
+    id: "pin-london-safe",
+    brand: "YES I CAN TRAVEL",
+    titleLines: ["Is London safe for", "solo female travellers?"],
+    bullets: ["Night Tube explained", "Licensed taxi rule", "Areas that work alone"],
+    cta: "Read the guide",
+    urlLine: "yesicantravel.com/blog",
+  },
 ];
 
 function escapeXml(s) {

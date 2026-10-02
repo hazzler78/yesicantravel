@@ -179,6 +179,26 @@ export default async function GrowthDashboardPage() {
             </article>
           </section>
 
+          {snapshot.signupsBySourceGoalPeriod.length > 0 && (
+            <section className="mt-6 rounded-xl border border-[var(--sand)] bg-white p-5">
+              <h2 className="text-lg font-semibold">Signups by source (goal period)</h2>
+              <p className="mt-1 text-xs text-[var(--navy-light)]">
+                Includes ChatGPT / referral sources when attribution is captured.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {snapshot.signupsBySourceGoalPeriod.map((row) => (
+                  <li
+                    key={row.source}
+                    className="flex items-center justify-between text-sm"
+                  >
+                    <span className="text-[var(--navy-light)]">{row.source}</span>
+                    <span className="font-semibold">{row.count}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {snapshot.signupsBySource.length > 0 && (
             <section className="mt-6 rounded-xl border border-[var(--sand)] bg-white p-5">
               <h2 className="text-lg font-semibold">Signups by source (this week)</h2>

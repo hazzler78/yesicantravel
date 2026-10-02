@@ -25,6 +25,8 @@ export type WeeklyGrowthSnapshot = {
   socialLandingsThisWeek: number;
   /** Checklist signups submitted on /bio this week */
   bioSignupsThisWeek: number;
+  /** Signups by leadProfile.source for the full goal period (e.g. chatgpt.com). */
+  signupsBySourceGoalPeriod: Array<{ source: string; count: number }>;
   signupsBySource: Array<{ source: string; count: number }>;
 };
 
@@ -87,6 +89,7 @@ export async function getWeeklyGrowthSnapshot(
     signupsInGoalPeriod,
     pageVisitsThisWeek,
     signupsBySourceRaw,
+    signupsBySourceGoalRaw,
     bioSignupsThisWeek,
   ] = await Promise.all([
     prisma.leadProfile.count({
@@ -104,6 +107,15 @@ export async function getWeeklyGrowthSnapshot(
       where: {
         consentMarketing: true,
         createdAt: { gte: weekStart, lt: weekEnd },
+        source: { not: null },
+      },
+      _count: { _all: true },
+    }),
+    prisma.leadProfile.groupBy({
+      by: ["source"],
+      where: {
+        consentMarketing: true,
+        createdAt: { gte: GROWTH_GOAL.startDate },
         source: { not: null },
       },
       _count: { _all: true },
@@ -139,6 +151,12 @@ export async function getWeeklyGrowthSnapshot(
     bioVisitsThisWeek: pageVisitsThisWeek.filter(isBioVisit).length,
     socialLandingsThisWeek: pageVisitsThisWeek.filter(isSocialLanding).length,
     bioSignupsThisWeek,
+    signupsBySourceGoalPeriod: signupsBySourceGoalRaw
+      .map((row) => ({
+        source: row.source ?? "unknown",
+        count: row._count._all,
+      }))
+      .sort((a, b) => b.count - a.count),
     signupsBySource: signupsBySourceRaw
       .map((row) => ({
         source: row.source ?? "unknown",

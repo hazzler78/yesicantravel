@@ -75,6 +75,16 @@ export const READY_PINS: ReadyPin[] = [
     pinDescription:
       "Rock en Seine Paris: metro line 10, Boulogne, late returns — solo women stay guide.",
   },
+  {
+    id: "pin-london-safe",
+    title: "Is London safe for solo female travellers?",
+    filePath: "/pins/pin-london-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-london-safe.png`,
+    destinationPath: "/blog/is-london-safe-for-solo-female-travellers",
+    utmCampaign: "pin_london_safe",
+    pinDescription:
+      "Is London safe for solo female travellers? Night Tube, licensed taxis, stay areas — practical guide.",
+  },
 ];
 
 export const PINS_ZIP_PATH = "/pins/yesicantravel-pins.zip";

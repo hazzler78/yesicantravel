@@ -38,9 +38,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = post.seoDescription ?? post.excerpt ?? "";
   const canonical = `https://yesicantravel.com/blog/${post.slug}`;
   const ogImage = ogImageForPath(`/blog/${post.slug}`);
+  const absoluteTitle = title.includes("Yes I Can Travel")
+    ? title
+    : `${title} | Yes I Can Travel`;
 
   return {
-    title,
+    title: { absolute: absoluteTitle },
     description,
     alternates: { canonical },
     openGraph: {

@@ -8,16 +8,16 @@ const p = new PrismaClient();
 
 const UPDATES = [
   {
-    slug: "is-milan-safe-for-solo-female-travellers",
-    seoTitle: "Is Milan Safe for Solo Female Travellers? Honest 2026 Guide",
+    slug: "amsterdam-safe-solo-women-night",
+    seoTitle: "Is Amsterdam Safe for Solo Female Travellers at Night?",
     seoDescription:
-      "Is Milan safe for solo female travellers? Brera & Porta Nuova bases, metro nights, 24/7 reception filters — plus free checklist.",
+      "Is Amsterdam safe for solo female travellers at night? Night buses after midnight, canal-belt bases, 24/7 reception — practical guide + free checklist.",
   },
   {
-    slug: "amsterdam-safe-solo-women-night",
-    seoTitle: "Is Amsterdam Safe at Night for Women? Solo Female Guide",
+    slug: "is-milan-safe-for-solo-female-travellers",
+    seoTitle: "Is Milan Safe for Solo Female Travellers?",
     seoDescription:
-      "Is Amsterdam safe at night for women? Canal-belt bases, night buses after midnight, and 24/7 reception — practical, not fear-based.",
+      "Is Milan safe for solo female travellers? Brera & Porta Nuova, metro nights, 24/7 reception — plus free checklist.",
   },
   {
     slug: "is-paris-safe-for-solo-female-travellers",

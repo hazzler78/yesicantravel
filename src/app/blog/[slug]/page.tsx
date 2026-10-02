@@ -3,6 +3,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ContentStatus } from "@prisma/client";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { ShareButton } from "@/components/ShareButton";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
@@ -121,9 +122,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   };
 
   const destinationSlug = BLOG_TO_DESTINATION_SLUG[post.slug];
-  const destinationFaqs = destinationSlug
-    ? getDestinationBySlug(destinationSlug)?.faqs
+  const destination = destinationSlug
+    ? getDestinationBySlug(destinationSlug)
     : undefined;
+  const destinationFaqs = destination?.faqs;
   const faqJsonLd =
     destinationFaqs && destinationFaqs.length > 0
       ? {
@@ -178,6 +180,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               Free — reception hours, arrival after dark, what to check before you book.
             </p>
             <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
+            {destination && (
+              <div className="mt-3">
+                <AskChatGptCta
+                  compact
+                  city={destination.city}
+                  citySlug={destination.slug}
+                />
+              </div>
+            )}
           </Card>
 
           <div className="mt-8">
@@ -241,6 +252,15 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               A practical checklist for vetting hotels and planning arrivals.
             </p>
             <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
+            {destination && (
+              <div className="mt-3">
+                <AskChatGptCta
+                  compact
+                  city={destination.city}
+                  citySlug={destination.slug}
+                />
+              </div>
+            )}
           </Card>
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>

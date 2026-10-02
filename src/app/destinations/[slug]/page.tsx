@@ -162,6 +162,7 @@ export default async function DestinationPage({ params }: Props) {
         <LeadMagnetHomeCta
           embedded
           city={dest.city}
+          citySlug={dest.slug}
           pagePath={`/destinations/${dest.slug}`}
         />
 

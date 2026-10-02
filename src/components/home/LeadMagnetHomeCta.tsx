@@ -11,6 +11,8 @@ type LeadMagnetHomeCtaProps = {
   embedded?: boolean;
   /** City name for destination pages — raises relevance + conversion intent */
   city?: string;
+  /** Destination slug for city-specific ChatGPT prefill */
+  citySlug?: string;
   /** Analytics path override (defaults to /lead-magnet or inferred) */
   pagePath?: string;
 };
@@ -22,6 +24,7 @@ type LeadMagnetHomeCtaProps = {
 export function LeadMagnetHomeCta({
   embedded = false,
   city,
+  citySlug,
   pagePath,
 }: LeadMagnetHomeCtaProps) {
   const headline = city
@@ -48,7 +51,7 @@ export function LeadMagnetHomeCta({
           <LeadMagnetForm compact pagePath={pagePath} />
           {/* Always show — destinations use embedded=true; ChatGPT→London is the only proven lead path */}
           <div className="mt-4">
-            <AskChatGptCta compact />
+            <AskChatGptCta compact city={city} citySlug={citySlug} />
           </div>
           <p className="mt-3 text-[0.8125rem] text-ink-muted">
             Prefer a dedicated page?{" "}

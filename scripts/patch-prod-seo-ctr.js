@@ -10,17 +10,17 @@ const TOKEN = process.env.REVENUE_AGENT_ADMIN_TOKEN;
 const PATCHES = [
   {
     slug: "amsterdam-safe-solo-women-night",
-    seoTitle: "Is Amsterdam Safe for Solo Female Travellers at Night?",
+    seoTitle: "Is Amsterdam Safe at Night for Women?",
     seoDescription:
-      "Is Amsterdam safe for solo female travellers at night? Night buses after midnight, canal-belt bases, 24/7 reception — practical guide + free checklist.",
-    targetKeyword: "is amsterdam safe for solo female travellers at night",
-    title: "Is Amsterdam safe for solo female travellers at night?",
+      "Yes for most solo women in the canal belt — night buses after midnight, lit bases, 24/7 reception. Practical guide + free checklist.",
+    targetKeyword: "is amsterdam safe at night for women",
+    title: "Is Amsterdam safe at night for women?",
   },
   {
     slug: "is-milan-safe-for-solo-female-travellers",
     seoTitle: "Is Milan Safe for Solo Female Travellers?",
     seoDescription:
-      "Is Milan safe for solo female travellers? Brera & Porta Nuova, metro nights, 24/7 reception — plus free checklist.",
+      "Yes — for most solo women in Brera or Porta Nuova. Metro until ~00:30, 24/7 reception hotels, free checklist.",
     targetKeyword: "is milan safe for solo female travellers",
   },
 ];

@@ -234,8 +234,8 @@ export default function PostNowPage() {
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
             Email 1 already includes the share CTA + button. New checklist signups get it
-            automatically. Optional: send the Nicolette share draft from Gmail if you want a
-            personal ask.
+            automatically. Nicolette share ask already sent from hello@yesicantravel.com
+            (MailerLite campaign finished 2 Oct).
           </p>
           <a
             href="https://dashboard.mailerlite.com/automations/198834126848001911"

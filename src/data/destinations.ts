@@ -472,7 +472,7 @@ export const destinations: Destination[] = [
       "A working city rather than a museum, compact in the centre and easy to cross by metro — as long as you know it shuts around 00:30. Here's where to stay and how the night network fills the gap.",
     metaTitle: "Is Milan Safe for Solo Female Travellers? | Yes I Can Travel",
     metaDescription:
-      "Is Milan safe for solo female travellers? Honest answer: Brera & Porta Nuova, metro to ~00:30, 24/7 reception hotels. Free checklist included.",
+      "Yes — for most solo women who stay in Brera or Porta Nuova. Metro until ~00:30, 24/7 reception hotels, free checklist.",
     aiSearch: "central safe hotel Milan Italy well-lit near metro",
     knownFor: [
       "The Duomo and the Galleria Vittorio Emanuele II",

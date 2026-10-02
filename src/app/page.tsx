@@ -8,7 +8,9 @@ import { SafetySignals } from "@/components/home/SafetySignals";
 import { TrendingEvents } from "@/components/home/TrendingEvents";
 
 export const metadata: Metadata = {
-  title: "Yes I Can Travel – Safe stays for solo female travellers",
+  title: {
+    absolute: "Yes I Can Travel – Safe stays for solo female travellers",
+  },
   description:
     "Safety-first hotel search for women travelling alone. 24/7 reception filters, honest city guides, and a free solo safety checklist — Europe & worldwide.",
   alternates: {

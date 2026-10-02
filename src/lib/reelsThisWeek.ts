@@ -139,8 +139,13 @@ export const THIS_WEEK_REELS: ReelShootScript[] = [
   },
 ];
 
-/** Copy-paste bio / profile links by platform. */
-export const SOCIAL_BIO_URL = "https://yesicantravel.com/bio";
+/** Copy-paste bio / profile links by platform (UTM so growth metrics attribute IG/TikTok). */
+export const SOCIAL_BIO_URL =
+  "https://yesicantravel.com/bio?utm_source=instagram&utm_medium=bio&utm_campaign=profile";
+
+/** TikTok profile link — same hub, separate UTM for attribution. */
+export const TIKTOK_BIO_URL =
+  "https://yesicantravel.com/bio?utm_source=tiktok&utm_medium=bio&utm_campaign=profile";
 
 /** Pinterest profile "Website" field — not /bio (Pinterest rejects link-hub / noindex pages). */
 export const PINTEREST_PROFILE_URL = "https://yesicantravel.com/lead-magnet";

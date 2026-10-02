@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { SOCIAL_BIO_URL, PINTEREST_PROFILE_URL, PINTEREST_PROFILE_URL_FALLBACK } from "@/lib/reelsThisWeek";
+import { SOCIAL_BIO_URL, TIKTOK_BIO_URL, PINTEREST_PROFILE_URL, PINTEREST_PROFILE_URL_FALLBACK } from "@/lib/reelsThisWeek";
 import { CAROUSEL_NO_FILM_PACKAGE, READY_CAROUSEL_SLIDES } from "@/lib/carouselNoFilmPackage";
 import {
   READY_PINS,
@@ -45,13 +45,27 @@ export default function PostNowPage() {
           </p>
 
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
-            Instagram + TikTok
+            Instagram
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <p className="min-w-0 flex-1 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">
               {SOCIAL_BIO_URL}
             </p>
             <CopyTextButton text={SOCIAL_BIO_URL} label="Copy" />
+          </div>
+          <p className="mt-1 text-xs text-ink-muted">
+            Profile already points at /bio — replace the link with this UTM version so visits
+            count as Instagram in growth metrics.
+          </p>
+
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            TikTok
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <p className="min-w-0 flex-1 break-all rounded-control border border-border bg-surface px-3 py-2 font-mono text-sm text-ink">
+              {TIKTOK_BIO_URL}
+            </p>
+            <CopyTextButton text={TIKTOK_BIO_URL} label="Copy" />
           </div>
 
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">

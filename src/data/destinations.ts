@@ -814,9 +814,9 @@ export const destinations: Destination[] = [
     headline: "Okinawa for solo female travellers",
     subheadline:
       "Japan's southern islands are among the easier places in Asia to travel alone — as long as you know the monorail stops around 23:30 and a car is what the rest of the island actually runs on.",
-    metaTitle: "Is Okinawa Safe for Solo Female Travellers? (Honest Guide)",
+    metaTitle: "Is Okinawa Safe for Solo Female Travellers? Honest 2026 Guide",
     metaDescription:
-      "Is Okinawa safe for solo female travellers? Yes — plan for Yui Rail until 23:30. Naha vs west-coast resorts, taxis, and 24/7 reception.",
+      "Is Okinawa safe for solo female travellers? Yui Rail until 23:30, Naha vs west-coast resorts, taxis, and 24/7 reception — plus free checklist.",
     aiSearch: "safe hotel Naha Okinawa Japan well-lit near monorail",
     knownFor: [
       "Kanhizakura cherry blossom, typically late January through February — weeks before the mainland",

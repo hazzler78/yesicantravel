@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "berlin-marathon-2026": `Berlin Marathon 2026 date: Sunday 27 Sept — safer solo hotels`,
     "lisbon-web-summit-2026": `Web Summit Lisbon 2026: safer hotels for solo women`,
     "rock-en-seine-paris-2026": `Rock en Seine 2026 hotels for solo women`,
-    "munich-oktoberfest-2026": `Oktoberfest 2026 hotels for solo women (Safe Space tip)`,
+    "munich-oktoberfest-2026": `Oktoberfest 2026 ends 4 Oct — Safe Space + solo hotels`,
     "amsterdam-dance-event-2026": `Amsterdam Dance Event 2026 dates (21–25 Oct) + solo hotels`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival 2026–27: safe solo stays`,
     "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: safe solo hotels`,

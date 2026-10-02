@@ -11,6 +11,11 @@ import {
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
 import { CopyTextButton } from "@/components/admin/CopyTextButton";
 import { AI_SOLO_PROMPT, chatgptPrefillUrl } from "@/lib/aiSharePrompt";
+import {
+  REDDIT_SOLO_POST,
+  REDDIT_OKTOBERFEST_COMMENT,
+  CHATGPT_STORY_CAPTION,
+} from "@/lib/communityPosts";
 
 export const metadata: Metadata = {
   title: "Post now — growth",
@@ -251,8 +256,63 @@ https://yesicantravel.com/lead-magnet?utm_source=email&utm_medium=nurture&utm_ca
           </a>
         </li>
 
+        <li className="rounded-card border border-coral/30 bg-coral-soft/20 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-coral">Step 6</p>
+          <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+            Reddit / community (no film needed)
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            {REDDIT_SOLO_POST.subreddit} — soft CTA, same checklist that converted Nicolette.
+            Oktoberfest ends <strong>4 Oct</strong> — use the comment template while Wiesn is live.
+          </p>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            Post title
+          </p>
+          <pre className="mt-1 whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
+            {REDDIT_SOLO_POST.title}
+          </pre>
+          <div className="mt-2">
+            <CopyTextButton text={REDDIT_SOLO_POST.title} label="Copy title" />
+          </div>
+          <p className="mt-3 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            Post body
+          </p>
+          <pre className="mt-1 max-h-48 overflow-auto whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
+            {REDDIT_SOLO_POST.body}
+          </pre>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <CopyTextButton text={REDDIT_SOLO_POST.body} label="Copy body" />
+            <a
+              href="https://www.reddit.com/r/solofemaletravel/submit"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-[40px] items-center justify-center rounded-control bg-coral px-3 text-sm font-semibold text-white hover:bg-coral-hover"
+            >
+              Open r/solofemaletravel submit
+            </a>
+          </div>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            Oktoberfest comment (ends 4 Oct)
+          </p>
+          <pre className="mt-1 whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
+            {REDDIT_OKTOBERFEST_COMMENT.body}
+          </pre>
+          <div className="mt-2">
+            <CopyTextButton text={REDDIT_OKTOBERFEST_COMMENT.body} label="Copy comment" />
+          </div>
+          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+            IG Story caption (ChatGPT prompt)
+          </p>
+          <pre className="mt-1 whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
+            {CHATGPT_STORY_CAPTION}
+          </pre>
+          <div className="mt-2">
+            <CopyTextButton text={CHATGPT_STORY_CAPTION} label="Copy Story caption" />
+          </div>
+        </li>
+
         <li className="rounded-card border border-border bg-surface p-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 6</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 7</p>
           <h2 className="mt-1 font-display text-lg font-semibold text-ink">
             Reel #1 (when you can film)
           </h2>

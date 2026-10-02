@@ -564,9 +564,9 @@ export const destinations: Destination[] = [
     headline: "London for solo female travellers",
     subheadline:
       "Enormous, well policed and staffed at every station — with one rule that genuinely matters: never get into a minicab you didn't book. Here's how the night network works and where to base yourself.",
-    metaTitle: "Is London Safe for Solo Female Travellers? | Stay Areas",
+    metaTitle: "Is London Safe for Solo Female Travellers? Honest 2026 Guide",
     metaDescription:
-      "Is London safe for solo female travellers? Honest area guidance, Night Tube, licensed taxis vs minicabs, and hotels with 24/7 reception.",
+      "Is London safe for solo female travellers? Night Tube, licensed taxis vs minicabs, stay areas, and hotels with 24/7 reception — plus free checklist.",
     aiSearch: "central safe hotel London UK well-lit near tube station",
     knownFor: [
       "World-class museums with free general admission",

@@ -174,7 +174,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
               Free — reception hours, arrival after dark, what to check before you book.
             </p>
-            <LeadMagnetForm pagePath={`/blog/${post.slug}`} />
+            <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
           </Card>
 
           <div className="mt-8">
@@ -237,7 +237,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
               A practical checklist for vetting hotels and planning arrivals.
             </p>
-            <LeadMagnetForm pagePath={`/blog/${post.slug}`} />
+            <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
           </Card>
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>

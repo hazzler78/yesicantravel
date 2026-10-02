@@ -185,9 +185,9 @@ export const destinations: Destination[] = [
     headline: "Amsterdam for solo female travellers",
     subheadline:
       "Small, flat and easy to cross on foot — with two things that catch visitors out: the trams stop just after midnight, and the red asphalt is a bike road, not a pavement. Here's how to stay somewhere calm and get home after the last tram.",
-    metaTitle: "Is Amsterdam Safe for Solo Female Travellers at Night? | Stays",
+    metaTitle: "Is Amsterdam Safe at Night for Women? Solo Traveller Guide 2026",
     metaDescription:
-      "Is Amsterdam safe for solo female travellers at night? Neighbourhoods, night buses, and hotels with 24/7 reception — practical, not fear-based.",
+      "Is Amsterdam safe at night for women travelling solo? Night buses after midnight, calm neighbourhoods, and 24/7 reception hotels — practical, not fear-based.",
     aiSearch: "central safe hotel Amsterdam Netherlands well-lit near station",
     knownFor: [
       "The UNESCO-listed canal ring, walkable end to end in under an hour",
@@ -469,9 +469,9 @@ export const destinations: Destination[] = [
     headline: "Milan for solo female travellers",
     subheadline:
       "A working city rather than a museum, compact in the centre and easy to cross by metro — as long as you know it shuts around 00:30. Here's where to stay and how the night network fills the gap.",
-    metaTitle: "Is Milan Safe for Solo Female Travellers? (Honest Guide)",
+    metaTitle: "Is Milan Safe for Solo Female Travellers in 2026? Areas + Hotels",
     metaDescription:
-      "Is Milan safe for solo female travellers? Yes — with pickpocketing awareness. Brera & Porta Nuova stays, metro until ~00:30, and 24/7 reception filters.",
+      "Is Milan safe for solo female travellers? Honest take on Brera, Porta Nuova, metro nights to ~00:30, and 24/7 reception stays — plus a free checklist.",
     aiSearch: "central safe hotel Milan Italy well-lit near metro",
     knownFor: [
       "The Duomo and the Galleria Vittorio Emanuele II",

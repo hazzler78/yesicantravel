@@ -157,6 +157,16 @@ export function pinDestinationUrl(pin: ReadyPin): string {
   return url.toString();
 }
 
+/** Prefills Pinterest pin-builder with image + destination + description. */
+export function pinterestCreateUrl(pin: ReadyPin): string {
+  const create = new URL("https://www.pinterest.com/pin-builder/");
+  create.searchParams.set("url", pinDestinationUrl(pin));
+  create.searchParams.set("media", pin.publicUrl);
+  create.searchParams.set("description", `${pin.title}. ${pin.pinDescription}`);
+  create.searchParams.set("method", "button");
+  return create.toString();
+}
+
 /** Absolute OG/Pinterest image for a blog path, if we have a matching pin. */
 export function ogImageForPath(path: string): string | undefined {
   const normalized = path.startsWith("/") ? path : `/${path}`;

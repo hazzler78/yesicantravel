@@ -2,7 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { SOCIAL_BIO_URL, PINTEREST_PROFILE_URL, PINTEREST_PROFILE_URL_FALLBACK } from "@/lib/reelsThisWeek";
 import { CAROUSEL_NO_FILM_PACKAGE, READY_CAROUSEL_SLIDES } from "@/lib/carouselNoFilmPackage";
-import { READY_PINS, PINS_ZIP_PATH, pinDestinationUrl } from "@/lib/readyPins";
+import {
+  READY_PINS,
+  PINS_ZIP_PATH,
+  pinDestinationUrl,
+  pinterestCreateUrl,
+} from "@/lib/readyPins";
 import { REEL_POST_PACKAGES } from "@/lib/reelPostPackages";
 import { CopyTextButton } from "@/components/admin/CopyTextButton";
 
@@ -97,19 +102,13 @@ export default function PostNowPage() {
             Pinterest pins (destination ≠ /bio)
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
-            Each pin links to a specific blog or checklist page — not the /bio hub.
+            Each pin links to a specific blog or checklist page — not the /bio hub. Prefer
+            &quot;Create on Pinterest&quot; (prefilled) over manual ZIP upload.
           </p>
-          <a
-            href={PINS_ZIP_PATH}
-            download
-            className="mt-3 inline-flex min-h-[44px] items-center justify-center rounded-control bg-coral px-4 text-sm font-semibold text-white hover:bg-coral-hover"
-          >
-            Download {READY_PINS.length} pins (ZIP)
-          </a>
           <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-coral">
-            Pin these first (fresh SEO)
+            Pin these first (one click each)
           </p>
-          <ul className="mt-2 space-y-2 text-xs text-ink-muted">
+          <ul className="mt-2 space-y-3 text-xs text-ink-muted">
             {READY_PINS.filter((pin) =>
               [
                 "pin-barcelona-safe",
@@ -117,31 +116,66 @@ export default function PostNowPage() {
                 "pin-okinawa-safe",
                 "pin-milan-safe",
                 "pin-safest-cities",
+                "pin-lead-magnet",
               ].includes(pin.id)
             ).map((pin) => (
-              <li key={pin.id} className="rounded-control border border-coral/30 bg-coral-soft/20 p-2">
+              <li
+                key={pin.id}
+                className="rounded-control border border-coral/30 bg-coral-soft/20 p-3"
+              >
                 <span className="font-medium text-ink">{pin.title}</span>
-                <br />
-                <span className="break-all font-mono">{pinDestinationUrl(pin)}</span>
-                <br />
-                <a href={pin.publicUrl} className="text-teal hover:underline" target="_blank" rel="noreferrer">
-                  Open PNG
-                </a>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <a
+                    href={pinterestCreateUrl(pin)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex min-h-[40px] items-center justify-center rounded-control bg-coral px-3 text-sm font-semibold text-white hover:bg-coral-hover"
+                  >
+                    Create on Pinterest
+                  </a>
+                  <CopyTextButton text={pinDestinationUrl(pin)} label="Copy link" />
+                  <a
+                    href={pin.publicUrl}
+                    className="inline-flex min-h-[40px] items-center text-teal hover:underline"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Open PNG
+                  </a>
+                </div>
               </li>
             ))}
           </ul>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.1em] text-teal">
-            All pins
-          </p>
-          <ul className="mt-2 space-y-2 text-xs text-ink-muted">
-            {READY_PINS.map((pin) => (
-              <li key={pin.id}>
-                <span className="font-medium text-ink">{pin.title}</span>
-                <br />
-                <span className="break-all font-mono">{pinDestinationUrl(pin)}</span>
-              </li>
-            ))}
-          </ul>
+          <details className="mt-4">
+            <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+              All pins + ZIP fallback
+            </summary>
+            <a
+              href={PINS_ZIP_PATH}
+              download
+              className="mt-3 inline-flex min-h-[40px] items-center justify-center rounded-control border border-border bg-surface px-3 text-sm font-semibold text-ink hover:bg-canvas"
+            >
+              Download {READY_PINS.length} pins (ZIP)
+            </a>
+            <ul className="mt-3 space-y-2 text-xs text-ink-muted">
+              {READY_PINS.map((pin) => (
+                <li key={pin.id} className="rounded-control border border-border p-2">
+                  <span className="font-medium text-ink">{pin.title}</span>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <a
+                      href={pinterestCreateUrl(pin)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-semibold text-teal hover:underline"
+                    >
+                      Create
+                    </a>
+                    <span className="break-all font-mono">{pinDestinationUrl(pin)}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </details>
         </li>
 
         <li className="rounded-card border border-border bg-surface p-5">

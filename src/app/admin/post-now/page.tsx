@@ -143,6 +143,35 @@ export default function PostNowPage() {
         <li className="rounded-card border border-border bg-surface p-5">
           <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 4</p>
           <h2 className="mt-1 font-display text-lg font-semibold text-ink">
+            MailerLite day-0 share line (optional, 30s)
+          </h2>
+          <p className="mt-1 text-sm text-ink-muted">
+            API can&apos;t edit an active automation — paste this into email 1 in the nurture
+            sequence so Nicolette (and future leads) can forward the checklist.
+          </p>
+          <pre className="mt-3 whitespace-pre-wrap rounded-card border border-border bg-canvas p-3 text-xs text-ink">
+            {`Know another woman planning a solo trip? Forward this link — same free checklist:
+https://yesicantravel.com/lead-magnet?utm_source=email&utm_medium=nurture&utm_campaign=day0_share`}
+          </pre>
+          <div className="mt-2">
+            <CopyTextButton
+              text={`Know another woman planning a solo trip? Forward this link — same free checklist:\nhttps://yesicantravel.com/lead-magnet?utm_source=email&utm_medium=nurture&utm_campaign=day0_share`}
+              label="Copy share line"
+            />
+          </div>
+          <a
+            href="https://dashboard.mailerlite.com/automations/198834126848001911"
+            target="_blank"
+            rel="noreferrer"
+            className="mt-3 inline-flex text-sm font-semibold text-teal hover:underline"
+          >
+            Open nurture automation →
+          </a>
+        </li>
+
+        <li className="rounded-card border border-border bg-surface p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">Step 5</p>
+          <h2 className="mt-1 font-display text-lg font-semibold text-ink">
             Reel #1 (when you can film)
           </h2>
           <p className="mt-1 text-sm text-ink-muted">

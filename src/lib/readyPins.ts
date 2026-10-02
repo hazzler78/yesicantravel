@@ -157,13 +157,12 @@ export function pinDestinationUrl(pin: ReadyPin): string {
   return url.toString();
 }
 
-/** Prefills Pinterest pin-builder with image + destination + description. */
+/** Prefills Pinterest save dialog with image + destination + description. */
 export function pinterestCreateUrl(pin: ReadyPin): string {
-  const create = new URL("https://www.pinterest.com/pin-builder/");
+  const create = new URL("https://www.pinterest.com/pin/create/button/");
   create.searchParams.set("url", pinDestinationUrl(pin));
   create.searchParams.set("media", pin.publicUrl);
   create.searchParams.set("description", `${pin.title}. ${pin.pinDescription}`);
-  create.searchParams.set("method", "button");
   return create.toString();
 }
 

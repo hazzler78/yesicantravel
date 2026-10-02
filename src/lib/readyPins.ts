@@ -125,6 +125,16 @@ export const READY_PINS: ReadyPin[] = [
     pinDescription:
       "ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception.",
   },
+  {
+    id: "pin-okinawa-safe",
+    title: "Is Okinawa safe for solo female travellers?",
+    filePath: "/pins/pin-okinawa-safe.png",
+    publicUrl: `${ORIGIN}/pins/pin-okinawa-safe.png`,
+    destinationPath: "/blog/is-okinawa-safe-for-solo-female-travellers",
+    utmCampaign: "pin_okinawa_safe",
+    pinDescription:
+      "Is Okinawa safe for solo women? Naha vs west-coast resorts, Yui Rail until 23:30 — practical guide.",
+  },
 ];
 
 export const PINS_ZIP_PATH = "/pins/yesicantravel-pins.zip";

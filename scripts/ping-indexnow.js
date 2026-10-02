@@ -14,8 +14,11 @@ const URLS = [
   "https://yesicantravel.com/blog/amsterdam-safe-solo-women-night",
   "https://yesicantravel.com/blog/is-milan-safe-for-solo-female-travellers",
   "https://yesicantravel.com/blog/berlin-marathon-2026-solo-women-hotels",
+  "https://yesicantravel.com/blog/is-okinawa-safe-for-solo-female-travellers",
   "https://yesicantravel.com/lead-magnet",
   "https://yesicantravel.com/destinations",
+  "https://yesicantravel.com/destinations/okinawa",
+  "https://yesicantravel.com/llms.txt",
   "https://yesicantravel.com/sitemap.xml",
 ];
 

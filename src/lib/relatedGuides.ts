@@ -63,4 +63,9 @@ export const DESTINATION_RELATED_GUIDES: Record<
     label: "Is Barcelona safe for solo female travellers?",
     blurb: "Theft vs violence, Eixample vs Raval, metro nights, and hotel filters that help.",
   },
+  okinawa: {
+    href: "/blog/is-okinawa-safe-for-solo-female-travellers",
+    label: "Is Okinawa safe for solo female travellers?",
+    blurb: "Naha vs west-coast resorts, Yui Rail until 23:30, and what to filter before you book.",
+  },
 };

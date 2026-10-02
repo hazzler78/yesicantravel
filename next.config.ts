@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
     // add a conflicting redirect here — apex is canonical.
     return [...destinationRedirects];
   },
+  async rewrites() {
+    // Some AI crawlers look for the briefing under /.well-known/
+    return [{ source: "/.well-known/llms.txt", destination: "/llms.txt" }];
+  },
 };
 
 export default nextConfig;

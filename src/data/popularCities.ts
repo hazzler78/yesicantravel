@@ -6,7 +6,8 @@
  * returns a different, much smaller subset of the city on every call — so the
  * "from" price advertised on the card could never be reproduced by clicking it.
  *
- * Refresh a placeId with:
+ * City photos live in /public/cities and are looked up via getCityPhotoBySlug
+ * in @/lib/cityPhotos. Refresh a placeId with:
  *   curl -H "X-API-Key: $LITEAPI_KEY" \
  *     "https://api.liteapi.travel/v3.0/data/places?textQuery=Paris,%20France"
  */

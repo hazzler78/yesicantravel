@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Check } from "lucide-react";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { Card } from "@/components/ui/Card";
@@ -7,6 +8,7 @@ import { AiReferralBanner } from "@/components/AiReferralBanner";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { PinterestReferralBanner } from "@/components/PinterestReferralBanner";
 import { SocialReferralBanner } from "@/components/SocialReferralBanner";
+import { ATMOSPHERE_PHOTOS } from "@/lib/cityPhotos";
 import { prisma } from "@/lib/prisma";
 
 const BASE_URL = "https://yesicantravel.com";
@@ -80,6 +82,7 @@ async function getLeadCount(): Promise<number | null> {
 
 export default async function LeadMagnetPage() {
   const leadCount = await getLeadCount();
+  const photo = ATMOSPHERE_PHOTOS.evening;
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -100,6 +103,16 @@ export default async function LeadMagnetPage() {
       <PageVisitTracker path="/lead-magnet" />
       <div className="mx-auto grid max-w-4xl gap-8 px-4 py-10 sm:px-6 md:py-14 lg:grid-cols-[1fr_360px]">
         <div>
+          <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-card border border-border">
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 560px"
+              className="object-cover"
+            />
+          </div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
             Free download
           </p>

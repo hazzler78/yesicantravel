@@ -6,8 +6,10 @@ import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
 import { getDestinationBySlug } from "@/data/destinations";
 import type { MinPricesResponse } from "@/app/api/popular-cities/min-prices/route";
+import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { SectionHeading } from "@/components/ui/Card";
 import { useCurrency } from "@/components/currency/CurrencyControl";
+import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { formatHeadlinePrice } from "@/lib/formatStayPrice";
 import { formatIsoDateShort } from "@/lib/stayDates";
 
@@ -67,14 +69,23 @@ export function PopularCitiesStrip() {
             // so it carries no crawl signal. The guide link below it is the
             // homepage's only route to the city pages.
             const guide = getDestinationBySlug(city.slug);
+            const photo = getCityPhotoBySlug(city.slug);
 
             return (
               <li key={city.slug} className="flex flex-col">
                 <Link
                   href={href}
-                  className="group flex items-center justify-between gap-4 rounded-card border border-border bg-surface px-4 py-3.5 transition-colors hover:border-border-strong hover:bg-surface-muted"
+                  className="group flex items-center gap-3 overflow-hidden rounded-card border border-border bg-surface pr-4 transition-colors hover:border-border-strong hover:bg-surface-muted"
                 >
-                  <span className="min-w-0">
+                  {photo && (
+                    <CityCardPhoto
+                      src={photo.src}
+                      alt=""
+                      size="strip"
+                      className="rounded-l-[inherit]"
+                    />
+                  )}
+                  <span className="min-w-0 flex-1 py-3">
                     <span className="block truncate font-display text-lg font-semibold text-ink">
                       {city.city}
                     </span>

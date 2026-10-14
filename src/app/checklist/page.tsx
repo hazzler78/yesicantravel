@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Check, MapPin, Moon, Shield } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { ATMOSPHERE_PHOTOS } from "@/lib/cityPhotos";
 
 export const metadata: Metadata = {
   title: "Solo Female Safety Checklist",
@@ -52,9 +54,21 @@ const SECTIONS = [
 ];
 
 export default function ChecklistPage() {
+  const photo = ATMOSPHERE_PHOTOS.arrival;
+
   return (
     <div className="bg-canvas">
       <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6 md:py-14">
+        <div className="relative mb-6 aspect-[16/9] overflow-hidden rounded-card border border-border">
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            priority
+            sizes="(max-width: 768px) 100vw, 768px"
+            className="object-cover"
+          />
+        </div>
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-teal">
           Your unlock
         </p>

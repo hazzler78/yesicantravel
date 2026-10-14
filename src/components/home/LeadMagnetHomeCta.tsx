@@ -1,10 +1,12 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ListChecks } from "lucide-react";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
 import { AiReferralBanner } from "@/components/AiReferralBanner";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { PinterestReferralBanner } from "@/components/PinterestReferralBanner";
 import { SocialReferralBanner } from "@/components/SocialReferralBanner";
+import { ATMOSPHERE_PHOTOS } from "@/lib/cityPhotos";
 
 type LeadMagnetHomeCtaProps = {
   /** Omit outer section padding when nested inside another page container */
@@ -34,32 +36,47 @@ export function LeadMagnetHomeCta({
     ? `Reception hours, arrival after dark, and what to check before you book in ${city} — short enough to actually use. Instant access + email tips.`
     : "Reception hours, arrival after dark, and what to check before you book — short enough to actually use. Instant access + email tips.";
 
+  const photo = ATMOSPHERE_PHOTOS.arrival;
+
   const inner = (
-    <div className="rounded-card border border-teal/25 bg-teal-soft/40 p-5 sm:p-6">
-      <div className="flex gap-3">
-        <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-surface text-teal shadow-card">
-          <ListChecks className="h-5 w-5" aria-hidden />
-        </span>
-        <div className="min-w-0 flex-1">
-          <AiReferralBanner />
-          <PinterestReferralBanner />
-          <SocialReferralBanner />
-          <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
-            {headline}
-          </h2>
-          <p className="mt-1 text-[0.9375rem] text-ink-muted">{supporting}</p>
-          <LeadMagnetForm compact pagePath={pagePath} />
-          {/* Always show — destinations use embedded=true; ChatGPT→London is the only proven lead path */}
-          <div className="mt-4">
-            <AskChatGptCta compact city={city} citySlug={citySlug} />
+    <div className="overflow-hidden rounded-card border border-teal/25 bg-teal-soft/40">
+      <div className="grid sm:grid-cols-[minmax(0,11rem)_1fr]">
+        <div className="relative hidden min-h-[11rem] sm:block">
+          <Image
+            src={photo.src}
+            alt=""
+            fill
+            sizes="176px"
+            className="object-cover"
+          />
+        </div>
+        <div className="p-5 sm:p-6">
+          <div className="flex gap-3">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-surface text-teal shadow-card">
+              <ListChecks className="h-5 w-5" aria-hidden />
+            </span>
+            <div className="min-w-0 flex-1">
+              <AiReferralBanner />
+              <PinterestReferralBanner />
+              <SocialReferralBanner />
+              <h2 className="font-display text-lg font-semibold text-ink sm:text-xl">
+                {headline}
+              </h2>
+              <p className="mt-1 text-[0.9375rem] text-ink-muted">{supporting}</p>
+              <LeadMagnetForm compact pagePath={pagePath} />
+              {/* Always show — destinations use embedded=true; ChatGPT→London is the only proven lead path */}
+              <div className="mt-4">
+                <AskChatGptCta compact city={city} citySlug={citySlug} />
+              </div>
+              <p className="mt-3 text-[0.8125rem] text-ink-muted">
+                Prefer a dedicated page?{" "}
+                <Link href="/lead-magnet" className="font-medium text-teal hover:underline">
+                  Open the checklist landing
+                </Link>
+                .
+              </p>
+            </div>
           </div>
-          <p className="mt-3 text-[0.8125rem] text-ink-muted">
-            Prefer a dedicated page?{" "}
-            <Link href="/lead-magnet" className="font-medium text-teal hover:underline">
-              Open the checklist landing
-            </Link>
-            .
-          </p>
         </div>
       </div>
     </div>

@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getLinkableDestinations } from "@/data/destinations";
+import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { Card } from "@/components/ui/Card";
+import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -86,41 +88,54 @@ export default function DestinationsPage() {
         </header>
 
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {destinations.map((destination) => (
-            <li key={destination.slug}>
-              <Card as="article" className="flex h-full flex-col p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
-                  {destination.country}
-                </p>
-                <h2 className="mt-1 font-display text-xl font-semibold text-ink">
-                  <Link
-                    href={`/destinations/${destination.slug}`}
-                    className="underline-offset-4 hover:underline"
-                  >
-                    {destination.city}
-                  </Link>
-                </h2>
-                {destination.neighbourhoods && destination.neighbourhoods.length > 0 && (
-                  <p className="mt-2 text-[0.8125rem] text-ink-muted">
-                    {destination.neighbourhoods.length} neighbourhoods reviewed
-                  </p>
-                )}
-                <p className="mt-2 flex-1 text-[0.9375rem] leading-relaxed text-ink-muted">
-                  {destination.subheadline}
-                </p>
-                <Link
-                  href={`/destinations/${destination.slug}`}
-                  className="group mt-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
-                >
-                  Read the {destination.city} guide
-                  <ArrowRight
-                    className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                    aria-hidden
-                  />
-                </Link>
-              </Card>
-            </li>
-          ))}
+          {destinations.map((destination, index) => {
+            const photo = getCityPhotoBySlug(destination.slug);
+            return (
+              <li key={destination.slug}>
+                <Card as="article" className="flex h-full flex-col overflow-hidden p-0">
+                  {photo && (
+                    <CityCardPhoto
+                      src={photo.src}
+                      alt={photo.alt}
+                      priority={index < 3}
+                      className="rounded-t-[inherit]"
+                    />
+                  )}
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
+                      {destination.country}
+                    </p>
+                    <h2 className="mt-1 font-display text-xl font-semibold text-ink">
+                      <Link
+                        href={`/destinations/${destination.slug}`}
+                        className="underline-offset-4 hover:underline"
+                      >
+                        {destination.city}
+                      </Link>
+                    </h2>
+                    {destination.neighbourhoods && destination.neighbourhoods.length > 0 && (
+                      <p className="mt-2 text-[0.8125rem] text-ink-muted">
+                        {destination.neighbourhoods.length} neighbourhoods reviewed
+                      </p>
+                    )}
+                    <p className="mt-2 flex-1 text-[0.9375rem] leading-relaxed text-ink-muted">
+                      {destination.subheadline}
+                    </p>
+                    <Link
+                      href={`/destinations/${destination.slug}`}
+                      className="group mt-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
+                    >
+                      Read the {destination.city} guide
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        aria-hidden
+                      />
+                    </Link>
+                  </div>
+                </Card>
+              </li>
+            );
+          })}
         </ul>
 
         <LeadMagnetHomeCta embedded />

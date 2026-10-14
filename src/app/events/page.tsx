@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { getUpcomingEvents } from "@/data/events";
+import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { Card } from "@/components/ui/Card";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
+import { getCityPhotoByCityName } from "@/lib/cityPhotos";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -124,43 +126,55 @@ export default function EventsPage() {
                   {month}
                 </h2>
                 <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {monthEvents.map((event) => (
-                    <li key={event.slug}>
-                      <Card as="article" className="flex h-full flex-col p-5">
-                        <p className="tnum text-xs font-semibold uppercase tracking-[0.08em] text-teal">
-                          {event.dateRange}
-                        </p>
-                        <h3 className="mt-1.5 font-display text-lg font-semibold leading-snug text-ink">
-                          <Link
-                            href={`/events/${event.slug}`}
-                            className="underline-offset-4 hover:underline"
-                          >
-                            {event.eventName}
-                          </Link>
-                        </h3>
-                        <p className="mt-1 text-[0.8125rem] text-ink-muted">
-                          {event.city}, {event.country}
-                        </p>
-                        {event.whyNow && (
-                          <p className="mt-3 flex-1 text-[0.9375rem] leading-relaxed text-ink-muted">
-                            {event.whyNow.length > 150
-                              ? `${event.whyNow.slice(0, 150).trim()}…`
-                              : event.whyNow}
-                          </p>
-                        )}
-                        <Link
-                          href={`/events/${event.slug}`}
-                          className="group mt-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
-                        >
-                          Stays for {event.eventShortName}
-                          <ArrowRight
-                            className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
-                            aria-hidden
-                          />
-                        </Link>
-                      </Card>
-                    </li>
-                  ))}
+                  {monthEvents.map((event) => {
+                    const photo = getCityPhotoByCityName(event.city);
+                    return (
+                      <li key={event.slug}>
+                        <Card as="article" className="flex h-full flex-col overflow-hidden p-0">
+                          {photo && (
+                            <CityCardPhoto
+                              src={photo.src}
+                              alt={photo.alt}
+                              className="rounded-t-[inherit]"
+                            />
+                          )}
+                          <div className="flex flex-1 flex-col p-5">
+                            <p className="tnum text-xs font-semibold uppercase tracking-[0.08em] text-teal">
+                              {event.dateRange}
+                            </p>
+                            <h3 className="mt-1.5 font-display text-lg font-semibold leading-snug text-ink">
+                              <Link
+                                href={`/events/${event.slug}`}
+                                className="underline-offset-4 hover:underline"
+                              >
+                                {event.eventName}
+                              </Link>
+                            </h3>
+                            <p className="mt-1 text-[0.8125rem] text-ink-muted">
+                              {event.city}, {event.country}
+                            </p>
+                            {event.whyNow && (
+                              <p className="mt-3 flex-1 text-[0.9375rem] leading-relaxed text-ink-muted">
+                                {event.whyNow.length > 150
+                                  ? `${event.whyNow.slice(0, 150).trim()}…`
+                                  : event.whyNow}
+                              </p>
+                            )}
+                            <Link
+                              href={`/events/${event.slug}`}
+                              className="group mt-4 inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold text-teal underline-offset-4 hover:underline"
+                            >
+                              Stays for {event.eventShortName}
+                              <ArrowRight
+                                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                                aria-hidden
+                              />
+                            </Link>
+                          </div>
+                        </Card>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             ))}

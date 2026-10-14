@@ -10,8 +10,11 @@ import {
 import { getUpcomingEventsInCity } from "@/data/events";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
+import Image from "next/image";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
+import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
+import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { DESTINATION_RELATED_GUIDES } from "@/lib/relatedGuides";
 
 const BASE_URL = "https://yesicantravel.com";
@@ -70,6 +73,7 @@ export default async function DestinationPage({ params }: Props) {
   const canonicalUrl = `${BASE_URL}/destinations/${slug}`;
   const related = getRelatedDestinations(slug, 3);
   const cityEvents = getUpcomingEventsInCity(dest.city, 4);
+  const photo = getCityPhotoBySlug(slug);
 
   // JSON-LD: BreadcrumbList + TouristDestination. Helps Google understand
   // topical relevance of thin templated pages while we build out richer copy.
@@ -158,6 +162,12 @@ export default async function DestinationPage({ params }: Props) {
             {dest.subheadline}
           </p>
         </header>
+
+        {photo && (
+          <div className="mb-8 overflow-hidden rounded-card border border-border">
+            <CityCardPhoto src={photo.src} alt={photo.alt} priority className="rounded-card" />
+          </div>
+        )}
 
         <LeadMagnetHomeCta
           embedded
@@ -385,20 +395,36 @@ export default async function DestinationPage({ params }: Props) {
               Other safer stays for solo women
             </h2>
             <ul className="grid gap-3 sm:grid-cols-2">
-              {related.map((r) => (
-                <li key={r.slug}>
-                  <Link
-                    href={`/destinations/${r.slug}`}
-                    className="block rounded-card border border-border bg-surface p-4 transition-colors hover:border-border-strong"
-                  >
-                    <p className="text-xs font-medium uppercase tracking-wider text-teal">
-                      {r.country}
-                    </p>
-                    <p className="mt-1 font-semibold text-ink">{r.city}</p>
-                    <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{r.subheadline}</p>
-                  </Link>
-                </li>
-              ))}
+              {related.map((r) => {
+                const relatedPhoto = getCityPhotoBySlug(r.slug);
+                return (
+                  <li key={r.slug}>
+                    <Link
+                      href={`/destinations/${r.slug}`}
+                      className="block overflow-hidden rounded-card border border-border bg-surface transition-colors hover:border-border-strong"
+                    >
+                      {relatedPhoto && (
+                        <span className="relative block aspect-[16/10] bg-surface-muted">
+                          <Image
+                            src={relatedPhoto.src}
+                            alt=""
+                            fill
+                            sizes="(max-width: 640px) 100vw, 33vw"
+                            className="object-cover"
+                          />
+                        </span>
+                      )}
+                      <span className="block p-4">
+                        <p className="text-xs font-medium uppercase tracking-wider text-teal">
+                          {r.country}
+                        </p>
+                        <p className="mt-1 font-semibold text-ink">{r.city}</p>
+                        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{r.subheadline}</p>
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
         )}

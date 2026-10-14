@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getEventsForHomepage } from "@/data/events";
+import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { SectionHeading } from "@/components/ui/Card";
+import { getCityPhotoByCityName } from "@/lib/cityPhotos";
 
 export function TrendingEvents() {
   const events = getEventsForHomepage(8);
@@ -18,24 +20,32 @@ export function TrendingEvents() {
         />
 
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {events.map((event) => (
-            <li key={event.slug}>
-              <Link
-                href={`/events/${event.slug}`}
-                className="group flex h-full flex-col rounded-card border border-border bg-surface p-4 transition-colors hover:border-border-strong hover:bg-surface-muted"
-              >
-                <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-teal tnum">
-                  {event.dateRange}
-                </span>
-                <span className="mt-1.5 font-display text-base font-semibold leading-snug text-ink">
-                  {event.eventShortName}
-                </span>
-                <span className="mt-auto pt-3 text-[0.8125rem] text-ink-muted">
-                  {event.city}, {event.country}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {events.map((event) => {
+            const photo = getCityPhotoByCityName(event.city);
+            return (
+              <li key={event.slug}>
+                <Link
+                  href={`/events/${event.slug}`}
+                  className="group flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface transition-colors hover:border-border-strong hover:bg-surface-muted"
+                >
+                  {photo && (
+                    <CityCardPhoto src={photo.src} alt="" className="rounded-t-[inherit]" />
+                  )}
+                  <span className="flex flex-1 flex-col p-4">
+                    <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-teal tnum">
+                      {event.dateRange}
+                    </span>
+                    <span className="mt-1.5 font-display text-base font-semibold leading-snug text-ink">
+                      {event.eventShortName}
+                    </span>
+                    <span className="mt-auto pt-3 text-[0.8125rem] text-ink-muted">
+                      {event.city}, {event.country}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
 
         <p className="mt-6 flex flex-wrap gap-x-6 gap-y-2">

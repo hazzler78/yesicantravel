@@ -9,17 +9,10 @@ import type { MinPricesResponse } from "@/app/api/popular-cities/min-prices/rout
 import { SectionHeading } from "@/components/ui/Card";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { formatHeadlinePrice } from "@/lib/formatStayPrice";
+import { formatIsoDateShort } from "@/lib/stayDates";
 
 function formatDateRange(checkin: string, checkout: string) {
-  try {
-    const from = new Date(checkin);
-    const to = new Date(checkout);
-    const day = (date: Date) =>
-      date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-    return `${day(from)} – ${day(to)}`;
-  } catch {
-    return `${checkin} – ${checkout}`;
-  }
+  return `${formatIsoDateShort(checkin)} – ${formatIsoDateShort(checkout)}`;
 }
 
 export function PopularCitiesStrip() {

@@ -40,8 +40,8 @@ export const metadata: Metadata = {
     "llms-txt": "https://yesicantravel.com/llms.txt",
   },
   icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    apple: [{ url: "/logo.png", type: "image/png" }],
+    icon: [{ url: "/logo.png", type: "image/png", sizes: "96x96" }],
+    apple: [{ url: "/apple-touch-icon.png", type: "image/png", sizes: "180x180" }],
   },
   title: {
     default: "Yes I Can Travel – Safe solo travel stays for women in Europe",

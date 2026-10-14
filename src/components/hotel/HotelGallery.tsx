@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import { ChevronLeft, ChevronRight, ImageOff, Images, X } from "lucide-react";
+import { shrinkHotelImageUrl } from "@/lib/hotelImages";
 
 type HotelGalleryProps = {
   name: string;
@@ -94,10 +95,13 @@ export function HotelGallery({ name, images }: HotelGalleryProps) {
                 {/* Partner CDN images aren't configured as next/image remote hosts. */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={url}
+                  src={shrinkHotelImageUrl(url, "gallery")}
                   alt={index === 0 ? name : ""}
+                  width={560}
+                  height={416}
                   loading={index < 3 ? "eager" : "lazy"}
                   decoding="async"
+                  sizes="(max-width: 640px) 72vw, 280px"
                   className="h-full w-full object-cover"
                 />
                 <span className="absolute bottom-2 right-2 rounded-control bg-ink/70 px-2 py-0.5 text-[0.6875rem] font-semibold text-ink-inverse">
@@ -129,10 +133,13 @@ export function HotelGallery({ name, images }: HotelGalleryProps) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={url}
+                src={shrinkHotelImageUrl(url, "gallery")}
                 alt={index === 0 ? name : ""}
+                width={index === 0 ? 800 : 400}
+                height={index === 0 ? 720 : 360}
                 loading={index === 0 ? "eager" : "lazy"}
                 decoding="async"
+                sizes={index === 0 ? "(min-width: 640px) 50vw, 100vw" : "25vw"}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
               />
               {index === mosaic.length - 1 && extraCount > 0 && (

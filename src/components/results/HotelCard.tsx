@@ -51,8 +51,11 @@ export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap 
             <img
               src={hotel.main_photo}
               alt=""
+              width={496}
+              height={376}
               loading="lazy"
               decoding="async"
+              sizes="(max-width: 640px) 100vw, 248px"
               className="h-full w-full object-cover"
             />
           ) : (

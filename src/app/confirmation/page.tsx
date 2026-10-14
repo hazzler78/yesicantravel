@@ -13,6 +13,7 @@ import { Card } from "@/components/ui/Card";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { HotelLocationCard } from "@/components/HotelLocationCard";
 import { LeadMagnetInlineCta } from "@/components/home/LeadMagnetInlineCta";
+import { shrinkHotelImageUrl } from "@/lib/hotelImages";
 
 interface Booking {
   bookingId?: string;
@@ -158,8 +159,10 @@ function ConfirmationContent() {
               {hotelDetail?.main_photo && (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={hotelDetail.main_photo}
+                  src={shrinkHotelImageUrl(hotelDetail.main_photo, "list")}
                   alt=""
+                  width={160}
+                  height={120}
                   loading="lazy"
                   decoding="async"
                   className="h-24 w-24 shrink-0 rounded-control object-cover"

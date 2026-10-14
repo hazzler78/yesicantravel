@@ -55,13 +55,26 @@ export function getSeasonStayWindow(
   return { checkin, checkout: addDays(checkin, nights), nights };
 }
 
-/** "26 Aug – 28 Aug · 2 nights" */
-export function formatStayWindow({ checkin, checkout, nights }: StayWindow): string {
-  const day = (iso: string) =>
-    new Date(iso + "T12:00:00Z").toLocaleDateString("en-GB", {
+/**
+ * Format a calendar date string (YYYY-MM-DD) for display.
+ * Noon UTC + timeZone:UTC avoids the classic off-by-one where
+ * `new Date("2026-10-28")` (midnight UTC) renders as the previous day
+ * in US timezones.
+ */
+export function formatIsoDateShort(iso: string | null | undefined): string {
+  if (!iso) return "";
+  try {
+    return new Date(iso + "T12:00:00Z").toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
       timeZone: "UTC",
     });
-  return `${day(checkin)} – ${day(checkout)} · ${nights} ${nights === 1 ? "night" : "nights"}`;
+  } catch {
+    return iso;
+  }
+}
+
+/** "26 Aug – 28 Aug · 2 nights" */
+export function formatStayWindow({ checkin, checkout, nights }: StayWindow): string {
+  return `${formatIsoDateShort(checkin)} – ${formatIsoDateShort(checkout)} · ${nights} ${nights === 1 ? "night" : "nights"}`;
 }

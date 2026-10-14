@@ -37,6 +37,8 @@ import {
   parsePartyFromSearchParams,
   requestedRoomsFromSearchParams,
 } from "@/lib/occupancy";
+import { formatIsoDateShort, nightsBetween as nightsBetweenIso } from "@/lib/stayDates";
+import { galleryHotelPhotos, shrinkHotelImageUrl } from "@/lib/hotelImages";
 
 interface Rate {
   name: string;
@@ -73,7 +75,7 @@ interface HotelDetail {
   id: string;
   name: string;
   main_photo?: string;
-  hotelImages?: Array<{ url: string }>;
+  hotelImages?: Array<{ url: string; thumbnailUrl?: string; defaultImage?: boolean }>;
   address?: string;
   city?: string;
   starRating?: number;
@@ -124,17 +126,11 @@ function stripHtml(html: string): string {
 
 function nightsBetween(checkin: string | null, checkout: string | null) {
   if (!checkin || !checkout) return 1;
-  const diff = new Date(checkout).getTime() - new Date(checkin).getTime();
-  return Math.max(1, Math.round(diff / 86_400_000));
+  return Math.max(1, nightsBetweenIso(checkin, checkout));
 }
 
 function formatStayDate(iso: string | null) {
-  if (!iso) return "";
-  try {
-    return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-  } catch {
-    return iso;
-  }
+  return formatIsoDateShort(iso);
 }
 
 function HotelContent() {
@@ -281,7 +277,8 @@ function HotelContent() {
             rates[0]?.name ?? roomInfo?.roomName ?? `Room ${mappedRoomId}`;
           const photos = (roomInfo?.photos ?? [])
             .map((photo) => photo.url)
-            .filter((url, index, all): url is string => Boolean(url) && all.indexOf(url) === index);
+            .filter((url, index, all): url is string => Boolean(url) && all.indexOf(url) === index)
+            .map((url) => shrinkHotelImageUrl(url, "gallery"));
           groups.push({
             mappedRoomId,
             roomName,
@@ -398,10 +395,7 @@ function HotelContent() {
     );
   }
 
-  const galleryImages = [
-    ...(hotel.main_photo ? [hotel.main_photo] : []),
-    ...(hotel.hotelImages ?? []).map((image) => image.url),
-  ].filter((url, index, all) => url && all.indexOf(url) === index);
+  const galleryImages = galleryHotelPhotos(hotel, "gallery");
   const facilityNames = normalizeFacilityNames(hotel);
   const safetyBadges = deriveSafetyBadges(facilityNames);
   const stay = deriveStaySignals({

@@ -40,6 +40,8 @@ import {
   readResultsListCache,
   rememberResultsReturn,
 } from "@/lib/resultsReturnState";
+import { formatIsoDateShort, nightsBetween as nightsBetweenIso } from "@/lib/stayDates";
+import { pickListHotelPhoto } from "@/lib/hotelImages";
 
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
@@ -50,6 +52,8 @@ interface HotelBasic {
   id: string;
   name: string;
   main_photo?: string;
+  thumbnail?: string;
+  hotelImages?: Array<{ url?: string; thumbnailUrl?: string; defaultImage?: boolean }>;
   address?: string;
   rating?: number;
   reviewCount?: number;
@@ -137,17 +141,11 @@ function sendSearchAnalyticsEvent(payload: Record<string, unknown>) {
 
 function nightsBetween(checkin: string | null, checkout: string | null) {
   if (!checkin || !checkout) return 1;
-  const diff = new Date(checkout).getTime() - new Date(checkin).getTime();
-  return Math.max(1, Math.round(diff / 86_400_000));
+  return Math.max(1, nightsBetweenIso(checkin, checkout));
 }
 
 function formatDate(iso: string | null) {
-  if (!iso) return "";
-  try {
-    return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
-  } catch {
-    return iso;
-  }
+  return formatIsoDateShort(iso);
 }
 
 function ResultsContent() {
@@ -399,6 +397,7 @@ function ResultsContent() {
             const fallbackCoords = extractLatLng(h);
             return {
               ...h,
+              main_photo: pickListHotelPhoto(h),
               address: extra.address ?? h.address,
               rating: extra.rating ?? normaliseRating(h.rating),
               reviewCount: extra.reviewCount,
@@ -465,7 +464,11 @@ function ResultsContent() {
             return {
             id: h.id,
             name: h.name,
-            main_photo: h.main_photo ?? apiHotel?.main_photo ?? h.hotelImages?.[0]?.url,
+            main_photo: pickListHotelPhoto({
+              thumbnail: apiHotel?.thumbnail,
+              main_photo: h.main_photo ?? apiHotel?.main_photo,
+              hotelImages: h.hotelImages ?? apiHotel?.hotelImages,
+            }),
             address: h.address ?? apiHotel?.address,
             rating: normaliseRating(h.rating, h.starRating) ?? apiHotel?.rating,
             reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
@@ -936,36 +939,33 @@ function ResultsContent() {
               </div>
             )}
 
-            {/* High-traffic page — always offer checklist capture */}
-            <LeadMagnetInlineCta pagePath="/results" />
-
             {loading &&
               Array.from({ length: 4 }).map((_, index) => <HotelCardSkeleton key={index} />)}
 
             {!loading &&
-              filteredAndSortedHotels.map((hotel, index) => (
-                <div key={hotel.id} className="space-y-4">
-                  <HotelCard
-                    hotel={hotel}
-                    signals={hotel.signals}
-                    href={hotelHref(hotel.id)}
-                    nights={nights}
-                    onShowOnMap={
-                      typeof hotel.lat === "number" && typeof hotel.lng === "number"
-                        ? () => showHotelOnMap(hotel.id)
-                        : undefined
-                    }
-                    onSelect={() => {
-                      rememberHotelNavigation(hotel.id);
-                      track("Rates Viewed", { hotelId: hotel.id });
-                    }}
-                  />
-                  {/* Mid-browse capture — /results is the highest-traffic page in the sprint */}
-                  {index === 1 && (
-                    <LeadMagnetInlineCta pagePath="/results" className="mt-0" />
-                  )}
-                </div>
+              filteredAndSortedHotels.map((hotel) => (
+                <HotelCard
+                  key={hotel.id}
+                  hotel={hotel}
+                  signals={hotel.signals}
+                  href={hotelHref(hotel.id)}
+                  nights={nights}
+                  onShowOnMap={
+                    typeof hotel.lat === "number" && typeof hotel.lng === "number"
+                      ? () => showHotelOnMap(hotel.id)
+                      : undefined
+                  }
+                  onSelect={() => {
+                    rememberHotelNavigation(hotel.id);
+                    track("Rates Viewed", { hotelId: hotel.id });
+                  }}
+                />
               ))}
+
+            {/* Once per page, after the list — not interleaved with hotels */}
+            {!loading && filteredAndSortedHotels.length > 0 && (
+              <LeadMagnetInlineCta pagePath="/results" />
+            )}
 
             {!loading && filteredAndSortedHotels.length === 0 && (
               <div className="rounded-card border border-border bg-surface p-8 text-center">

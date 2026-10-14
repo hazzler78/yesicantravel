@@ -12,7 +12,7 @@ type LogoMarkProps = {
  */
 export function LogoMark({ className = "h-9 w-9" }: LogoMarkProps) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- brand asset; next/image adds little at this size
+    // eslint-disable-next-line @next/next/no-img-element -- tiny brand mark; file is already 96px
     <img
       src="/logo.png"
       alt=""
@@ -20,6 +20,7 @@ export function LogoMark({ className = "h-9 w-9" }: LogoMarkProps) {
       height={36}
       className={`object-contain ${className}`}
       decoding="async"
+      fetchPriority="high"
     />
   );
 }

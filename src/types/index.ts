@@ -33,6 +33,8 @@ export interface HotelInfo {
   id: string;
   name: string;
   main_photo?: string;
+  /** Smaller list-view derivative when the rates payload includes one. */
+  thumbnail?: string;
   address?: string;
   rating?: number;
   tags?: string[];
@@ -46,7 +48,7 @@ export interface HotelDetail {
   name: string;
   hotelDescription?: string;
   main_photo?: string;
-  hotelImages?: Array<{ url: string; defaultImage?: boolean }>;
+  hotelImages?: Array<{ url: string; thumbnailUrl?: string; defaultImage?: boolean }>;
   address?: string;
   city?: string;
   country?: string;

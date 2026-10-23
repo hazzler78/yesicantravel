@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
+import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { formatStayTotal } from "@/lib/formatStayPrice";
+import { getMapTileLayerConfig } from "@/lib/mapTiles";
 
-const CARTO_TILES = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
-const OSM_TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const CARTO_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
-const OSM_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+const MAP_TILES = getMapTileLayerConfig();
 
 interface PlaceDetails {
   location: { latitude: number; longitude: number };
@@ -55,25 +51,7 @@ const CORAL_PIN = pinIcon("coral");
 const DESTINATION_PIN = pinIcon("destination");
 
 function MapTiles() {
-  const [tileUrl, setTileUrl] = useState(CARTO_TILES);
-  const errorCount = useRef(0);
-
-  return (
-    <TileLayer
-      key={tileUrl}
-      attribution={tileUrl === CARTO_TILES ? CARTO_ATTRIBUTION : OSM_ATTRIBUTION}
-      url={tileUrl}
-      eventHandlers={{
-        tileerror: () => {
-          errorCount.current += 1;
-          if (tileUrl === CARTO_TILES && errorCount.current >= 4) {
-            errorCount.current = 0;
-            setTileUrl(OSM_TILES);
-          }
-        },
-      }}
-    />
-  );
+  return <TileLayer attribution={MAP_TILES.attribution} url={MAP_TILES.url} />;
 }
 
 function InvalidateSize() {

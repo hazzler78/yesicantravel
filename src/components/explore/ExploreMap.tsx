@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { getMapTileLayerConfig } from "@/lib/mapTiles";
 import Link from "next/link";
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -21,10 +22,7 @@ type ExploreHotel = {
   address?: string;
 };
 
-const CARTO_TILES = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png";
-const OSM_TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-const CARTO_ATTRIBUTION =
-  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+const MAP_TILES = getMapTileLayerConfig();
 
 /** Default check-in 14 days out, 2 nights — same as the homepage search. */
 function defaultDates() {
@@ -57,24 +55,7 @@ function cacheKeyFor(center: L.LatLng, radiusM: number): string {
 }
 
 function MapTiles() {
-  const [tileUrl, setTileUrl] = useState(CARTO_TILES);
-  const errorCount = useRef(0);
-  return (
-    <TileLayer
-      key={tileUrl}
-      attribution={CARTO_ATTRIBUTION}
-      url={tileUrl}
-      eventHandlers={{
-        tileerror: () => {
-          errorCount.current += 1;
-          if (tileUrl === CARTO_TILES && errorCount.current >= 4) {
-            errorCount.current = 0;
-            setTileUrl(OSM_TILES);
-          }
-        },
-      }}
-    />
-  );
+  return <TileLayer attribution={MAP_TILES.attribution} url={MAP_TILES.url} />;
 }
 
 function pinIcon(selected: boolean) {

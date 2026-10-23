@@ -17,6 +17,7 @@ These are NOT set by default; the app boots and builds without them, but the ext
 - `XAI_API_KEY` (optional `XAI_MODEL`) — the "Atlas" chat assistant (`/api/chat`).
 - `MAILERLITE_API_KEY` (+ related `MAILERLITE_*`) — newsletter/lead capture. Optional `MAILERLITE_NURTURE_GROUP_ID` enrols leads in a MailerLite automation (4-email nurture sequence on signup).
 - `REVENUE_AGENT_ADMIN_TOKEN` / `REVENUE_AGENT_CRON_SECRET` — auth for `/api/automation/*` routes and cron jobs.
+- Map tiles: Leaflet maps default to keyless OpenStreetMap tiles. Optional `NEXT_PUBLIC_MAP_TILE_URL` (+ `NEXT_PUBLIC_MAP_TILE_ATTRIBUTION` for custom attribution HTML) overrides the tile URL (e.g. a keyed CARTO basemap).
 - Meta/analytics vars (`NEXT_PUBLIC_META_PIXEL_ID`, `META_ACCESS_TOKEN`, `NEXT_PUBLIC_CLARITY_PROJECT_ID`, `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_GA4_MEASUREMENT_ID` with a `G-` prefix only, etc.) are optional and have safe defaults / no-op when unset.
   - **Purchase tracking:** Pixel fires client-side; CAPI needs `META_ACCESS_TOKEN` in Vercel. `/api/health` reports `metaCapiToken`, `clarity`, `gtm`, and `ga4`.
   - **Social traffic:** `/bio` is the UTM-tracked link hub for Instagram/TikTok. Internal playbook at `/admin/social-playbook`. Seed first SEO blog post with `node scripts/seed-first-seo-blog.js` (requires `DATABASE_URL`).

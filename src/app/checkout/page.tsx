@@ -16,6 +16,7 @@ import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
 import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
 import { CheckoutProgress } from "@/components/checkout/CheckoutProgress";
 import { formatStayTotal } from "@/lib/formatStayPrice";
+import { repairLiteApiText } from "@/lib/repairLiteApiText";
 import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
 import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
@@ -816,7 +817,9 @@ function CheckoutContent() {
                       <p className="truncate text-[0.8125rem] text-ink-muted">Loading stay details…</p>
                     )}
                     {stayInfo?.address && (
-                      <p className="truncate text-xs text-ink-muted">{stayInfo.address}</p>
+                      <p className="truncate text-xs text-ink-muted">
+                        {repairLiteApiText(stayInfo.address)}
+                      </p>
                     )}
                     {checkin && checkout && (
                       <p className="tnum mt-1 text-[0.8125rem] text-ink">

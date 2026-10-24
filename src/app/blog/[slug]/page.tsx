@@ -12,6 +12,8 @@ import { prisma } from "@/lib/prisma";
 import { BLOG_TO_DESTINATION_SLUG } from "@/lib/relatedGuides";
 import { getDestinationBySlug } from "@/data/destinations";
 import { ogImageForPath } from "@/lib/readyPins";
+import { ContentSearchCta } from "@/components/content/ContentSearchCta";
+import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -126,6 +128,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ? getDestinationBySlug(destinationSlug)
     : undefined;
   const destinationFaqs = destination?.faqs;
+  const destinationPlaceId = destinationSlug
+    ? getPlaceIdForDestinationSlug(destinationSlug)
+    : undefined;
   const faqJsonLd =
     destinationFaqs && destinationFaqs.length > 0
       ? {
@@ -227,18 +232,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </ReactMarkdown>
           </div>
 
-          <Card className="mt-10 p-5">
-            <h2 className="font-display text-lg font-semibold text-ink">
-              Ready to look at actual rooms?
-            </h2>
-            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
-              Search stays with reception hours, location and cancellation terms shown up front.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <PrimaryLink href="/" variant="coral" size="md" fullWidth={false}>
-                Start a search
-              </PrimaryLink>
+          {destination ? (
+            <ContentSearchCta
+              className="mt-10"
+              city={destination.city}
+              placeId={destinationPlaceId}
+              aiSearch={destinationPlaceId ? undefined : destination.aiSearch}
+              trackingSource={`blog_${post.slug}`}
+            />
+          ) : null}
+
+          <Card className="mt-6 p-5">
+            <div className="flex flex-wrap gap-2">
               <SecondaryLink href="/lead-magnet">Get the free checklist</SecondaryLink>
+              {!destination && (
+                <PrimaryLink href="/" variant="coral" size="md" fullWidth={false}>
+                  Start a search
+                </PrimaryLink>
+              )}
             </div>
           </Card>
         </article>

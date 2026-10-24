@@ -16,6 +16,7 @@ import {
 import { DateRangePicker } from "@/components/search/DateRangePicker";
 import { TravellersPicker } from "@/components/search/TravellersPicker";
 import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES, type StayType } from "@/lib/stayTypes";
+import { localIsoDaysFromNow } from "@/lib/localIsoDate";
 
 type Place = { placeId: string; displayName: string; formattedAddress?: string };
 
@@ -40,14 +41,11 @@ export type SearchBarProps = {
   onDark?: boolean;
   /** Fires once a search is about to navigate, so a collapsible host can close. */
   onSubmitted?: () => void;
+  /** Passed to trackFunnelEvent("Search", { source, city }) for content CTAs. */
+  trackingSource?: string;
+  trackingCity?: string;
   className?: string;
 };
-
-function isoDaysFromNow(days: number) {
-  const date = new Date();
-  date.setDate(date.getDate() + days);
-  return date.toISOString().slice(0, 10);
-}
 
 /** How far ahead properties will quote. Also caps the calendar's selectable range. */
 const BOOKING_WINDOW_DAYS = 730;
@@ -76,6 +74,8 @@ export function SearchBar({
   onStayChange,
   onDark = false,
   onSubmitted,
+  trackingSource,
+  trackingCity,
   className = "",
 }: SearchBarProps) {
   const router = useRouter();
@@ -91,8 +91,12 @@ export function SearchBar({
   const setDestination = setTypedDestination;
   const [placeId, setPlaceId] = useState(initialPlaceId);
   const [vibe, setVibe] = useState(initialVibe);
-  const [checkin, setCheckin] = useState(initialCheckin ?? isoDaysFromNow(14));
-  const [checkout, setCheckout] = useState(initialCheckout ?? isoDaysFromNow(16));
+  const [checkin, setCheckin] = useState(initialCheckin ?? localIsoDaysFromNow(14));
+  const [checkout, setCheckout] = useState(initialCheckout ?? localIsoDaysFromNow(16));
+  const stayDatesRef = useRef({ checkin, checkout });
+  useEffect(() => {
+    stayDatesRef.current = { checkin, checkout };
+  }, [checkin, checkout]);
   const [party, setParty] = useState<Party>(() => ({
     adults: clampAdults(initialAdults ?? initialGuests ?? 1),
     childAges: (initialChildAges ?? []).map(clampChildAge).slice(0, MAX_CHILDREN),
@@ -114,8 +118,8 @@ export function SearchBar({
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const minCheckin = isoDaysFromNow(0);
-  const maxDate = isoDaysFromNow(BOOKING_WINDOW_DAYS);
+  const minCheckin = localIsoDaysFromNow(0);
+  const maxDate = localIsoDaysFromNow(BOOKING_WINDOW_DAYS);
 
   useEffect(() => () => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -179,17 +183,21 @@ export function SearchBar({
 
   const submit = async () => {
     setFormError(null);
-    if (!checkin || !checkout) {
+    const { checkin: checkinValue, checkout: checkoutValue } = stayDatesRef.current;
+    if (!checkinValue || !checkoutValue) {
       setFormError("Please choose your check-in and check-out dates.");
       return;
     }
     // Typing straight into a native date field can produce a year like 12026,
     // which sorts before a four-digit year and would slip past a string compare.
-    if (!isBookableDate(checkin, minCheckin, maxDate) || !isBookableDate(checkout, minCheckin, maxDate)) {
+    if (
+      !isBookableDate(checkinValue, minCheckin, maxDate) ||
+      !isBookableDate(checkoutValue, minCheckin, maxDate)
+    ) {
       setFormError("Please pick dates within the next two years.");
       return;
     }
-    if (new Date(checkout).getTime() <= new Date(checkin).getTime()) {
+    if (new Date(checkoutValue).getTime() <= new Date(checkinValue).getTime()) {
       setFormError("Check-out has to be after check-in.");
       return;
     }
@@ -228,6 +236,8 @@ export function SearchBar({
       mode,
       hasPlaceId: Boolean(resolvedPlaceId),
       hasVibeQuery: Boolean(vibe.trim()),
+      ...(trackingSource ? { source: trackingSource } : {}),
+      ...(trackingCity ? { city: trackingCity } : {}),
     });
     const eventId = generateMetaEventId("search");
     const metaSearchData = {
@@ -245,7 +255,7 @@ export function SearchBar({
 
     setLoading(true);
     onSubmitted?.();
-    const params = new URLSearchParams({ checkin, checkout });
+    const params = new URLSearchParams({ checkin: checkinValue, checkout: checkoutValue });
     appendOccupancyParams(params, party);
     if (mode === "destination") {
       params.set("placeId", resolvedPlaceId);
@@ -366,6 +376,7 @@ export function SearchBar({
           inputClass={`${inputClass} tnum`}
           labelClass={labelClass}
           onChange={({ checkin: nextIn, checkout: nextOut }) => {
+            stayDatesRef.current = { checkin: nextIn, checkout: nextOut };
             setCheckin(nextIn);
             setCheckout(nextOut);
             setFormError(null);

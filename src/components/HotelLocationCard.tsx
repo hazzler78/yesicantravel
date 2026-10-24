@@ -1,19 +1,11 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { ExternalLink, MapPin, Navigation, TrainFront } from "lucide-react";
+import ResultsMap from "@/components/ResultsMap";
 import { Card } from "@/components/ui/Card";
 import { extractLatLng, externalMapLinks } from "@/lib/geo";
 import { formatDistance, type NearestTransit } from "@/lib/staySignals";
-
-const StayMap = dynamic(() => import("@/components/ResultsMap"), {
-  ssr: false,
-  loading: () => (
-    <div className="flex h-full min-h-[16rem] items-center justify-center bg-surface-muted text-[0.9375rem] text-ink-muted">
-      Loading map…
-    </div>
-  ),
-});
+import { repairLiteApiText } from "@/lib/repairLiteApiText";
 
 type HotelLocationCardProps = {
   name: string;
@@ -55,7 +47,7 @@ export function HotelLocationCard({
           <p className="mt-2 flex items-start gap-1.5 text-[0.9375rem] text-ink">
             <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-teal" aria-hidden />
             <span>
-              {address}
+              {repairLiteApiText(address)}
               {city && !address.toLowerCase().includes(city.toLowerCase()) ? `, ${city}` : ""}
             </span>
           </p>
@@ -77,7 +69,7 @@ export function HotelLocationCard({
 
       {coords ? (
         <div className="relative h-64 w-full overflow-hidden bg-surface-muted sm:h-80">
-          <StayMap
+          <ResultsMap
             variant="stay"
             placeDetails={{ location: { latitude: coords.lat, longitude: coords.lng } }}
             hotels={[

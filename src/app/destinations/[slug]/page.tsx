@@ -16,6 +16,7 @@ import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { DESTINATION_RELATED_GUIDES } from "@/lib/relatedGuides";
+import { ContentSearchCta } from "@/components/content/ContentSearchCta";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -174,6 +175,14 @@ export default async function DestinationPage({ params }: Props) {
           city={dest.city}
           citySlug={dest.slug}
           pagePath={`/destinations/${dest.slug}`}
+        />
+
+        <ContentSearchCta
+          className="mb-8 mt-6"
+          city={dest.city}
+          placeId={placeId}
+          aiSearch={placeId ? undefined : dest.aiSearch}
+          trackingSource={`destination_${dest.slug}`}
         />
 
         {DESTINATION_RELATED_GUIDES[dest.slug] && (

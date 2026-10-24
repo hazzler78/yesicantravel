@@ -12,6 +12,9 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { textSizeBootstrapScript } from "@/components/layout/TextSizeControl";
 import { currencyBootstrapScript } from "@/components/currency/CurrencyControl";
+import { setSsrCurrencySnapshot } from "@/components/currency/server";
+import { resolveRequestCurrency } from "@/lib/currency";
+import { cookies } from "next/headers";
 
 const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "948121024567031";
 const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
@@ -65,13 +68,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((entry) => `${entry.name}=${entry.value}`)
+    .join("; ");
+  const initialCurrency = resolveRequestCurrency({ cookieHeader });
+  setSsrCurrencySnapshot(initialCurrency);
+
   return (
-    <html lang="en" className="scroll-smooth" data-scroll-behavior="smooth">
+    <html
+      lang="en"
+      className="scroll-smooth"
+      data-scroll-behavior="smooth"
+      data-currency={initialCurrency}
+    >
       <body className={`${inter.variable} ${fraunces.variable} flex min-h-screen flex-col`}>
         <span
           dangerouslySetInnerHTML={{

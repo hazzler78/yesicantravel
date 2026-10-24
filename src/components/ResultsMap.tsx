@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { formatStayTotal } from "@/lib/formatStayPrice";
-import { getMapTileLayerConfig } from "@/lib/mapTiles";
-
-const MAP_TILES = getMapTileLayerConfig();
+import { ResilientMapTileLayer } from "@/components/map/ResilientMapTileLayer";
+import { repairLiteApiText } from "@/lib/repairLiteApiText";
 
 interface PlaceDetails {
   location: { latitude: number; longitude: number };
@@ -49,10 +48,6 @@ function pinIcon(tone: "teal" | "coral" | "destination") {
 const TEAL_PIN = pinIcon("teal");
 const CORAL_PIN = pinIcon("coral");
 const DESTINATION_PIN = pinIcon("destination");
-
-function MapTiles() {
-  return <TileLayer attribution={MAP_TILES.attribution} url={MAP_TILES.url} />;
-}
 
 function InvalidateSize() {
   const map = useMap();
@@ -159,7 +154,7 @@ export default function ResultsMap({
         className="yict-map"
         attributionControl
       >
-        <MapTiles />
+        <ResilientMapTileLayer />
         <InvalidateSize />
         {!isStay && hotelsWithCoords.length > 0 && (
           <FitArea hotels={hotelsWithCoords} selectedHotelId={selectedHotelId} />
@@ -203,7 +198,9 @@ export default function ResultsMap({
                     hotel.name
                   )}
                 </p>
-                {hotel.address && <p className="mt-0.5 text-xs text-ink-muted">{hotel.address}</p>}
+                {hotel.address && (
+                  <p className="mt-0.5 text-xs text-ink-muted">{repairLiteApiText(hotel.address)}</p>
+                )}
                 {hotel.price != null && (
                   <p className="tnum mt-1 text-[0.8125rem] font-semibold text-ink">
                     {formatStayTotal(hotel.price, hotel.currency ?? "EUR")}

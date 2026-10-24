@@ -7,6 +7,7 @@ import { Check, ImageOff, Lock, MapPin, TriangleAlert } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { priceBucket, trackVercelFunnelEvent } from "@/lib/vercelFunnelEvents";
 import { normalizeFacilityNames, deriveSafetyBadges } from "@/lib/safetyBadges";
 import {
   deriveStaySignals,
@@ -198,6 +199,10 @@ function HotelContent() {
           hotelData.address = repairLiteApiText(hotelData.address);
         }
         setHotel(hotelData);
+        trackVercelFunnelEvent("hotel_viewed", {
+          hotelId,
+          city: hotelData.city?.trim()?.slice(0, 80) ?? "unknown",
+        });
         if (hotelData.sentiment_analysis) {
           setSentiment((current) => current ?? hotelData.sentiment_analysis ?? null);
         }
@@ -291,9 +296,25 @@ function HotelContent() {
   }, [hotelId, checkin, checkout, occupancyKey, currency, hotel]);
 
   const handleBook = (offerId: string) => {
-    const total = roomGroups
+    const selectedRate = roomGroups
       .flatMap((g) => g.rates)
-      .find((r) => r.offerId === offerId)?.retailRate?.total?.[0];
+      .find((r) => r.offerId === offerId);
+    const total = selectedRate?.retailRate?.total?.[0];
+    const refundable = selectedRate?.cancellationPolicies?.refundableTag === "RFN";
+    const amount = total?.amount;
+    const rateCurrency = total?.currency ?? quotedCurrency ?? currency;
+    trackVercelFunnelEvent("rate_selected", {
+      hotelId,
+      refundable,
+      currency: rateCurrency,
+      price_bucket: priceBucket(amount),
+    });
+    trackVercelFunnelEvent("book_clicked", {
+      hotelId,
+      refundable,
+      currency: rateCurrency,
+      price_bucket: priceBucket(amount),
+    });
     track("select_room", {
       hotelId,
       offerId,

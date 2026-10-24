@@ -1,7 +1,6 @@
 "use client";
 
 import { useId, useMemo, useState } from "react";
-import { track } from "@vercel/analytics";
 import { Mail } from "lucide-react";
 import {
   formatNewsletterCityName,
@@ -11,11 +10,18 @@ import {
 import { pinterestTrack } from "@/lib/pinterest";
 import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import {
+  inferNewsletterPlacement,
+  trackVercelFunnelEvent,
+  type NewsletterPlacement,
+} from "@/lib/vercelFunnelEvents";
 
 type EmailSignupBoxProps = {
   variant?: "section" | "compact" | "inline";
   /** Display city name (destination, blog-mapped city, or results search). */
   city?: string | null;
+  /** Where the box is shown (for analytics). Inferred from pagePath when omitted. */
+  placement?: NewsletterPlacement;
   pagePath?: string;
   className?: string;
 };
@@ -23,6 +29,7 @@ type EmailSignupBoxProps = {
 export function EmailSignupBox({
   variant = "compact",
   city,
+  placement,
   pagePath,
   className = "",
 }: EmailSignupBoxProps) {
@@ -85,14 +92,12 @@ export function EmailSignupBox({
       setMessage(json.alreadySubscribed ? copy.successAlready : copy.success);
       setEmail("");
 
-      try {
-        track("NewsletterSignup", {
-          page: resolvedPath,
-          city: cityForApi ?? "generic",
-        });
-      } catch {
-        // ignore
-      }
+      const resolvedPlacement =
+        placement ?? inferNewsletterPlacement(resolvedPath, variant);
+      trackVercelFunnelEvent("newsletter_signup", {
+        city: cityForApi ?? "generic",
+        placement: resolvedPlacement,
+      });
       pinterestTrack("lead", { lead_type: "Newsletter" });
     } catch {
       setStatus("error");

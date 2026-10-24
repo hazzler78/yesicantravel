@@ -201,6 +201,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <EmailSignupBox
               variant="compact"
               city={destination?.city}
+              placement="blog"
               pagePath={`/blog/${post.slug}`}
             />
           </Card>
@@ -286,6 +287,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <EmailSignupBox
               variant="compact"
               city={destination?.city}
+              placement="blog"
               pagePath={`/blog/${post.slug}`}
             />
           </Card>

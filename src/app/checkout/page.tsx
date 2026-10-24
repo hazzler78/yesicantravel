@@ -11,6 +11,7 @@ import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackClientPurchase } from "@/lib/trackClientPurchase";
 import { pinterestTrack } from "@/lib/pinterest";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { trackVercelFunnelEvent } from "@/lib/vercelFunnelEvents";
 import { BookingSuccess } from "@/components/checkout/BookingSuccess";
 import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
 import { CheckoutTrustBar } from "@/components/checkout/CheckoutTrustBar";
@@ -276,6 +277,10 @@ function CheckoutContent() {
         checkout,
         adults,
       });
+      trackVercelFunnelEvent("checkout_started", {
+        hotelId,
+        currency: totalCurrencyParam ?? "EUR",
+      });
       const eventId = generateMetaEventId("checkout_view");
       const metaData = {
         content_ids: [hotelId],
@@ -298,7 +303,7 @@ function CheckoutContent() {
         order_quantity: travellerCount,
       });
     }
-  }, [offerId, hotelId, checkin, checkout, adults, travellerCount, step]);
+  }, [offerId, hotelId, checkin, checkout, adults, travellerCount, step, totalCurrencyParam]);
 
   useEffect(() => {
     if (step !== "payment" || !hotelId || !offerId) return;
@@ -430,6 +435,10 @@ function CheckoutContent() {
           checkout,
           adults,
           paymentMethod: "card",
+        });
+        trackVercelFunnelEvent("booking_completed", {
+          hotelId: booked.hotel?.hotelId ?? hotelId ?? "unknown",
+          currency: booked.currency ?? totalCurrencyParam ?? "EUR",
         });
         if (booked.bookingId && typeof booked.price === "number" && booked.price > 0) {
           trackClientPurchase({
@@ -624,6 +633,10 @@ function CheckoutContent() {
           checkout,
           adults,
           paymentMethod: "account",
+        });
+        trackVercelFunnelEvent("booking_completed", {
+          hotelId: booked.hotel?.hotelId ?? hotelId ?? "unknown",
+          currency: booked.currency ?? totalCurrencyParam ?? "EUR",
         });
         if (booked.bookingId && typeof booked.price === "number" && booked.price > 0) {
           trackClientPurchase({

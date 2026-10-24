@@ -908,6 +908,7 @@ function ResultsContent() {
                 <EmailSignupBox
                   variant="inline"
                   city={newsletterCity}
+                  placement="results"
                   pagePath="/results"
                   className="mt-4"
                 />

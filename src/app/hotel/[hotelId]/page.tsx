@@ -138,7 +138,6 @@ function HotelContent() {
   const checkout = searchParams.get("checkout");
   const party = parsePartyFromSearchParams(searchParams);
   const requestedRooms = requestedRoomsFromSearchParams(searchParams);
-  const occupancies = occupanciesForRequest(party, requestedRooms);
   const occupancyKey = `${party.adults}|${party.childAges.join(",")}|${requestedRooms}`;
 
   useEffect(() => {
@@ -223,6 +222,10 @@ function HotelContent() {
     }
     if (!hotel) return;
 
+    const partyForRates = parsePartyFromSearchParams(searchParams);
+    const roomsForRates = requestedRoomsFromSearchParams(searchParams);
+    const occupanciesForRates = occupanciesForRequest(partyForRates, roomsForRates);
+
     const requestedCurrency = currency;
     const generation = ++ratesFetchGen.current;
     const abort = new AbortController();
@@ -237,9 +240,9 @@ function HotelContent() {
         hotelIds: [hotelId],
         checkin,
         checkout,
-        adults: occupancies[0]?.adults ?? party.adults,
-        children: party.childAges,
-        occupancies,
+        adults: occupanciesForRates[0]?.adults ?? partyForRates.adults,
+        children: partyForRates.childAges,
+        occupancies: occupanciesForRates,
         maxRatesPerHotel: 50,
         currency: requestedCurrency,
         guestNationality: guestNationalityForCurrency(requestedCurrency),
@@ -285,7 +288,7 @@ function HotelContent() {
     return () => {
       abort.abort();
     };
-  }, [hotelId, checkin, checkout, occupancyKey, currency, hotel, occupancies, party.adults, party.childAges]);
+  }, [hotelId, checkin, checkout, occupancyKey, currency, hotel]);
 
   const handleBook = (offerId: string) => {
     const total = roomGroups

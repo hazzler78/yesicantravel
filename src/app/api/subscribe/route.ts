@@ -102,19 +102,6 @@ export async function POST(request: NextRequest) {
       await assignSubscriberToGroup(existing.id, groupId);
     }
 
-    const nurtureId = process.env.MAILERLITE_NURTURE_GROUP_ID?.trim();
-    if (nurtureId && nurtureId !== groupId && existing?.id) {
-      const inNurture = existing.groups?.some((g) => g.id === nurtureId);
-      if (!inNurture) {
-        await assignSubscriberToGroup(existing.id, nurtureId);
-      }
-    } else if (nurtureId && nurtureId !== groupId && !existing?.id) {
-      await upsertMailerLiteSubscriber({
-        email,
-        groups: [nurtureId],
-      });
-    }
-
     return NextResponse.json({
       ok: true,
       alreadySubscribed: Boolean(existing && alreadyInMain),

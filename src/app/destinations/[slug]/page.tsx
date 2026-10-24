@@ -433,6 +433,7 @@ export default async function DestinationPage({ params }: Props) {
         <div className="mt-10 rounded-card border border-border bg-surface p-5 shadow-card">
           <EmailSignupBox
             variant="compact"
+            city={dest.city}
             pagePath={`/destinations/${dest.slug}`}
           />
         </div>

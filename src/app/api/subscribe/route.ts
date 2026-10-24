@@ -4,6 +4,7 @@ import {
   findMailerLiteSubscriber,
   upsertMailerLiteSubscriber,
 } from "@/lib/mailerlite";
+import { formatNewsletterCityName } from "@/lib/newsletterCopy";
 import { checkSubscribeRateLimit, getClientIp } from "@/lib/subscribeRateLimit";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,6 +12,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 type SubscribeBody = {
   email?: string;
   consent?: boolean;
+  city?: string;
   pageUrl?: string;
   /** Honeypot — must stay empty for humans */
   company?: string;
@@ -76,6 +78,12 @@ export async function POST(request: NextRequest) {
     const fields: Record<string, string> = {
       nurture_campaign: "newsletter_signup",
     };
+    const city = formatNewsletterCityName(
+      typeof body.city === "string" ? body.city : undefined
+    );
+    if (city) {
+      fields.city = city.slice(0, 100);
+    }
 
     const upsert = await upsertMailerLiteSubscriber({
       email,

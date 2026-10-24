@@ -1,29 +1,35 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { track } from "@vercel/analytics";
 import { Mail } from "lucide-react";
-import { newsletterCopy } from "@/lib/newsletterCopy";
+import {
+  formatNewsletterCityName,
+  getNewsletterCopy,
+  newsletterCopy,
+} from "@/lib/newsletterCopy";
 import { pinterestTrack } from "@/lib/pinterest";
 import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 
 type EmailSignupBoxProps = {
   variant?: "section" | "compact" | "inline";
+  /** Display city name (destination, blog-mapped city, or results search). */
+  city?: string | null;
   pagePath?: string;
   className?: string;
 };
 
 export function EmailSignupBox({
   variant = "compact",
+  city,
   pagePath,
   className = "",
 }: EmailSignupBoxProps) {
   const uid = useId();
-  const copy = variant === "section" ? newsletterCopy.section : newsletterCopy.compact;
+  const copy = useMemo(() => getNewsletterCopy(city), [city]);
 
   const [email, setEmail] = useState("");
-  const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState<string | null>(null);
   const [honeypot, setHoneypot] = useState("");
@@ -37,16 +43,12 @@ export function EmailSignupBox({
       setMessage(newsletterCopy.messages.errorEmail);
       return;
     }
-    if (!consent) {
-      setStatus("error");
-      setMessage(newsletterCopy.messages.errorConsent);
-      return;
-    }
 
     setStatus("loading");
 
     const resolvedPath =
       pagePath ?? (typeof window !== "undefined" ? window.location.pathname : "/");
+    const cityForApi = formatNewsletterCityName(city);
 
     try {
       const res = await fetch("/api/subscribe", {
@@ -55,6 +57,7 @@ export function EmailSignupBox({
         body: JSON.stringify({
           email: email.trim(),
           consent: true,
+          city: cityForApi,
           pageUrl: resolvedPath,
           company: honeypot,
         }),
@@ -79,16 +82,14 @@ export function EmailSignupBox({
       }
 
       setStatus("success");
-      setMessage(
-        json.alreadySubscribed
-          ? newsletterCopy.messages.successAlready
-          : newsletterCopy.messages.success
-      );
+      setMessage(json.alreadySubscribed ? copy.successAlready : copy.success);
       setEmail("");
-      setConsent(false);
 
       try {
-        track("NewsletterSignup", { page: resolvedPath });
+        track("NewsletterSignup", {
+          page: resolvedPath,
+          city: cityForApi ?? "generic",
+        });
       } catch {
         // ignore
       }
@@ -206,21 +207,13 @@ export function EmailSignupBox({
           </PrimaryButton>
         </div>
 
-        <label
-          className={`mt-2.5 flex cursor-pointer items-start gap-2 text-xs leading-snug ${
+        <p
+          className={`mt-2.5 text-xs leading-snug ${
             isSection ? "text-ink-inverse/60" : "text-ink-muted"
           }`}
         >
-          <input
-            type="checkbox"
-            className="mt-0.5 h-4 w-4 shrink-0 rounded border-border text-teal focus:ring-teal"
-            checked={consent}
-            onChange={(e) => setConsent(e.target.checked)}
-            disabled={status === "loading" || status === "success"}
-            required
-          />
-          <span>{copy.consent}</span>
-        </label>
+          {copy.finePrint}
+        </p>
 
         {message && (
           <p role="status" className={`mt-3 text-[0.8125rem] ${statusColor}`}>

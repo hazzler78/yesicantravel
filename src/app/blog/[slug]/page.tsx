@@ -193,7 +193,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </Card>
 
           <Card className="mt-4 p-5 lg:hidden">
-            <EmailSignupBox variant="compact" pagePath={`/blog/${post.slug}`} />
+            <EmailSignupBox
+              variant="compact"
+              city={destination?.city}
+              pagePath={`/blog/${post.slug}`}
+            />
           </Card>
 
           <div className="mt-8">
@@ -268,7 +272,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             )}
           </Card>
           <Card className="p-5">
-            <EmailSignupBox variant="compact" pagePath={`/blog/${post.slug}`} />
+            <EmailSignupBox
+              variant="compact"
+              city={destination?.city}
+              pagePath={`/blog/${post.slug}`}
+            />
           </Card>
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>

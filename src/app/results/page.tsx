@@ -741,6 +741,8 @@ function ResultsContent() {
     travellersSummary(party),
   ].join(" · ");
 
+  const newsletterCity = placeLabel || aiSearch || undefined;
+
   const hotelHref = (id: string) => {
     const qs = new URLSearchParams({
       checkin: checkin ?? "",
@@ -967,7 +969,12 @@ function ResultsContent() {
             {!loading && filteredAndSortedHotels.length > 0 && (
               <>
                 <LeadMagnetInlineCta pagePath="/results" />
-                <EmailSignupBox variant="inline" pagePath="/results" className="mt-4" />
+                <EmailSignupBox
+                  variant="inline"
+                  city={newsletterCity}
+                  pagePath="/results"
+                  className="mt-4"
+                />
               </>
             )}
 

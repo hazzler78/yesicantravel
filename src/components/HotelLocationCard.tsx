@@ -1,7 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { ExternalLink, MapPin, Navigation, TrainFront } from "lucide-react";
-import ResultsMap from "@/components/ResultsMap";
+
+const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full min-h-[16rem] items-center justify-center bg-surface-muted text-[0.9375rem] text-ink-muted">
+      Loading map…
+    </div>
+  ),
+});
 import { Card } from "@/components/ui/Card";
 import { extractLatLng, externalMapLinks } from "@/lib/geo";
 import { formatDistance, type NearestTransit } from "@/lib/staySignals";

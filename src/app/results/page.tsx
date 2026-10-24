@@ -6,13 +6,14 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { Map as MapIcon, SearchX, SlidersHorizontal, TriangleAlert } from "lucide-react";
-import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
-import { deriveStaySignals, type StayFilterId, type StaySignals } from "@/lib/staySignals";
+import { type StayFilterId, type StaySignals } from "@/lib/staySignals";
 import {
-  firstRateTotalByHotel,
   RESULTS_HOTEL_LIMIT,
+  RESULTS_MAX_RATES_PER_HOTEL,
   type RateOffer,
 } from "@/lib/resultsPricing";
+import { buildResultsHotelRow, pricingForResults } from "@/lib/resultsHotelMerge";
+import { fetchWithTimeout, FetchTimeoutError } from "@/lib/fetchWithTimeout";
 import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
@@ -41,8 +42,6 @@ import {
   rememberResultsReturn,
 } from "@/lib/resultsReturnState";
 import { formatIsoDateShort, nightsBetween as nightsBetweenIso } from "@/lib/stayDates";
-import { pickListHotelPhoto } from "@/lib/hotelImages";
-
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
   loading: () => <p className="p-4 text-center text-[0.9375rem] text-ink-muted">Loading map…</p>,
@@ -63,6 +62,7 @@ interface HotelListItem extends HotelBasic, HotelCardData {
   price?: number;
   currency?: string;
   hasFreeCancellation?: boolean;
+  refundableFromPrice?: number;
   lat?: number;
   lng?: number;
   safetyBadges?: string[];
@@ -155,6 +155,7 @@ function ResultsContent() {
   const currency = useCurrency();
   const [hotels, setHotels] = useState<HotelListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [enriching, setEnriching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ResultsFilterState>(DEFAULT_FILTERS);
   const [sortBy, setSortBy] = useState<"rating" | "price">("rating");
@@ -261,6 +262,7 @@ function ResultsContent() {
     async function run() {
       try {
         setLoading(true);
+        setEnriching(false);
         setError(null);
         setSearchAnalyticsOutcome(null);
         setUsedSplitRooms(false);
@@ -273,9 +275,10 @@ function ResultsContent() {
         const requestedRooms = Number(searchParams.get("rooms") ?? 1) >= 2 ? 2 : 1;
 
         const requestRates = async (occupancies: Array<{ adults: number; children?: number[] }>) => {
-          const res = await fetch("/api/rates", {
+          const res = await fetchWithTimeout("/api/rates", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
+            timeoutMs: 45_000,
             body: JSON.stringify({
               checkin: checkin!,
               checkout: checkout!,
@@ -284,6 +287,7 @@ function ResultsContent() {
               occupancies,
               currency,
               guestNationality: guestNationalityForCurrency(currency),
+              maxRatesPerHotel: RESULTS_MAX_RATES_PER_HOTEL,
               stay,
               ...(placeId ? { placeId } : {}),
               ...(aiSearch ? { aiSearch } : {}),
@@ -345,165 +349,90 @@ function ResultsContent() {
           ...new Set([...data.map((d) => d.hotelId), ...hotelsFromApi.map((h) => h.id)].filter(Boolean)),
         ];
 
-        if (aiSearch && hotelsFromApi.length > 0) {
-          // For vibe/AI search, enrich basic hotel data with full details (including coordinates)
-          const details = await Promise.all(
-            hotelsFromApi.slice(0, RESULTS_HOTEL_LIMIT).map(async (h) => {
-              try {
-                const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(h.id)}`);
-                const j = await r.json();
-                return j.data ?? j;
-              } catch {
-                return null;
-              }
-            })
-          );
-          if (cancelled) return;
-          const byHotelId: Record<
-            string,
-            {
-              address?: string;
-              rating?: number;
-              reviewCount?: number;
-              lat?: number;
-              lng?: number;
-              safetyBadges?: string[];
-              signals?: StaySignals;
-            }
-          > = {};
-          for (const d of details) {
-            if (!d?.id) continue;
-            const coords = extractLatLng(d);
-            byHotelId[d.id] = {
-              address: d.address,
-              rating: normaliseRating(d.rating, d.starRating),
-              reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : undefined,
-              lat: coords?.lat,
-              lng: coords?.lng,
-              safetyBadges: safetyBadgesFromHotel(d),
-              signals: deriveStaySignals({
-                ...d,
-                rateNames: rateNamesByHotel[d.id],
-              }),
-            };
-          }
+        const pricing = pricingForResults(data as RateOffer[], currency);
+        const ids: string[] = [
+          ...new Set(
+            aiSearch && hotelsFromApi.length > 0
+              ? hotelsFromApi.map((h) => h.id)
+              : data.map((d) => d.hotelId),
+          ),
+        ].filter(Boolean);
 
-          const merged = hotelsFromApi.map((h) => {
-            const rateData = data.find((d) => d.hotelId === h.id);
-            const allRates = rateData?.roomTypes?.flatMap((rt) => rt.rates ?? []) ?? [];
-            const firstRate = allRates[0];
-            const freeCancellation = allRates.some((r) => r.cancellationPolicies?.refundableTag === "RFN");
-            const extra = byHotelId[h.id] ?? {};
-            const fallbackCoords = extractLatLng(h);
-            return {
-              ...h,
-              main_photo: pickListHotelPhoto(h),
-              address: extra.address ?? h.address,
-              rating: extra.rating ?? normaliseRating(h.rating),
-              reviewCount: extra.reviewCount,
-              price: firstRate?.retailRate?.total?.[0]?.amount,
-              currency: firstRate?.retailRate?.total?.[0]?.currency ?? "USD",
-              hasFreeCancellation: freeCancellation,
-              lat: extra.lat ?? fallbackCoords?.lat,
-              lng: extra.lng ?? fallbackCoords?.lng,
-              safetyBadges: extra.safetyBadges ?? [],
-              signals: extra.signals,
-            };
+        const apiHotelByKey = new Map(
+          hotelsFromApi
+            .filter((h) => h?.id)
+            .map((h) => [h.id, h as HotelBasic & { latitude?: number; longitude?: number }]),
+        );
+
+        const buildRow = (id: string, detail?: HotelBasic | null) =>
+          buildResultsHotelRow({
+            id,
+            offers: data as RateOffer[],
+            pricing,
+            apiHotel: apiHotelByKey.get(id),
+            detail,
+            rateNames: rateNamesByHotel[id],
+            currency,
+            normaliseRating,
+            starRating: (detail as { starRating?: number } | undefined)?.starRating,
           });
-          setHotels(merged);
-          cacheResultsList({
-            searchKey,
-            hotels: merged,
-            placeLabel: undefined,
-          });
-          setSearchAnalyticsOutcome({
-            apiRateCount: data.length,
-            apiHotelCount: hotelsFromApi.length,
-            uniqueHotelCount: uniqueHotelIds.length,
-            enrichedHotelCount: merged.length,
-            sampleHotels: merged.slice(0, 5).map((h) => ({
-              id: h.id,
-              name: h.name,
-              rating: h.rating,
-              price: h.price,
-              currency: h.currency,
-            })),
-          });
-        } else {
-          const ids: string[] = [...new Set(data.map((d) => d.hotelId))];
-          // The rates response already carries root-level latitude/longitude.
-          const apiHotelByKey = new Map(
-            hotelsFromApi
-              .filter((h) => h?.id)
-              .map((h) => [h.id, h as (HotelBasic & { latitude?: number; longitude?: number })])
-          );
-          const details = await Promise.all(
-            ids.slice(0, RESULTS_HOTEL_LIMIT).map(async (id) => {
-              const r = await fetch(`/api/hotel?hotelId=${encodeURIComponent(id)}`);
-              const j = await r.json();
-              return j.data ?? j;
-            })
-          );
-          if (cancelled) return;
-          const totalByHotel = firstRateTotalByHotel(data as RateOffer[]);
-          const freeCancellationByHotel: Record<string, boolean> = {};
-          for (const d of data) {
-            if (freeCancellationByHotel[d.hotelId]) continue;
-            freeCancellationByHotel[d.hotelId] = (d.roomTypes ?? [])
-              .flatMap((rt) => rt.rates ?? [])
-              .some((r) => r.cancellationPolicies?.refundableTag === "RFN");
-          }
-          const merged = details.filter(Boolean).map((h) => {
-            const apiHotel = apiHotelByKey.get(h.id);
-            const coords =
-              extractLatLng(h) ??
-              extractLatLng(apiHotel) ?? {
-                lat: apiHotel?.latitude,
-                lng: apiHotel?.longitude,
-              };
-            return {
+
+        const initial = ids.slice(0, RESULTS_HOTEL_LIMIT).map((id) =>
+          buildRow(id, apiHotelByKey.get(id)),
+        );
+
+        setHotels(initial);
+        cacheResultsList({
+          searchKey,
+          hotels: initial,
+          placeLabel: undefined,
+        });
+        setSearchAnalyticsOutcome({
+          apiRateCount: data.length,
+          apiHotelCount: hotelsFromApi.length,
+          uniqueHotelCount: uniqueHotelIds.length,
+          enrichedHotelCount: initial.length,
+          sampleHotels: initial.slice(0, 5).map((h) => ({
             id: h.id,
             name: h.name,
-            main_photo: pickListHotelPhoto({
-              thumbnail: apiHotel?.thumbnail,
-              main_photo: h.main_photo ?? apiHotel?.main_photo,
-              hotelImages: h.hotelImages ?? apiHotel?.hotelImages,
-            }),
-            address: h.address ?? apiHotel?.address,
-            rating: normaliseRating(h.rating, h.starRating) ?? apiHotel?.rating,
-            reviewCount: typeof h.reviewCount === "number" ? h.reviewCount : undefined,
-            price: totalByHotel[h.id]?.amount,
-            currency: totalByHotel[h.id]?.currency ?? "EUR",
-            hasFreeCancellation: freeCancellationByHotel[h.id] ?? false,
-            lat: coords?.lat,
-            lng: coords?.lng,
-            safetyBadges: safetyBadgesFromHotel(h),
-            signals: deriveStaySignals({ ...h, rateNames: rateNamesByHotel[h.id] }),
-          };
-          });
-          setHotels(merged);
-          cacheResultsList({
-            searchKey,
-            hotels: merged,
-            placeLabel: undefined,
-          });
-          setSearchAnalyticsOutcome({
-            apiRateCount: data.length,
-            apiHotelCount: hotelsFromApi.length,
-            uniqueHotelCount: uniqueHotelIds.length,
-            enrichedHotelCount: merged.length,
-            sampleHotels: merged.slice(0, 5).map((h) => ({
-              id: h.id,
-              name: h.name,
-              rating: h.rating,
-              price: h.price,
-              currency: h.currency,
-            })),
-          });
-        }
+            rating: h.rating,
+            price: h.price,
+            currency: h.currency,
+          })),
+        });
+        setLoading(false);
+
+        setEnriching(true);
+        const enrichIds = ids.slice(0, RESULTS_HOTEL_LIMIT);
+        const details = await Promise.all(
+          enrichIds.map(async (id) => {
+            try {
+              const r = await fetchWithTimeout(`/api/hotel?hotelId=${encodeURIComponent(id)}`, {
+                timeoutMs: 12_000,
+              });
+              const j = await r.json();
+              return j.data ?? j;
+            } catch {
+              return null;
+            }
+          }),
+        );
+        if (cancelled) return;
+        setEnriching(false);
+
+        const enriched = enrichIds.map((id, index) => buildRow(id, details[index]));
+        setHotels(enriched);
+        cacheResultsList({
+          searchKey,
+          hotels: enriched,
+          placeLabel: undefined,
+        });
       } catch (e) {
         if (cancelled) return;
-        const message = (e as Error).message;
+        const message =
+          e instanceof FetchTimeoutError
+            ? "Search is taking longer than usual. Try again or narrow your dates."
+            : (e as Error).message;
         sendSearchAnalyticsEvent({
           mode: aiSearch ? "vibe" : "destination",
           placeId,
@@ -518,7 +447,10 @@ function ResultsContent() {
         });
         setError(message);
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setEnriching(false);
+        }
       }
     }
     run();
@@ -822,7 +754,11 @@ function ResultsContent() {
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
-              {loading ? "Finding stays…" : `${filteredAndSortedHotels.length} stays for your dates`}
+              {loading
+                ? "Finding stays…"
+                : enriching
+                  ? `Showing ${filteredAndSortedHotels.length} stays — loading details…`
+                  : `${filteredAndSortedHotels.length} stays for your dates`}
             </h1>
             <p className="mt-1 text-[0.9375rem] text-ink-muted">
               {formatDate(checkin)} – {formatDate(checkout)} · {nights}{" "}

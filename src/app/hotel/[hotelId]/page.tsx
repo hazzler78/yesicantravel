@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { track } from "@vercel/analytics";
 import { Check, ImageOff, Lock, MapPin, TriangleAlert } from "lucide-react";
@@ -28,7 +28,9 @@ import { Card } from "@/components/ui/Card";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
-import { guestNationalityForCurrency } from "@/lib/currency";
+import { guestNationalityForCurrency, type CurrencyCode } from "@/lib/currency";
+import { buildRoomGroups, type HotelRoomRate } from "@/lib/hotelRoomRates";
+import { repairLiteApiText } from "@/lib/repairLiteApiText";
 import {
   appendOccupancyParams,
   buildStaySearchParams,
@@ -38,25 +40,7 @@ import {
   requestedRoomsFromSearchParams,
 } from "@/lib/occupancy";
 import { formatIsoDateShort, nightsBetween as nightsBetweenIso } from "@/lib/stayDates";
-import { galleryHotelPhotos, shrinkHotelImageUrl } from "@/lib/hotelImages";
-
-interface Rate {
-  name: string;
-  mappedRoomId: number;
-  offerId: string;
-  boardName: string;
-  retailRate: {
-    total: Array<{ amount: number; currency: string }>;
-  };
-  cancellationPolicies?: { refundableTag: string };
-}
-
-interface RoomGroup {
-  mappedRoomId: number;
-  roomName: string;
-  photos: string[];
-  rates: Rate[];
-}
+import { galleryHotelPhotos } from "@/lib/hotelImages";
 
 interface Facility {
   facilityId?: number;
@@ -139,8 +123,11 @@ function HotelContent() {
   const currency = useCurrency();
   const hotelId = params.hotelId as string;
   const [hotel, setHotel] = useState<HotelDetail | null>(null);
-  const [roomGroups, setRoomGroups] = useState<RoomGroup[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [roomGroups, setRoomGroups] = useState<ReturnType<typeof buildRoomGroups>>([]);
+  const [hotelLoading, setHotelLoading] = useState(true);
+  const [ratesLoading, setRatesLoading] = useState(true);
+  const [quotedCurrency, setQuotedCurrency] = useState<CurrencyCode | null>(null);
+  const ratesFetchGen = useRef(0);
   const [error, setError] = useState<string | null>(null);
   const [hasFreeCancellation, setHasFreeCancellation] = useState(false);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
@@ -197,52 +184,76 @@ function HotelContent() {
   }, [hotelId]);
 
   useEffect(() => {
-    if (!hotelId || !checkin || !checkout) {
-      setError("Missing parameters");
-      setLoading(false);
-      return;
-    }
+    if (!hotelId) return;
+    let cancelled = false;
+    setHotelLoading(true);
+    setError(null);
 
-    async function run() {
-      try {
-        setLoading(true);
-        setError(null);
-        const [hotelRes, ratesRes] = await Promise.all([
-          fetch(`/api/hotel?hotelId=${encodeURIComponent(hotelId)}`),
-          fetch("/api/rates", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              hotelIds: [hotelId],
-              checkin,
-              checkout,
-              adults: occupancies[0]?.adults ?? party.adults,
-              children: party.childAges,
-              occupancies,
-              maxRatesPerHotel: 50,
-              currency,
-              guestNationality: guestNationalityForCurrency(currency),
-            }),
-          }),
-        ]);
-
+    fetch(`/api/hotel?hotelId=${encodeURIComponent(hotelId)}`)
+      .then(async (hotelRes) => {
         const hotelJson = await hotelRes.json();
-        const ratesJson = await ratesRes.json();
-
         if (!hotelRes.ok) throw new Error(hotelJson.error ?? "Hotel fetch failed");
-        if (!ratesRes.ok) throw new Error(ratesJson.error ?? "Rates fetch failed");
-
+        if (cancelled) return;
         const hotelData = (hotelJson.data ?? hotelJson) as HotelDetail;
+        if (hotelData.address) {
+          hotelData.address = repairLiteApiText(hotelData.address);
+        }
         setHotel(hotelData);
-        // Hotel payload often already includes AI sentiment — show it before reviews return.
         if (hotelData.sentiment_analysis) {
           setSentiment((current) => current ?? hotelData.sentiment_analysis ?? null);
         }
+      })
+      .catch((e) => {
+        if (!cancelled) setError((e as Error).message);
+      })
+      .finally(() => {
+        if (!cancelled) setHotelLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [hotelId]);
+
+  useEffect(() => {
+    if (!hotelId || !checkin || !checkout) {
+      setError("Missing parameters");
+      setRatesLoading(false);
+      return;
+    }
+    if (!hotel) return;
+
+    const requestedCurrency = currency;
+    const generation = ++ratesFetchGen.current;
+    const abort = new AbortController();
+    setRatesLoading(true);
+    setError(null);
+
+    fetch("/api/rates", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: abort.signal,
+      body: JSON.stringify({
+        hotelIds: [hotelId],
+        checkin,
+        checkout,
+        adults: occupancies[0]?.adults ?? party.adults,
+        children: party.childAges,
+        occupancies,
+        maxRatesPerHotel: 50,
+        currency: requestedCurrency,
+        guestNationality: guestNationalityForCurrency(requestedCurrency),
+      }),
+    })
+      .then(async (ratesRes) => {
+        const ratesJson = await ratesRes.json();
+        if (generation !== ratesFetchGen.current) return;
+        if (!ratesRes.ok) throw new Error(ratesJson.error ?? "Rates fetch failed");
 
         const data = ratesJson.data ?? [];
         const rateData = data.find((d: { hotelId: string }) => d.hotelId === hotelId);
         const roomTypes = rateData?.roomTypes ?? [];
-        const allRates: Rate[] = [];
+        const allRates: HotelRoomRate[] = [];
         let freeCancellation = false;
         for (const rt of roomTypes) {
           for (const r of rt.rates ?? []) {
@@ -256,46 +267,25 @@ function HotelContent() {
           }
         }
 
-        const roomMap = new Map<number, Record<string, unknown>>();
-        for (const r of hotelData.rooms ?? []) {
-          roomMap.set(r.id, r);
-        }
-
-        const byRoom = new Map<number, Rate[]>();
-        for (const rate of allRates) {
-          const mid = rate.mappedRoomId;
-          if (!byRoom.has(mid)) byRoom.set(mid, []);
-          byRoom.get(mid)!.push(rate);
-        }
-
-        const groups: RoomGroup[] = [];
-        byRoom.forEach((rates, mappedRoomId) => {
-          const roomInfo = roomMap.get(mappedRoomId) as
-            | { roomName?: string; photos?: Array<{ url: string }> }
-            | undefined;
-          const roomName =
-            rates[0]?.name ?? roomInfo?.roomName ?? `Room ${mappedRoomId}`;
-          const photos = (roomInfo?.photos ?? [])
-            .map((photo) => photo.url)
-            .filter((url, index, all): url is string => Boolean(url) && all.indexOf(url) === index)
-            .map((url) => shrinkHotelImageUrl(url, "gallery"));
-          groups.push({
-            mappedRoomId,
-            roomName,
-            photos,
-            rates,
-          });
-        });
-        setRoomGroups(groups);
+        setQuotedCurrency(requestedCurrency);
+        setRoomGroups(buildRoomGroups(hotel, allRates));
         setHasFreeCancellation(freeCancellation);
-      } catch (e) {
+      })
+      .catch((e) => {
+        if (abort.signal.aborted) return;
+        if (generation !== ratesFetchGen.current) return;
         setError((e as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    }
-    run();
-  }, [hotelId, checkin, checkout, occupancyKey, currency]);
+      })
+      .finally(() => {
+        if (generation === ratesFetchGen.current) {
+          setRatesLoading(false);
+        }
+      });
+
+    return () => {
+      abort.abort();
+    };
+  }, [hotelId, checkin, checkout, occupancyKey, currency, hotel, occupancies, party.adults, party.childAges]);
 
   const handleBook = (offerId: string) => {
     const total = roomGroups
@@ -357,7 +347,9 @@ function HotelContent() {
         })}`
       : "/";
 
-  if (loading) {
+  const pricesReady = quotedCurrency === currency && !ratesLoading;
+
+  if (hotelLoading && !hotel) {
     return (
       <div className="mx-auto max-w-6xl animate-pulse px-4 py-8 sm:px-6">
         <div className="h-56 rounded-card bg-surface-muted sm:h-[340px]" />
@@ -447,7 +439,7 @@ function HotelContent() {
                     href="#stay-location"
                     className="hover:text-teal hover:underline hover:underline-offset-4"
                   >
-                    {hotel.address}
+                    {repairLiteApiText(hotel.address)}
                   </a>
                 </p>
               )}
@@ -500,6 +492,21 @@ function HotelContent() {
               Swipe room photos to see the space — then pick a rate that fits your dates.
             </p>
             <div className="mt-4 space-y-4">
+              {ratesLoading && roomGroups.length === 0 && (
+                <div className="space-y-4" aria-busy="true" aria-label="Loading room rates">
+                  {[0, 1].map((key) => (
+                    <Card key={key} className="overflow-hidden">
+                      <div className="flex animate-pulse flex-col sm:flex-row">
+                        <div className="aspect-[4/3] w-full bg-surface-muted sm:w-44" />
+                        <div className="flex-1 space-y-3 p-4">
+                          <div className="h-5 w-1/2 rounded bg-surface-muted" />
+                          <div className="h-12 rounded-control bg-surface-muted" />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              )}
               {roomGroups.map((group) => (
                 <Card key={group.mappedRoomId} className="overflow-hidden">
                   <div className="flex flex-col sm:flex-row">
@@ -511,8 +518,8 @@ function HotelContent() {
                       <div className="mt-3 space-y-2">
                         {group.rates.map((rate, index) => {
                           const total = rate.retailRate?.total?.[0];
-                          const amount = total?.amount ?? 0;
-                          const rateCurrency = total?.currency ?? "EUR";
+                          const amount = pricesReady ? (total?.amount ?? 0) : 0;
+                          const rateCurrency = total?.currency ?? quotedCurrency ?? currency;
                           const refundable =
                             rate.cancellationPolicies?.refundableTag === "RFN";
                           return (
@@ -537,7 +544,9 @@ function HotelContent() {
                               <div className="flex items-center gap-3">
                                 <div className="text-right">
                                   <p className="tnum font-display text-lg font-semibold text-ink">
-                                    {formatStayTotal(amount, rateCurrency)}
+                                    {pricesReady
+                                      ? formatStayTotal(amount, rateCurrency)
+                                      : "…"}
                                   </p>
                                   <p className="text-xs text-ink-muted">
                                     total · {nights} {nights === 1 ? "night" : "nights"}
@@ -560,7 +569,7 @@ function HotelContent() {
                 </Card>
               ))}
 
-              {roomGroups.length === 0 && (
+              {!ratesLoading && roomGroups.length === 0 && (
                 <Card className="p-6 text-center">
                   <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-surface-muted text-ink-muted">
                     <ImageOff className="h-5 w-5" aria-hidden />
@@ -593,7 +602,7 @@ function HotelContent() {
                 {occupancySummary(party, requestedRooms)}
               </p>
 
-              {cheapest && (
+              {pricesReady && cheapest && (
                 <div className="mt-4 border-t border-border pt-4">
                   <p className="text-xs text-ink-muted">From</p>
                   <p className="tnum font-display text-2xl font-semibold text-ink">

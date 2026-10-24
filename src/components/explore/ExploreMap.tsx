@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { getMapTileLayerConfig } from "@/lib/mapTiles";
+import { ResilientMapTileLayer } from "@/components/map/ResilientMapTileLayer";
 import Link from "next/link";
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet.markercluster/dist/MarkerCluster.css";
@@ -21,8 +21,6 @@ type ExploreHotel = {
   city?: string;
   address?: string;
 };
-
-const MAP_TILES = getMapTileLayerConfig();
 
 /** Default check-in 14 days out, 2 nights — same as the homepage search. */
 function defaultDates() {
@@ -52,10 +50,6 @@ function cacheKeyFor(center: L.LatLng, radiusM: number): string {
   const lng = Math.round(center.lng * 20) / 20;
   const radius = Math.round(radiusM / 5000) * 5000;
   return `${lat}|${lng}|${radius}`;
-}
-
-function MapTiles() {
-  return <TileLayer attribution={MAP_TILES.attribution} url={MAP_TILES.url} />;
 }
 
 function pinIcon(selected: boolean) {
@@ -207,7 +201,7 @@ export function ExploreMap({ initialStay = "all" }: { initialStay?: StayType }) 
         className="h-full w-full"
         style={{ height: "100%", width: "100%" }}
       >
-        <MapTiles />
+        <ResilientMapTileLayer />
         <ExploreController onViewportChange={handleViewportChange} active={!loading} />
         <MarkerClusterGroup chunkedLoading>{markers}</MarkerClusterGroup>
       </MapContainer>

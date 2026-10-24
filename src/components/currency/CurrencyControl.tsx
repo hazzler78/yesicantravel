@@ -10,6 +10,7 @@ import {
   isCurrencyCode,
   type CurrencyCode,
 } from "@/lib/currency";
+import { getSsrCurrencySnapshot } from "./server";
 
 function subscribe(onChange: () => void) {
   const observer = new MutationObserver(onChange);
@@ -26,7 +27,7 @@ function getSnapshot(): CurrencyCode {
 }
 
 function getServerSnapshot(): CurrencyCode {
-  return DEFAULT_CURRENCY;
+  return getSsrCurrencySnapshot();
 }
 
 function writeCookie(currency: CurrencyCode) {

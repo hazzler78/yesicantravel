@@ -14,6 +14,7 @@ import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { HotelLocationCard } from "@/components/HotelLocationCard";
 import { LeadMagnetInlineCta } from "@/components/home/LeadMagnetInlineCta";
 import { shrinkHotelImageUrl } from "@/lib/hotelImages";
+import { repairLiteApiText } from "@/lib/repairLiteApiText";
 
 interface Booking {
   bookingId?: string;
@@ -173,7 +174,7 @@ function ConfirmationContent() {
                 {hotelDetail?.address && (
                   <p className="mt-1 flex items-start gap-1.5 text-[0.9375rem] text-ink-muted">
                     <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-                    {hotelDetail.address}
+                    {repairLiteApiText(hotelDetail.address)}
                   </p>
                 )}
                 {booking.checkin && booking.checkout && (

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Clock, ImageOff, MapPin, TrainFront, Venus } from "lucide-react";
 import { formatStayTotal } from "@/lib/formatStayPrice";
+import { repairLiteApiText } from "@/lib/repairLiteApiText";
 import { formatDistance, type StaySignals } from "@/lib/staySignals";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
@@ -15,6 +16,8 @@ export type HotelCardData = {
   price?: number;
   currency?: string;
   hasFreeCancellation?: boolean;
+  /** Cheapest refundable total when it differs from `price`. */
+  refundableFromPrice?: number;
   safetyBadges?: string[];
 };
 
@@ -29,6 +32,11 @@ type HotelCardProps = {
 
 export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap }: HotelCardProps) {
   const hasPrice = hotel.price != null;
+  const showRefundableLine =
+    hasPrice &&
+    hotel.hasFreeCancellation &&
+    hotel.refundableFromPrice != null &&
+    hotel.refundableFromPrice > (hotel.price ?? 0);
   const nearestTransit = signals?.nearestTransit;
   const cardId = `hotel-card-${hotel.id}`;
 
@@ -84,7 +92,7 @@ export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap 
             {hotel.address && (
               <p className="mt-1.5 flex items-start gap-1.5 text-[0.8125rem] text-ink-muted">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-                <span className="line-clamp-2">{hotel.address}</span>
+                <span className="line-clamp-2">{repairLiteApiText(hotel.address)}</span>
               </p>
             )}
             {onShowOnMap && (
@@ -131,6 +139,12 @@ export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap 
                 <p className="tnum font-display text-xl font-semibold text-ink">
                   {formatStayTotal(hotel.price!, hotel.currency ?? "EUR")}
                 </p>
+                {showRefundableLine && (
+                  <p className="mt-0.5 text-xs font-medium text-positive">
+                    Free cancellation from{" "}
+                    {formatStayTotal(hotel.refundableFromPrice!, hotel.currency ?? "EUR")}
+                  </p>
+                )}
                 <p className="text-xs text-ink-muted">
                   total for {nights} {nights === 1 ? "night" : "nights"}
                 </p>

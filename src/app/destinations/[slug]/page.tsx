@@ -14,6 +14,7 @@ import Image from "next/image";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
 import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
+import { EmailSignupBox } from "@/components/EmailSignupBox";
 import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { DESTINATION_RELATED_GUIDES } from "@/lib/relatedGuides";
 import { ContentSearchCta } from "@/components/content/ContentSearchCta";
@@ -437,6 +438,14 @@ export default async function DestinationPage({ params }: Props) {
             </ul>
           </section>
         )}
+
+        <div className="mt-10 rounded-card border border-border bg-surface p-5 shadow-card">
+          <EmailSignupBox
+            variant="compact"
+            city={dest.city}
+            pagePath={`/destinations/${dest.slug}`}
+          />
+        </div>
 
       </div>
     </div>

@@ -6,6 +6,7 @@ import { MapPin, Search, Sparkles } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { searchSubmittedCityLabel, trackVercelFunnelEvent } from "@/lib/vercelFunnelEvents";
 import {
   appendOccupancyParams,
   clampAdults,
@@ -238,6 +239,13 @@ export function SearchBar({
       hasVibeQuery: Boolean(vibe.trim()),
       ...(trackingSource ? { source: trackingSource } : {}),
       ...(trackingCity ? { city: trackingCity } : {}),
+    });
+    trackVercelFunnelEvent("search_submitted", {
+      city: searchSubmittedCityLabel(mode, destination, vibe, trackingCity),
+      has_dates: Boolean(checkinValue && checkoutValue),
+      guests: party.adults + party.childAges.length,
+      search_mode: mode,
+      ...(trackingSource ? { source: trackingSource } : {}),
     });
     const eventId = generateMetaEventId("search");
     const metaSearchData = {

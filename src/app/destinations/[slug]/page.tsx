@@ -443,6 +443,7 @@ export default async function DestinationPage({ params }: Props) {
           <EmailSignupBox
             variant="compact"
             city={dest.city}
+            placement="destinations"
             pagePath={`/destinations/${dest.slug}`}
           />
         </div>

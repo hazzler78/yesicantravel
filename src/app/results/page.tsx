@@ -17,6 +17,7 @@ import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
 import { LeadMagnetInlineCta } from "@/components/home/LeadMagnetInlineCta";
+import { EmailSignupBox } from "@/components/EmailSignupBox";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
@@ -964,7 +965,10 @@ function ResultsContent() {
 
             {/* Once per page, after the list — not interleaved with hotels */}
             {!loading && filteredAndSortedHotels.length > 0 && (
-              <LeadMagnetInlineCta pagePath="/results" />
+              <>
+                <LeadMagnetInlineCta pagePath="/results" />
+                <EmailSignupBox variant="inline" pagePath="/results" className="mt-4" />
+              </>
             )}
 
             {!loading && filteredAndSortedHotels.length === 0 && (

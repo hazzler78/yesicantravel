@@ -3,6 +3,7 @@ import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import { ContentStatus } from "@prisma/client";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { EmailSignupBox } from "@/components/EmailSignupBox";
 import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { ShareButton } from "@/components/ShareButton";
 import { Card } from "@/components/ui/Card";
@@ -191,6 +192,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             )}
           </Card>
 
+          <Card className="mt-4 p-5 lg:hidden">
+            <EmailSignupBox variant="compact" pagePath={`/blog/${post.slug}`} />
+          </Card>
+
           <div className="mt-8">
             <ReactMarkdown
               components={{
@@ -261,6 +266,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 />
               </div>
             )}
+          </Card>
+          <Card className="p-5">
+            <EmailSignupBox variant="compact" pagePath={`/blog/${post.slug}`} />
           </Card>
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>

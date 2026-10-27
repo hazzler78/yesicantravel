@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { book, LiteAPIError } from "@/lib/liteapi";
 import { sendServerPurchaseEvent } from "@/lib/metaCapiServer";
+import { deleteCheckoutGuestSession, recordCheckoutEvent } from "@/lib/checkoutTelemetry";
 
 export async function POST(request: NextRequest) {
   try {
@@ -75,6 +76,18 @@ export async function POST(request: NextRequest) {
       // never fail the booking because of analytics
     }
 
+    const bookingPayload = (data as { data?: { bookingId?: string } })?.data ?? data;
+    const bookingId = (bookingPayload as { bookingId?: string })?.bookingId;
+    void recordCheckoutEvent({
+      kind: "book_ok",
+      prebookId,
+      transactionId: typeof transactionId === "string" ? transactionId : undefined,
+      errorMessage: bookingId ? undefined : "book_ok_without_booking_id",
+      metadata: bookingId ? { bookingId } : undefined,
+    });
+    if (prebookId) {
+      void deleteCheckoutGuestSession(prebookId);
+    }
     return NextResponse.json(data);
   } catch (e) {
     const err = e as LiteAPIError & Error;
@@ -84,6 +97,22 @@ export async function POST(request: NextRequest) {
       payload.code = err.code;
       payload.description = err.description;
     }
+    let failPrebookId: string | undefined;
+    let failTransactionId: string | undefined;
+    try {
+      const parsed = await request.clone().json();
+      failPrebookId = parsed.prebookId;
+      failTransactionId = parsed.transactionId;
+    } catch {
+      /* ignore */
+    }
+    void recordCheckoutEvent({
+      kind: "book_failed",
+      prebookId: failPrebookId,
+      transactionId: failTransactionId,
+      errorCode: payload.code,
+      errorMessage: message,
+    });
     return NextResponse.json(payload, { status: 500 });
   }
 }

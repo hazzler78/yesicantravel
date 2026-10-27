@@ -326,3 +326,33 @@ model JobRun {
   @@index([status, startedAt])
   @@index([runKey, jobName])
 }
+
+/// Guest details keyed by prebookId so payment redirect can complete /api/book in another tab/browser.
+model CheckoutGuestSession {
+  prebookId       String   @id
+  clientReference String?
+  holder          Json
+  stayContext     Json?
+  expiresAt       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([expiresAt])
+}
+
+/// Checkout funnel failures and orphan prebooks (no card data; minimal PII in metadata).
+model CheckoutEvent {
+  id            String   @id @default(cuid())
+  kind          String
+  prebookId     String?
+  transactionId String?
+  offerId       String?
+  hotelId       String?
+  errorCode     Int?
+  errorMessage  String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([kind, createdAt])
+  @@index([prebookId, createdAt])
+}

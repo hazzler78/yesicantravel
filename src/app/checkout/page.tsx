@@ -31,9 +31,29 @@ import {
   parsePartyFromSearchParams,
   requestedRoomsFromSearchParams,
 } from "@/lib/occupancy";
+import {
+  clearCheckoutGuestStorage,
+  clearPaymentRedirectPending,
+  isPaymentRedirectPending,
+  markPaymentRedirectPending,
+  markPaymentSubmittedForPrebook,
+  resolveCheckoutGuest,
+  wasPaymentSubmittedForPrebook,
+  writeGuestToLocalStorage,
+} from "@/lib/checkoutGuestPersistence";
+import {
+  guestMissingAfterPaymentMessage,
+  parsePaymentRedirectStatus,
+  paymentFailureUserMessage,
+  paymentRedirectIndicatesFailure,
+  shouldAttemptBookingAfterPaymentReturn,
+} from "@/lib/checkoutPaymentReturn";
+import {
+  fetchCheckoutGuestFromServer,
+  logCheckoutEventClient,
+  persistCheckoutGuestToServer,
+} from "@/lib/checkoutClient";
 
-const STORAGE_KEY = "liteapi_checkout_guest";
-const CLIENT_REF_KEY = "liteapi_checkout_client_ref";
 const CHECKOUT_COMPLETED_KEY = "liteapi_checkout_completed";
 
 function PaymentFormInit({
@@ -46,6 +66,7 @@ function PaymentFormInit({
   checkin,
   checkout,
   occupancyQuery,
+  onPaymentSubmit,
 }: {
   secretKey: string;
   publicKey: "sandbox" | "live";
@@ -56,6 +77,7 @@ function PaymentFormInit({
   checkin: string;
   checkout: string;
   occupancyQuery: string;
+  onPaymentSubmit?: () => void;
 }) {
   const initialized = useRef(false);
   useEffect(() => {
@@ -77,6 +99,21 @@ function PaymentFormInit({
     });
     payment.handlePayment();
   }, [secretKey, publicKey, prebookId, transactionId, offerId, hotelId, checkin, checkout, occupancyQuery]);
+
+  useEffect(() => {
+    const root = document.getElementById("payment-form");
+    if (!root || !onPaymentSubmit) return;
+    const onClick = (ev: MouseEvent) => {
+      const target = ev.target as HTMLElement | null;
+      if (!target?.closest(".lp-submit-button, button[type='submit']")) return;
+      markPaymentRedirectPending();
+      markPaymentSubmittedForPrebook(prebookId);
+      onPaymentSubmit();
+    };
+    root.addEventListener("click", onClick, true);
+    return () => root.removeEventListener("click", onClick, true);
+  }, [prebookId, onPaymentSubmit]);
+
   return null;
 }
 
@@ -106,6 +143,7 @@ function CheckoutContent() {
     : "/";
   const prebookId = searchParams.get("prebookId");
   const transactionId = searchParams.get("transactionId");
+  const redirectStatus = parsePaymentRedirectStatus(searchParams.get("redirect_status"));
   const totalAmountRaw = searchParams.get("totalAmount");
   const totalCurrencyParam = searchParams.get("totalCurrency");
   const quotedTotal =
@@ -166,6 +204,20 @@ function CheckoutContent() {
     step === "form" ? "details" : step === "payment" ? "payment" : step === "booking" ? "confirm" : "details";
 
   const guestDetailsEnteredRef = useRef(false);
+  const paymentReturnHandledRef = useRef(false);
+  const bookInFlightRef = useRef(false);
+
+  const trackPaymentSubmitted = useCallback(
+    (source: "pay_button" | "return_url") => {
+      if (!hotelId || !offerId) return;
+      trackVercelFunnelEvent("payment_submitted", {
+        hotelId,
+        offerId,
+        source,
+      });
+    },
+    [hotelId, offerId]
+  );
 
   const trackGuestDetailsEntered = useCallback(() => {
     if (guestDetailsEnteredRef.current || !hotelId || !offerId) return;
@@ -307,7 +359,13 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (step !== "payment" || !hotelId || !offerId) return;
-    trackFunnelEvent("PaymentSubmit", { hotelId, offerId, checkin, checkout, adults });
+    trackVercelFunnelEvent("payment_form_shown", {
+      hotelId,
+      offerId,
+      checkin: checkin ?? undefined,
+      checkout: checkout ?? undefined,
+      adults,
+    });
   }, [step, hotelId, offerId, checkin, checkout, adults]);
 
   useEffect(() => {
@@ -315,6 +373,7 @@ function CheckoutContent() {
       try {
         if (sessionStorage.getItem(CHECKOUT_COMPLETED_KEY) === "1") return;
         if (step === "done") return;
+        if (isPaymentRedirectPending()) return;
         track("Booking Abandoned", { step, hotelId, offerId, checkin, checkout, adults });
       } catch {
         /* ignore */
@@ -338,45 +397,128 @@ function CheckoutContent() {
     return () => clearTimeout(timer);
   }, [step, prebookData]);
 
-  // Return from payment: we have prebookId + transactionId in URL
+  // Return from payment: prebookId + transactionId (+ optional Stripe redirect_status) in URL
   useEffect(() => {
-    if (prebookId && transactionId && step === "form") {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        try {
-          const guest = JSON.parse(stored);
-          setFirstName(guest.firstName ?? "");
-          setLastName(guest.lastName ?? "");
-          setEmail(guest.email ?? "");
-          setPhone(guest.phone ?? "");
-          if (!String(guest.phone ?? "").trim()) {
-            setError("Mobile phone is required to complete the booking. Please start checkout again and include your phone number.");
-            setStep("form");
-            return;
-          }
-          setStep("booking");
-        } catch {
-          setError("Guest details not found. Please start the checkout again.");
+    if (!prebookId || !transactionId || paymentReturnHandledRef.current) return;
+    if (step !== "form") return;
+
+    paymentReturnHandledRef.current = true;
+    clearPaymentRedirectPending();
+
+    void (async () => {
+      const bookingDecision = shouldAttemptBookingAfterPaymentReturn(transactionId, redirectStatus);
+      if (!bookingDecision.attempt) {
+        if (
+          paymentRedirectIndicatesFailure(redirectStatus) ||
+          redirectStatus === "processing" ||
+          redirectStatus === "unknown"
+        ) {
+          logCheckoutEventClient({
+            kind: "payment_return_failed",
+            prebookId,
+            transactionId,
+            offerId: offerId ?? undefined,
+            hotelId: hotelId ?? undefined,
+            errorMessage: bookingDecision.reason,
+          });
+          setError(paymentFailureUserMessage(redirectStatus));
+          setStep("error");
         }
-      } else {
-        setError("Guest details not found. Please start the checkout again.");
+        return;
       }
-    }
-  }, [prebookId, transactionId, step]);
+
+      if (redirectStatus === "succeeded" && !wasPaymentSubmittedForPrebook(prebookId)) {
+        trackPaymentSubmitted("return_url");
+        markPaymentSubmittedForPrebook(prebookId);
+      }
+
+      let resolved = resolveCheckoutGuest(prebookId);
+      if (!resolved) {
+        const fromServer = await fetchCheckoutGuestFromServer(prebookId);
+        if (fromServer) {
+          resolved = {
+            guest: fromServer.holder,
+            clientReference: fromServer.clientReference,
+            source: "localStorage",
+          };
+        }
+      }
+
+      if (!resolved) {
+        logCheckoutEventClient({
+          kind: "payment_return_guest_missing",
+          prebookId,
+          transactionId,
+          offerId: offerId ?? undefined,
+          hotelId: hotelId ?? undefined,
+        });
+        setError(guestMissingAfterPaymentMessage(prebookId));
+        setStep("error");
+        return;
+      }
+
+      const guest = resolved.guest;
+      setFirstName(guest.firstName ?? "");
+      setLastName(guest.lastName ?? "");
+      setEmail(guest.email ?? "");
+      setPhone(guest.phone ?? "");
+      if (!String(guest.phone ?? "").trim()) {
+        setError(
+          "Mobile phone is required to complete the booking. Please start checkout again and include your phone number."
+        );
+        setStep("form");
+        return;
+      }
+      setStep("booking");
+    })();
+  }, [
+    prebookId,
+    transactionId,
+    step,
+    redirectStatus,
+    offerId,
+    hotelId,
+    trackPaymentSubmitted,
+  ]);
 
   // Execute book when we have everything (return from User Payment redirect)
   useEffect(() => {
-    if (step !== "booking" || !prebookId || !transactionId) return;
-    const stored = sessionStorage.getItem(STORAGE_KEY);
-    if (!stored) return;
+    if (step !== "booking" || !prebookId || !transactionId || bookInFlightRef.current) return;
 
-    (async () => {
-      try {
-        const guest = JSON.parse(stored);
-        if (!String(guest.phone ?? "").trim()) {
-          throw new Error("Mobile phone is required to complete the booking. Please start checkout again and include your phone number.");
+    void (async () => {
+      let resolved = resolveCheckoutGuest(prebookId);
+      if (!resolved) {
+        const fromServer = await fetchCheckoutGuestFromServer(prebookId);
+        if (fromServer) {
+          resolved = {
+            guest: fromServer.holder,
+            clientReference: fromServer.clientReference,
+            source: "localStorage",
+          };
         }
-        const clientRef = sessionStorage.getItem(CLIENT_REF_KEY);
+      }
+      if (!resolved) {
+        logCheckoutEventClient({
+          kind: "payment_return_orphan",
+          prebookId,
+          transactionId,
+          offerId: offerId ?? undefined,
+          hotelId: hotelId ?? undefined,
+        });
+        setError(guestMissingAfterPaymentMessage(prebookId));
+        setStep("error");
+        return;
+      }
+
+      bookInFlightRef.current = true;
+      try {
+        const guest = resolved.guest;
+        if (!String(guest.phone ?? "").trim()) {
+          throw new Error(
+            "Mobile phone is required to complete the booking. Please start checkout again and include your phone number."
+          );
+        }
+        const clientRef = resolved.clientReference;
         const res = await fetch("/api/book", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -402,8 +544,10 @@ function CheckoutContent() {
         if (!res.ok) throw new Error(json.error ?? "Booking failed");
         const data = json.data;
         setBooking(data);
-        sessionStorage.removeItem(STORAGE_KEY);
-        sessionStorage.removeItem(CLIENT_REF_KEY);
+        clearCheckoutGuestStorage(prebookId);
+        void fetch(`/api/checkout/guest-session?prebookId=${encodeURIComponent(prebookId)}`, {
+          method: "DELETE",
+        }).catch(() => {});
         {
           const booked = data as Record<string, unknown>;
           sessionStorage.setItem(
@@ -474,11 +618,28 @@ function CheckoutContent() {
           leadEmail: guest.email,
         });
       } catch (e) {
+        bookInFlightRef.current = false;
         setError((e as Error).message);
         setStep("error");
       }
     })();
-  }, [step, prebookId, transactionId, occupancyQuery, hotelId, checkin, checkout, saveCustomerForSuggestions, ingestBookingRevenue]);
+  }, [
+    step,
+    prebookId,
+    transactionId,
+    occupancyQuery,
+    hotelId,
+    checkin,
+    checkout,
+    offerId,
+    adults,
+    travellerCount,
+    totalCurrencyParam,
+    party,
+    occupancies,
+    saveCustomerForSuggestions,
+    ingestBookingRevenue,
+  ]);
 
   // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
   // Must run unconditionally (before any early return) to avoid React "fewer hooks" error.
@@ -678,8 +839,16 @@ function CheckoutContent() {
       const sk = prebookJson.data.secretKey;
       const prebookSandbox = prebookJson.data?.sandbox;
       setPrebookData({ prebookId: pid, transactionId: tid, secretKey: sk, sandbox: prebookSandbox });
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(guestPayload));
-      sessionStorage.setItem(CLIENT_REF_KEY, clientRef);
+      const stayContext = {
+        offerId,
+        hotelId: hotelId ?? undefined,
+        checkin: checkin ?? undefined,
+        checkout: checkout ?? undefined,
+        occupancyQuery,
+        clientReference: clientRef,
+      };
+      writeGuestToLocalStorage(pid, guestPayload, stayContext);
+      void persistCheckoutGuestToServer(pid, guestPayload, stayContext);
       setStep("payment");
 
       const base = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
@@ -1029,6 +1198,7 @@ function CheckoutContent() {
                 checkin={checkin!}
                 checkout={checkout!}
                 occupancyQuery={occupancyQuery}
+                onPaymentSubmit={() => trackPaymentSubmitted("pay_button")}
               />
             )}
           </div>

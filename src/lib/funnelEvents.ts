@@ -8,7 +8,7 @@ export type FunnelEvent =
   | "Search"
   | "HotelClick"
   | "CheckoutStart"
-  | "PaymentSubmit"
+  | "PaymentFormShown"
   | "BookingSuccess";
 
 type ClarityFn = (...args: unknown[]) => void;

@@ -24,7 +24,7 @@ Recent site behaviour (high level):
 - Results search includes a map of stays (desktop always; mobile behind a Map toggle). Each card with coordinates has a "Show on map" control.
 - Checkout shows a short "you're booking" summary (photo, name, address, dates, guests, safety badges when available) and required phone with a note that it is for the hotel (e.g. late check-in).
 - Checkout trust copy: secure payments; cancellation terms shown per rate; safety signals from hotel facilities — no blanket "48-hour free cancellation" or "Safer Stays guarantee" claim.
-- Microsoft Clarity may be enabled for session insights; funnel events also go to analytics (Search, HotelClick, CheckoutStart, PaymentSubmit, BookingSuccess).
+- Microsoft Clarity may be enabled for session insights; funnel events also go to analytics (Search, HotelClick, CheckoutStart, payment_form_shown, payment_submitted, BookingSuccess).
 - Booking codes: RFN = refundable/free cancellation; NRFN = non-refundable. Board names describe meals.
 `.trim();
 

@@ -2,7 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { searchRates } from "@/lib/liteapi";
 import { normalizeCurrency, resolveRequestCurrency } from "@/lib/currency";
 import { sanitizeChildAges, sanitizeOccupancies } from "@/lib/occupancy";
+import { countDistinctRateHotels, RATES_THIN_RESULT_THRESHOLD } from "@/lib/ratesSearchReliability";
+import { recordSearchEvent } from "@/lib/searchAnalytics";
 import { DEFAULT_SEARCH_RADIUS_M, parseStayType, STAY_TYPES } from "@/lib/stayTypes";
+
+/** Room for near-term delayed LiteAPI retries while staying under the browser’s 45s timeout. */
+export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,6 +59,24 @@ export async function POST(request: NextRequest) {
       longitude,
       radius,
     });
+    const apiHotelCount = countDistinctRateHotels(data);
+    if (apiHotelCount < RATES_THIN_RESULT_THRESHOLD && !body.hotelIds?.length) {
+      void recordSearchEvent({
+        mode: body.aiSearch ? "vibe" : "destination",
+        placeId,
+        aiSearch: typeof body.aiSearch === "string" ? body.aiSearch : undefined,
+        checkin: body.checkin,
+        checkout: body.checkout,
+        adults: body.adults ?? 1,
+        currency,
+        guestNationality: body.guestNationality,
+        apiHotelCount,
+        uniqueHotelCount: apiHotelCount,
+        context: { source: "api_rates_thin" },
+      }).catch(() => {
+        // Analytics must never block rates.
+      });
+    }
     return NextResponse.json(
       { ...data, stay, radius: radius ?? null },
       { headers: { "Cache-Control": "private, no-store, max-age=0" } },

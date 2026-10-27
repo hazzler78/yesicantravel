@@ -4,6 +4,7 @@
  */
 
 import type { ResultsFilterState } from "@/components/results/ResultsFilters";
+import { shouldPersistResultsListCache } from "@/lib/ratesSearchReliability";
 
 export const RESULTS_RETURN_STORAGE_KEY = "yict_results_return";
 export const RESULTS_CACHE_STORAGE_KEY = "yict_results_cache";
@@ -94,6 +95,8 @@ export function consumeResultsReturn(searchKey: string): ResultsReturnState | nu
 }
 
 export function cacheResultsList(cache: Omit<ResultsListCache, "savedAt">) {
+  const hotelCount = Array.isArray(cache.hotels) ? cache.hotels.length : 0;
+  if (!shouldPersistResultsListCache(hotelCount)) return;
   writeJson(RESULTS_CACHE_STORAGE_KEY, { ...cache, savedAt: Date.now() });
 }
 
@@ -101,6 +104,8 @@ export function readResultsListCache(searchKey: string): ResultsListCache | null
   const cache = readJson<ResultsListCache>(RESULTS_CACHE_STORAGE_KEY);
   if (!cache || cache.searchKey !== searchKey) return null;
   if (Date.now() - cache.savedAt > MAX_AGE_MS) return null;
+  const hotelCount = Array.isArray(cache.hotels) ? cache.hotels.length : 0;
+  if (!shouldPersistResultsListCache(hotelCount)) return null;
   return cache;
 }
 

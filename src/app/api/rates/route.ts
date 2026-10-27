@@ -54,7 +54,10 @@ export async function POST(request: NextRequest) {
       longitude,
       radius,
     });
-    return NextResponse.json({ ...data, stay, radius: radius ?? null });
+    return NextResponse.json(
+      { ...data, stay, radius: radius ?? null },
+      { headers: { "Cache-Control": "private, no-store, max-age=0" } },
+    );
   } catch (e) {
     return NextResponse.json(
       { error: (e as Error).message },

@@ -1,4 +1,4 @@
-/** Stay-type filters for LiteAPI `hotelTypeIds`. 264 is backpacker/hostel (Bunks at Rode) — not 203. */
+/** Stay-type filters for LiteAPI `hotelTypeIds` (hotels vs apartments; no separate budget/hostel tab). */
 
 export const STAY_TYPES = {
   all: {
@@ -11,11 +11,6 @@ export const STAY_TYPES = {
     label: "Hotels",
     hotelTypeIds: [204, 206],
   },
-  budget: {
-    id: "budget",
-    label: "Budget",
-    hotelTypeIds: [203, 264, 208, 216, 225],
-  },
   apartments: {
     id: "apartments",
     label: "Apartments",
@@ -25,13 +20,13 @@ export const STAY_TYPES = {
 
 export type StayType = keyof typeof STAY_TYPES;
 
-export const STAY_TYPE_ORDER: StayType[] = ["all", "hotels", "budget", "apartments"];
+export const STAY_TYPE_ORDER: StayType[] = ["all", "hotels", "apartments"];
 
 /** 20 km — LiteAPI placeId is ~1 km; Nittedal-style searches need a real radius. */
 export const DEFAULT_SEARCH_RADIUS_M = 20_000;
 
 export function parseStayType(raw: unknown): StayType {
-  if (raw === "hotels" || raw === "budget" || raw === "apartments" || raw === "all") {
+  if (raw === "hotels" || raw === "apartments" || raw === "all") {
     return raw;
   }
   return "all";

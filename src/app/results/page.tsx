@@ -18,6 +18,7 @@ import { ResultsSearchBar } from "@/components/results/ResultsSearchBar";
 import { HotelCard, HotelCardSkeleton, type HotelCardData } from "@/components/results/HotelCard";
 import { ResultsFilters, type ResultsFilterState } from "@/components/results/ResultsFilters";
 import { EmailCaptureResultsSlot } from "@/components/EmailCaptureResultsSlot";
+import { ResultsFeedbackWidget } from "@/components/results/ResultsFeedbackWidget";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
@@ -903,6 +904,22 @@ function ResultsContent() {
             {/* Once per page, after the list — not interleaved with hotels */}
             {!loading && filteredAndSortedHotels.length > 0 && (
               <EmailCaptureResultsSlot city={newsletterCity} />
+            )}
+
+            {!loading && !error && (
+              <ResultsFeedbackWidget
+                resultsReady={!loading}
+                blocked={enriching}
+                context={{
+                  placeId,
+                  city: newsletterCity,
+                  checkin,
+                  checkout,
+                  adults: party.adults,
+                  stayType: stay,
+                  resultCount: filteredAndSortedHotels.length,
+                }}
+              />
             )}
 
             {!loading && filteredAndSortedHotels.length === 0 && (

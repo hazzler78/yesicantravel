@@ -356,3 +356,24 @@ model CheckoutEvent {
   @@index([kind, createdAt])
   @@index([prebookId, createdAt])
 }
+
+/// Anonymous results-page feedback (no email; search context only).
+model VisitorFeedback {
+  id          String   @id @default(cuid())
+  answer      String
+  comment     String?
+  pageUrl     String
+  placeId     String?
+  city        String?
+  checkin     String?
+  checkout    String?
+  adults      Int?
+  stayType    String?
+  resultCount Int?
+  language    String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([answer, createdAt])
+}

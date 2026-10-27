@@ -1,4 +1,11 @@
 import { guestNationalityForCurrency, normalizeCurrency } from "@/lib/currency";
+import {
+  buildRatesRetryBody,
+  LITEAPI_RATES_TIMEOUT_SECONDS,
+  mergeRatesPayloads,
+  shouldRetryThinRatesSearch,
+  type RatesSearchPayload,
+} from "@/lib/ratesSearchReliability";
 import { DEFAULT_SEARCH_RADIUS_M, extractPlaceLatLng } from "@/lib/stayTypes";
 
 const LITEAPI_KEY = process.env.LITEAPI_KEY!;
@@ -10,6 +17,25 @@ const defaultHeaders = {
   accept: "application/json",
   "content-type": "application/json",
 };
+
+const liteApiFetchInit: RequestInit = { cache: "no-store" };
+
+async function postHotelRates(body: Record<string, unknown>): Promise<RatesSearchPayload> {
+  const res = await fetch(`${API_BASE}/hotels/rates`, {
+    method: "POST",
+    headers: defaultHeaders,
+    body: JSON.stringify(body),
+    ...liteApiFetchInit,
+  });
+  const data = (await res.json().catch(() => ({}))) as RatesSearchPayload;
+  if (data?.error?.code === 2001) {
+    return { data: [], hotels: [], error: data.error };
+  }
+  if (!res.ok) {
+    throw new Error(data?.error?.message ?? `Rates search failed: ${res.status}`);
+  }
+  return data;
+}
 
 /** LiteAPI error shape: { error: { code, description, message } }. Use for logging and idempotency/support. */
 export class LiteAPIError extends Error {
@@ -38,7 +64,10 @@ function parseAndThrow(body: { error?: { code?: number; description?: string; me
 export async function searchPlaces(query: string) {
   const res = await fetch(
     `${API_BASE}/data/places?textQuery=${encodeURIComponent(query)}`,
-    { headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" } }
+    {
+      headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" },
+      ...liteApiFetchInit,
+    }
   );
   if (!res.ok) throw new Error(`Places search failed: ${res.status}`);
   return res.json();
@@ -48,7 +77,10 @@ export async function searchPlaces(query: string) {
 export async function getPlaceDetails(placeId: string) {
   const res = await fetch(
     `${API_BASE}/data/places/${encodeURIComponent(placeId)}?language=en`,
-    { headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" } }
+    {
+      headers: { "X-API-Key": LITEAPI_KEY, accept: "application/json" },
+      ...liteApiFetchInit,
+    }
   );
   if (!res.ok) throw new Error(`Place details failed: ${res.status}`);
   return res.json();
@@ -173,6 +205,7 @@ export async function searchRates(params: {
     roomMapping: true,
     maxRatesPerHotel: params.maxRatesPerHotel ?? 1,
     includeHotelData: true,
+    timeout: LITEAPI_RATES_TIMEOUT_SECONDS,
   };
   // One primary location: coords+radius beat placeId (~1 km) for suburbs.
   if (
@@ -190,16 +223,17 @@ export async function searchRates(params: {
   if (params.aiSearch) body.aiSearch = params.aiSearch;
   if (params.hotelTypeIds && params.hotelTypeIds.length) body.hotelTypeIds = params.hotelTypeIds;
 
-  const res = await fetch(`${API_BASE}/hotels/rates`, {
-    method: "POST",
-    headers: defaultHeaders,
-    body: JSON.stringify(body),
-  });
-  const data = await res.json().catch(() => ({}));
-  if (data?.error?.code === 2001) {
-    return { data: [], hotels: [], error: data.error };
+  let data = await postHotelRates(body);
+
+  if (shouldRetryThinRatesSearch(data, body)) {
+    try {
+      const retryData = await postHotelRates(buildRatesRetryBody(body));
+      data = mergeRatesPayloads(data, retryData);
+    } catch {
+      // Keep the first response if the retry fails.
+    }
   }
-  if (!res.ok) throw new Error(data?.error?.message ?? `Rates search failed: ${res.status}`);
+
   return data;
 }
 

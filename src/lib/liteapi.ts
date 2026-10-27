@@ -1,4 +1,5 @@
 import { guestNationalityForCurrency, normalizeCurrency } from "@/lib/currency";
+import { DEFAULT_SEARCH_RADIUS_M, extractPlaceLatLng } from "@/lib/stayTypes";
 
 const LITEAPI_KEY = process.env.LITEAPI_KEY!;
 const API_BASE = "https://api.liteapi.travel/v3.0";
@@ -137,6 +138,31 @@ export async function searchRates(params: {
             ...(params.children && params.children.length > 0 ? { children: params.children } : {}),
           },
         ];
+  let latitude = params.latitude;
+  let longitude = params.longitude;
+  let radius = params.radius;
+  let placeId = params.placeId;
+
+  // LiteAPI placeId searches only cover ~1 km — expand to the same radius we use for suburbs.
+  if (
+    placeId &&
+    typeof latitude !== "number" &&
+    typeof longitude !== "number"
+  ) {
+    try {
+      const placeRaw = await getPlaceDetails(placeId);
+      const coords = extractPlaceLatLng(placeRaw);
+      if (coords) {
+        latitude = coords.latitude;
+        longitude = coords.longitude;
+        radius = radius ?? DEFAULT_SEARCH_RADIUS_M;
+        placeId = undefined;
+      }
+    } catch {
+      // Keep placeId-only search if details fail.
+    }
+  }
+
   const body: Record<string, unknown> = {
     occupancies,
     currency,
@@ -150,15 +176,15 @@ export async function searchRates(params: {
   };
   // One primary location: coords+radius beat placeId (~1 km) for suburbs.
   if (
-    typeof params.latitude === "number" &&
-    typeof params.longitude === "number" &&
-    typeof params.radius === "number"
+    typeof latitude === "number" &&
+    typeof longitude === "number" &&
+    typeof radius === "number"
   ) {
-    body.latitude = params.latitude;
-    body.longitude = params.longitude;
-    body.radius = params.radius;
-  } else if (params.placeId) {
-    body.placeId = params.placeId;
+    body.latitude = latitude;
+    body.longitude = longitude;
+    body.radius = radius;
+  } else if (placeId) {
+    body.placeId = placeId;
   }
   if (params.hotelIds && params.hotelIds.length) body.hotelIds = params.hotelIds;
   if (params.aiSearch) body.aiSearch = params.aiSearch;

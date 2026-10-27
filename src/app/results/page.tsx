@@ -42,6 +42,16 @@ import {
   rememberResultsReturn,
 } from "@/lib/resultsReturnState";
 import { formatIsoDateShort, nightsBetween as nightsBetweenIso } from "@/lib/stayDates";
+import { shouldClientQuietRetryThinResults } from "@/lib/ratesSearchOrchestration";
+import {
+  buildInitialResultsHotels,
+  countUniqueHotelsFromRatesPayload,
+} from "@/lib/resultsRatesResponse";
+import {
+  isGeoDestinationSearch,
+  pickResultsThinSearchCopy,
+  shouldShowFarDateThinNotice,
+} from "@/lib/resultsThinSearchUi";
 const ResultsMap = dynamic(() => import("@/components/ResultsMap"), {
   ssr: false,
   loading: () => <p className="p-4 text-center text-[0.9375rem] text-ink-muted">Loading map…</p>,
@@ -171,7 +181,11 @@ function ResultsContent() {
   const [selectedHotelId, setSelectedHotelId] = useState<string | null>(null);
   const [usedSplitRooms, setUsedSplitRooms] = useState(false);
   const [pairAvailable, setPairAvailable] = useState(false);
+  const [quietRetrying, setQuietRetrying] = useState(false);
+  const [thinRescanNonce, setThinRescanNonce] = useState(0);
   const lastSearchEventSignature = useRef<string | null>(null);
+  const clientQuietRetryDoneRef = useRef(false);
+  const quietRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { minRating, maxPrice, onlyFreeCancellation, signals } = filters;
 
@@ -258,6 +272,11 @@ function ResultsContent() {
     }
 
     let cancelled = false;
+    clientQuietRetryDoneRef.current = false;
+    if (quietRetryTimerRef.current) {
+      clearTimeout(quietRetryTimerRef.current);
+      quietRetryTimerRef.current = null;
+    }
 
     async function run() {
       try {
@@ -322,64 +341,14 @@ function ResultsContent() {
         setUsedSplitRooms(split);
         if (cancelled) return;
 
-        const data = (json.data ?? []) as Array<{
-          hotelId: string;
-          roomTypes?: Array<{
-            rates?: Array<{
-              name?: string;
-              retailRate?: { total?: Array<{ amount: number; currency?: string }> };
-              cancellationPolicies?: { refundableTag: string };
-            }>;
-          }>;
-        }>;
-        // Room names are where a women-only dorm shows up, when it shows up at all.
-        const rateNamesByHotel: Record<string, string[]> = {};
-        for (const offer of data) {
-          const names = (offer.roomTypes ?? [])
-            .flatMap((rt) => rt.rates ?? [])
-            .map((rate) => rate.name)
-            .filter((name): name is string => Boolean(name));
-          if (names.length) rateNamesByHotel[offer.hotelId] = names;
-        }
-        const hotelsFromApi = (json.hotels ?? []) as (HotelBasic & {
-          location?: { latitude?: number; longitude?: number };
-          rating?: number; // guest review rating, when present
-        })[];
-        const uniqueHotelIds = [
-          ...new Set([...data.map((d) => d.hotelId), ...hotelsFromApi.map((h) => h.id)].filter(Boolean)),
-        ];
-
-        const pricing = pricingForResults(data as RateOffer[], currency);
-        const ids: string[] = [
-          ...new Set(
-            aiSearch && hotelsFromApi.length > 0
-              ? hotelsFromApi.map((h) => h.id)
-              : data.map((d) => d.hotelId),
-          ),
-        ].filter(Boolean);
-
-        const apiHotelByKey = new Map(
-          hotelsFromApi
-            .filter((h) => h?.id)
-            .map((h) => [h.id, h as HotelBasic & { latitude?: number; longitude?: number }]),
-        );
-
-        const buildRow = (id: string, detail?: HotelBasic | null) =>
-          buildResultsHotelRow({
-            id,
-            offers: data as RateOffer[],
-            pricing,
-            apiHotel: apiHotelByKey.get(id),
-            detail,
-            rateNames: rateNamesByHotel[id],
-            currency,
-            normaliseRating,
-            starRating: (detail as { starRating?: number } | undefined)?.starRating,
-          });
-
-        const initial = ids.slice(0, RESULTS_HOTEL_LIMIT).map((id) =>
-          buildRow(id, apiHotelByKey.get(id)),
-        );
+        const built = buildInitialResultsHotels({
+          json,
+          aiSearch,
+          currency,
+          normaliseRating,
+        });
+        const { hotels: initial, uniqueHotelCount, apiRateCount, apiHotelCount } = built;
+        const ids = initial.map((h) => h.id);
 
         setHotels(initial);
         cacheResultsList({
@@ -388,9 +357,9 @@ function ResultsContent() {
           placeLabel: undefined,
         });
         setSearchAnalyticsOutcome({
-          apiRateCount: data.length,
-          apiHotelCount: hotelsFromApi.length,
-          uniqueHotelCount: uniqueHotelIds.length,
+          apiRateCount,
+          apiHotelCount,
+          uniqueHotelCount,
           enrichedHotelCount: initial.length,
           sampleHotels: initial.slice(0, 5).map((h) => ({
             id: h.id,
@@ -401,6 +370,95 @@ function ResultsContent() {
           })),
         });
         setLoading(false);
+
+        const scheduleQuietRetryIfNeeded = (count: number) => {
+          if (cancelled || clientQuietRetryDoneRef.current) return;
+          if (
+            !shouldClientQuietRetryThinResults(checkin!, count, {
+              isGeoSearch: isGeoDestinationSearch(placeId, aiSearch),
+            })
+          ) {
+            return;
+          }
+          clientQuietRetryDoneRef.current = true;
+          setQuietRetrying(true);
+          quietRetryTimerRef.current = setTimeout(async () => {
+            if (cancelled) return;
+            try {
+              const retryJson = await requestRates(occupanciesForRequest(party, requestedRooms));
+              const retryCount = countUniqueHotelsFromRatesPayload(retryJson);
+              if (retryCount <= count) return;
+              const retryBuilt = buildInitialResultsHotels({
+                json: retryJson,
+                aiSearch,
+                currency,
+                normaliseRating,
+              });
+              setHotels(retryBuilt.hotels);
+              cacheResultsList({
+                searchKey,
+                hotels: retryBuilt.hotels,
+                placeLabel: undefined,
+              });
+              setSearchAnalyticsOutcome({
+                apiRateCount: retryBuilt.apiRateCount,
+                apiHotelCount: retryBuilt.apiHotelCount,
+                uniqueHotelCount: retryBuilt.uniqueHotelCount,
+                enrichedHotelCount: retryBuilt.hotels.length,
+                sampleHotels: retryBuilt.hotels.slice(0, 5).map((h) => ({
+                  id: h.id,
+                  name: h.name,
+                  rating: h.rating,
+                  price: h.price,
+                  currency: h.currency,
+                })),
+              });
+              setEnriching(true);
+              const enrichIds = retryBuilt.hotels.map((h) => h.id);
+              const details = await Promise.all(
+                enrichIds.map(async (id) => {
+                  try {
+                    const r = await fetchWithTimeout(`/api/hotel?hotelId=${encodeURIComponent(id)}`, {
+                      timeoutMs: 12_000,
+                    });
+                    const j = await r.json();
+                    return j.data ?? j;
+                  } catch {
+                    return null;
+                  }
+                }),
+              );
+              if (cancelled) return;
+              const data = retryJson.data ?? [];
+              const pricing = pricingForResults(data as RateOffer[], currency);
+              const hotelsFromApi = (retryJson.hotels ?? []) as HotelBasic[];
+              const apiHotelByKey = new Map(
+                hotelsFromApi.filter((h) => h?.id).map((h) => [h.id, h]),
+              );
+              const enriched = enrichIds.map((id, index) =>
+                buildResultsHotelRow({
+                  id,
+                  offers: data as RateOffer[],
+                  pricing,
+                  apiHotel: apiHotelByKey.get(id),
+                  detail: details[index],
+                  currency,
+                  normaliseRating,
+                  starRating: (details[index] as { starRating?: number } | undefined)?.starRating,
+                }),
+              );
+              setHotels(enriched);
+              cacheResultsList({ searchKey, hotels: enriched, placeLabel: undefined });
+            } catch {
+              // Quiet retry must not surface errors.
+            } finally {
+              if (!cancelled) {
+                setQuietRetrying(false);
+                setEnriching(false);
+              }
+            }
+          }, 6_000);
+        };
 
         setEnriching(true);
         const enrichIds = ids.slice(0, RESULTS_HOTEL_LIMIT);
@@ -420,13 +478,29 @@ function ResultsContent() {
         if (cancelled) return;
         setEnriching(false);
 
-        const enriched = enrichIds.map((id, index) => buildRow(id, details[index]));
+        const data = (json.data ?? []) as RateOffer[];
+        const pricing = pricingForResults(data, currency);
+        const hotelsFromApi = (json.hotels ?? []) as HotelBasic[];
+        const apiHotelByKey = new Map(hotelsFromApi.filter((h) => h?.id).map((h) => [h.id, h]));
+        const enriched = enrichIds.map((id, index) =>
+          buildResultsHotelRow({
+            id,
+            offers: data,
+            pricing,
+            apiHotel: apiHotelByKey.get(id),
+            detail: details[index],
+            currency,
+            normaliseRating,
+            starRating: (details[index] as { starRating?: number } | undefined)?.starRating,
+          }),
+        );
         setHotels(enriched);
         cacheResultsList({
           searchKey,
           hotels: enriched,
           placeLabel: undefined,
         });
+        scheduleQuietRetryIfNeeded(uniqueHotelCount);
       } catch (e) {
         if (cancelled) return;
         const message =
@@ -456,8 +530,12 @@ function ResultsContent() {
     run();
     return () => {
       cancelled = true;
+      if (quietRetryTimerRef.current) {
+        clearTimeout(quietRetryTimerRef.current);
+        quietRetryTimerRef.current = null;
+      }
     };
-  }, [searchParams, currency, searchKey]);
+  }, [searchParams, currency, searchKey, thinRescanNonce]);
 
   // Land back on the hotel the visitor just left — not the top of the list.
   useEffect(() => {
@@ -673,6 +751,22 @@ function ResultsContent() {
   ].join(" · ");
 
   const newsletterCity = placeLabel || aiSearch || undefined;
+  const thinSearchCopy = pickResultsThinSearchCopy({ currency });
+  const showFarDateThinNotice =
+    !loading &&
+    Boolean(checkin) &&
+    shouldShowFarDateThinNotice(checkin!, hotels.length);
+  const showThinSearchActions =
+    !loading &&
+    Boolean(checkin) &&
+    shouldClientQuietRetryThinResults(checkin!, hotels.length, {
+      isGeoSearch: isGeoDestinationSearch(placeId, aiSearch),
+    });
+
+  const rerunThinSearch = useCallback(() => {
+    clientQuietRetryDoneRef.current = false;
+    setThinRescanNonce((n) => n + 1);
+  }, []);
 
   const hotelHref = (id: string) => {
     const qs = new URLSearchParams({
@@ -874,6 +968,31 @@ function ResultsContent() {
               <div className="rounded-card border border-border bg-teal-soft/40 px-4 py-3 text-[0.9375rem] text-ink">
                 Few properties sell a single room for {travellersSummary(party)}. These prices are
                 for two rooms.
+              </div>
+            )}
+
+            {quietRetrying && (
+              <p className="rounded-card border border-border bg-surface-muted/80 px-4 py-3 text-[0.9375rem] text-ink-muted">
+                {thinSearchCopy.fetchingMore}
+              </p>
+            )}
+
+            {showFarDateThinNotice && (
+              <p className="rounded-card border border-border bg-surface-muted/80 px-4 py-3 text-[0.9375rem] text-ink-muted">
+                {thinSearchCopy.farDateThin}
+              </p>
+            )}
+
+            {showThinSearchActions && !quietRetrying && (
+              <div className="flex flex-wrap items-center gap-3 rounded-card border border-border bg-surface-muted/60 px-4 py-3 text-[0.9375rem] text-ink-muted">
+                <span>Fewer hotels than usual showed up for these dates.</span>
+                <button
+                  type="button"
+                  onClick={rerunThinSearch}
+                  className="inline-flex min-h-[36px] items-center rounded-control border border-border bg-surface px-3 text-[0.875rem] font-semibold text-ink hover:bg-surface-muted"
+                >
+                  {thinSearchCopy.searchAgain}
+                </button>
               </div>
             )}
 

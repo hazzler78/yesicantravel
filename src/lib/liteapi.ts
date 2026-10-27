@@ -1,11 +1,9 @@
 import { guestNationalityForCurrency, normalizeCurrency } from "@/lib/currency";
 import {
-  buildRatesRetryBody,
-  LITEAPI_RATES_TIMEOUT_SECONDS,
-  mergeRatesPayloads,
-  shouldRetryThinRatesSearch,
-  type RatesSearchPayload,
-} from "@/lib/ratesSearchReliability";
+  buildThinRatesSearchLogPayload,
+  runRatesSearchWithRetries,
+} from "@/lib/ratesSearchOrchestration";
+import { LITEAPI_RATES_TIMEOUT_SECONDS, type RatesSearchPayload } from "@/lib/ratesSearchReliability";
 import { DEFAULT_SEARCH_RADIUS_M, extractPlaceLatLng } from "@/lib/stayTypes";
 
 const LITEAPI_KEY = process.env.LITEAPI_KEY!;
@@ -223,14 +221,22 @@ export async function searchRates(params: {
   if (params.aiSearch) body.aiSearch = params.aiSearch;
   if (params.hotelTypeIds && params.hotelTypeIds.length) body.hotelTypeIds = params.hotelTypeIds;
 
-  let data = await postHotelRates(body);
+  const { data, meta } = await runRatesSearchWithRetries(
+    body,
+    params.checkin,
+    params.checkout,
+    postHotelRates,
+  );
 
-  if (shouldRetryThinRatesSearch(data, body)) {
-    try {
-      const retryData = await postHotelRates(buildRatesRetryBody(body));
-      data = mergeRatesPayloads(data, retryData);
-    } catch {
-      // Keep the first response if the retry fails.
+  if (meta.initialCount < 10 || meta.delayedAttempts > 0 || meta.usedImmediateRetry) {
+    const logPayload = buildThinRatesSearchLogPayload({
+      placeId: params.placeId ?? (typeof body.placeId === "string" ? body.placeId : undefined),
+      checkin: params.checkin,
+      checkout: params.checkout,
+      meta,
+    });
+    if (typeof console !== "undefined" && console.info) {
+      console.info("[rates-search]", logPayload);
     }
   }
 

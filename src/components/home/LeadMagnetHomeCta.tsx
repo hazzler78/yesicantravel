@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { ListChecks } from "lucide-react";
@@ -7,6 +9,7 @@ import { AskChatGptCta } from "@/components/AskChatGptCta";
 import { PinterestReferralBanner } from "@/components/PinterestReferralBanner";
 import { SocialReferralBanner } from "@/components/SocialReferralBanner";
 import { ATMOSPHERE_PHOTOS } from "@/lib/cityPhotos";
+import { useEmailCaptureSubscribed } from "@/hooks/useEmailCaptureSubscribed";
 
 type LeadMagnetHomeCtaProps = {
   /** Omit outer section padding when nested inside another page container */
@@ -29,6 +32,9 @@ export function LeadMagnetHomeCta({
   citySlug,
   pagePath,
 }: LeadMagnetHomeCtaProps) {
+  const alreadySubscribed = useEmailCaptureSubscribed(false);
+  if (alreadySubscribed) return null;
+
   const headline = city
     ? `Free ${city} solo safety checklist`
     : "Free solo travel safety checklist";

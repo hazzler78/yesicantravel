@@ -13,7 +13,6 @@ import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
 import Image from "next/image";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
 import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
-import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { EmailSignupBox } from "@/components/EmailSignupBox";
 import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { DESTINATION_RELATED_GUIDES } from "@/lib/relatedGuides";
@@ -170,13 +169,6 @@ export default async function DestinationPage({ params }: Props) {
             <CityCardPhoto src={photo.src} alt={photo.alt} priority className="rounded-card" />
           </div>
         )}
-
-        <LeadMagnetHomeCta
-          embedded
-          city={dest.city}
-          citySlug={dest.slug}
-          pagePath={`/destinations/${dest.slug}`}
-        />
 
         <ContentSearchCta
           className="mb-8 mt-6"

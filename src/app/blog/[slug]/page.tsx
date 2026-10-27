@@ -15,6 +15,7 @@ import { getDestinationBySlug } from "@/data/destinations";
 import { ogImageForPath } from "@/lib/readyPins";
 import { ContentSearchCta } from "@/components/content/ContentSearchCta";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
+import { preferredEmailCaptureKind } from "@/lib/emailCapture";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -132,6 +133,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const destinationPlaceId = destinationSlug
     ? getPlaceIdForDestinationSlug(destinationSlug)
     : undefined;
+  const emailCaptureKind = preferredEmailCaptureKind(destination?.city);
+  const showChecklistCapture = emailCaptureKind === "checklist";
+  const showCityListCapture = emailCaptureKind === "city-list";
+
   const faqJsonLd =
     destinationFaqs && destinationFaqs.length > 0
       ? {
@@ -177,34 +182,38 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             />
           </div>
 
-          {/* Mobile: capture before the scroll — desktop uses sticky sidebar */}
-          <Card className="mt-6 p-5 lg:hidden">
-            <h2 className="font-display text-base font-semibold text-ink">
-              Get the safety checklist
-            </h2>
-            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
-              Free — reception hours, arrival after dark, what to check before you book.
-            </p>
-            <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
-            {destination && (
-              <div className="mt-3">
-                <AskChatGptCta
-                  compact
-                  city={destination.city}
-                  citySlug={destination.slug}
-                />
-              </div>
-            )}
-          </Card>
+          {/* Mobile: one email capture before the scroll — desktop uses sticky sidebar */}
+          {showChecklistCapture && (
+            <Card className="mt-6 p-5 lg:hidden">
+              <h2 className="font-display text-base font-semibold text-ink">
+                Get the safety checklist
+              </h2>
+              <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
+                Free — reception hours, arrival after dark, what to check before you book.
+              </p>
+              <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
+              {destination && (
+                <div className="mt-3">
+                  <AskChatGptCta
+                    compact
+                    city={destination.city}
+                    citySlug={destination.slug}
+                  />
+                </div>
+              )}
+            </Card>
+          )}
 
-          <Card className="mt-4 p-5 lg:hidden">
-            <EmailSignupBox
-              variant="compact"
-              city={destination?.city}
-              placement="blog"
-              pagePath={`/blog/${post.slug}`}
-            />
-          </Card>
+          {showCityListCapture && (
+            <Card className="mt-6 p-5 lg:hidden">
+              <EmailSignupBox
+                variant="compact"
+                city={destination?.city}
+                placement="blog"
+                pagePath={`/blog/${post.slug}`}
+              />
+            </Card>
+          )}
 
           <div className="mt-8">
             <ReactMarkdown
@@ -265,32 +274,36 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </article>
 
         <aside className="hidden space-y-4 lg:block lg:sticky lg:top-24 lg:self-start">
-          <Card className="p-5">
-            <h2 className="font-display text-base font-semibold text-ink">
-              Get the safety checklist
-            </h2>
-            <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
-              A practical checklist for vetting hotels and planning arrivals.
-            </p>
-            <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
-            {destination && (
-              <div className="mt-3">
-                <AskChatGptCta
-                  compact
-                  city={destination.city}
-                  citySlug={destination.slug}
-                />
-              </div>
-            )}
-          </Card>
-          <Card className="p-5">
-            <EmailSignupBox
-              variant="compact"
-              city={destination?.city}
-              placement="blog"
-              pagePath={`/blog/${post.slug}`}
-            />
-          </Card>
+          {showChecklistCapture && (
+            <Card className="p-5">
+              <h2 className="font-display text-base font-semibold text-ink">
+                Get the safety checklist
+              </h2>
+              <p className="mt-1.5 text-[0.9375rem] text-ink-muted">
+                A practical checklist for vetting hotels and planning arrivals.
+              </p>
+              <LeadMagnetForm pagePath={`/blog/${post.slug}`} compact />
+              {destination && (
+                <div className="mt-3">
+                  <AskChatGptCta
+                    compact
+                    city={destination.city}
+                    citySlug={destination.slug}
+                  />
+                </div>
+              )}
+            </Card>
+          )}
+          {showCityListCapture && (
+            <Card className="p-5">
+              <EmailSignupBox
+                variant="compact"
+                city={destination?.city}
+                placement="blog"
+                pagePath={`/blog/${post.slug}`}
+              />
+            </Card>
+          )}
           <Card className="p-5">
             <h2 className="font-display text-base font-semibold text-ink">Explore next</h2>
             <ul className="mt-3 space-y-2 text-[0.9375rem]">

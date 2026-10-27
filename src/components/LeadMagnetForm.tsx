@@ -5,6 +5,7 @@ import Link from "next/link";
 import { TextField } from "@/components/ui/TextField";
 import { PrimaryButton, PrimaryLink } from "@/components/ui/PrimaryButton";
 import { trackVercelFunnelEvent } from "@/lib/vercelFunnelEvents";
+import { markEmailCaptureSubscribed } from "@/lib/emailCapture";
 
 const SHARE_CHECKLIST_URL =
   "https://yesicantravel.com/lead-magnet?utm_source=share&utm_medium=referral&utm_campaign=post_signup";
@@ -56,6 +57,7 @@ export default function LeadMagnetForm({ pagePath, compact = false }: LeadMagnet
       }
 
       setStatus("success");
+      markEmailCaptureSubscribed();
       trackVercelFunnelEvent("checklist_signup", {
         page: resolvedPath.slice(0, 120),
       });

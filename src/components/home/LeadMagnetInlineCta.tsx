@@ -2,6 +2,7 @@
 
 import { ListChecks } from "lucide-react";
 import LeadMagnetForm from "@/components/LeadMagnetForm";
+import { useEmailCaptureSubscribed } from "@/hooks/useEmailCaptureSubscribed";
 
 type LeadMagnetInlineCtaProps = {
   /** Attribution path stored on the lead (e.g. /results, /hotel). */
@@ -14,6 +15,9 @@ export function LeadMagnetInlineCta({
   pagePath,
   className = "mt-8",
 }: LeadMagnetInlineCtaProps) {
+  const alreadySubscribed = useEmailCaptureSubscribed(false);
+  if (alreadySubscribed) return null;
+
   return (
     <aside
       className={`rounded-card border border-teal/25 bg-teal-soft/30 p-4 sm:p-5 ${className}`}

@@ -15,6 +15,8 @@ import {
   trackVercelFunnelEvent,
   type NewsletterPlacement,
 } from "@/lib/vercelFunnelEvents";
+import { markEmailCaptureSubscribed } from "@/lib/emailCapture";
+import { useEmailCaptureSubscribed } from "@/hooks/useEmailCaptureSubscribed";
 
 type EmailSignupBoxProps = {
   variant?: "section" | "compact" | "inline";
@@ -35,6 +37,7 @@ export function EmailSignupBox({
 }: EmailSignupBoxProps) {
   const uid = useId();
   const copy = useMemo(() => getNewsletterCopy(city), [city]);
+  const alreadySubscribed = useEmailCaptureSubscribed(true);
 
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -91,6 +94,7 @@ export function EmailSignupBox({
       setStatus("success");
       setMessage(json.alreadySubscribed ? copy.successAlready : copy.success);
       setEmail("");
+      markEmailCaptureSubscribed();
 
       const resolvedPlacement =
         placement ?? inferNewsletterPlacement(resolvedPath, variant);
@@ -104,6 +108,10 @@ export function EmailSignupBox({
       setMessage(newsletterCopy.messages.errorGeneric);
     }
   };
+
+  if (alreadySubscribed && status !== "success") {
+    return null;
+  }
 
   if (variant === "section") {
     return (

@@ -8,7 +8,7 @@ import type { StayType } from "@/lib/stayTypes";
 type ResultsSearchBarProps = SearchBarProps & {
   /** One-line description of the current search, shown while collapsed. */
   summary: string;
-  /** Called when the visitor switches All/Hotels/Budget/Apartments — re-runs the search. */
+  /** Called when the visitor switches All/Hotels/Apartments — re-runs the search. */
   onStayChange?: (stay: StayType) => void;
 };
 

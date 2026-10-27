@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import NewsletterForm from "@/components/NewsletterForm";
 import { CommunityQuote } from "@/components/home/CommunityQuote";
 import { HomeHero } from "@/components/home/HomeHero";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
@@ -37,7 +36,6 @@ export default function HomePage() {
       <SafetySignals />
       <TrendingEvents />
       <CommunityQuote />
-      <NewsletterForm />
     </>
   );
 }

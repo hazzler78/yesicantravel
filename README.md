@@ -187,4 +187,4 @@ If you’re working on UI, copy, or growth experiments (Facebook / Instagram), k
 - **Design och UX** – layout, färger, tillgänglighet, flöden.
 - **Ändringar på hemsidan** – nya funktioner, buggfixar, refaktorering.
 
-**Statistik (trafik, konvertering):** Atlas har inte direkt åtkomst till live-analys (t.ex. Vercel Analytics eller Google Analytics). För siffror som konverteringsgrad eller besökare – kolla i er analytics-panel eller klistra in siffrorna i chatten; då kan Atlas hjälpa till att tolka eller planera utifrån dem.
+**Statistik (trafik, konvertering):** Sajten skickar cookiefria sidvisningar och bokningssteg till Plausible för `yesicantravel.com` (via `/yict/collect`), plus tratt-händelser i Vercel Analytics. Atlas läser inte Plausible-panelen. För besökare, avhopp och bokningar – öppna Plausible, eller klistra in siffrorna här så går de att tolka.

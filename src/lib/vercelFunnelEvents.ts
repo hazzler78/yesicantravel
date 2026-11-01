@@ -1,5 +1,19 @@
 import { track } from "@vercel/analytics";
 import { formatNewsletterCityName } from "@/lib/newsletterCopy";
+import { trackPlausibleEvent } from "@/lib/plausible";
+
+/** Vercel events worth a Plausible goal. Canonical funnel names go out via trackFunnelEvent. */
+const PLAUSIBLE_VERCEL_EVENTS = new Set([
+  "search_submitted",
+  "hotel_viewed",
+  "rates_shown",
+  "rates_unavailable",
+  "rate_selected",
+  "book_clicked",
+  "payment_submitted",
+  "newsletter_signup",
+  "checklist_signup",
+]);
 
 type VercelEventProps = Record<string, string | number | boolean | null>;
 
@@ -34,6 +48,10 @@ export function trackVercelFunnelEvent(
     }
   } catch {
     // Analytics must never interrupt the UI.
+  }
+
+  if (PLAUSIBLE_VERCEL_EVENTS.has(name)) {
+    trackPlausibleEvent(name, props);
   }
 }
 

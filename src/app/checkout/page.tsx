@@ -11,6 +11,7 @@ import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackClientPurchase } from "@/lib/trackClientPurchase";
 import { pinterestTrack } from "@/lib/pinterest";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { trackPlausibleEvent } from "@/lib/plausible";
 import { trackVercelFunnelEvent } from "@/lib/vercelFunnelEvents";
 import { BookingSuccess } from "@/components/checkout/BookingSuccess";
 import { CheckoutMessage } from "@/components/checkout/CheckoutMessage";
@@ -223,6 +224,7 @@ function CheckoutContent() {
     if (guestDetailsEnteredRef.current || !hotelId || !offerId) return;
     guestDetailsEnteredRef.current = true;
     track("Entered Guest Details", { hotelId, offerId, checkin, checkout, adults });
+    trackPlausibleEvent("Entered Guest Details", { adults });
   }, [hotelId, offerId, checkin, checkout, adults]);
 
   const saveCustomerForSuggestions = useCallback(
@@ -359,6 +361,7 @@ function CheckoutContent() {
 
   useEffect(() => {
     if (step !== "payment" || !hotelId || !offerId) return;
+    trackFunnelEvent("PaymentFormShown", { adults });
     trackVercelFunnelEvent("payment_form_shown", {
       hotelId,
       offerId,
@@ -375,6 +378,7 @@ function CheckoutContent() {
         if (step === "done") return;
         if (isPaymentRedirectPending()) return;
         track("Booking Abandoned", { step, hotelId, offerId, checkin, checkout, adults });
+        trackPlausibleEvent("Booking Abandoned", { step }, { interactive: false });
       } catch {
         /* ignore */
       }
@@ -579,6 +583,8 @@ function CheckoutContent() {
           checkout,
           adults,
           paymentMethod: "card",
+          currency: booked.currency ?? totalCurrencyParam ?? "EUR",
+          revenueAmount: typeof booked.price === "number" ? booked.price : undefined,
         });
         trackVercelFunnelEvent("booking_completed", {
           hotelId: booked.hotel?.hotelId ?? hotelId ?? "unknown",
@@ -794,6 +800,8 @@ function CheckoutContent() {
           checkout,
           adults,
           paymentMethod: "account",
+          currency: booked.currency ?? totalCurrencyParam ?? "EUR",
+          revenueAmount: typeof booked.price === "number" ? booked.price : undefined,
         });
         trackVercelFunnelEvent("booking_completed", {
           hotelId: booked.hotel?.hotelId ?? hotelId ?? "unknown",

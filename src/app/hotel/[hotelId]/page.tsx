@@ -129,6 +129,7 @@ function HotelContent() {
   const [ratesLoading, setRatesLoading] = useState(true);
   const [quotedCurrency, setQuotedCurrency] = useState<CurrencyCode | null>(null);
   const ratesFetchGen = useRef(0);
+  const ratesOutcomeKey = useRef<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [hasFreeCancellation, setHasFreeCancellation] = useState(false);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
@@ -223,6 +224,11 @@ function HotelContent() {
     if (!hotelId || !checkin || !checkout) {
       setError("Missing parameters");
       setRatesLoading(false);
+      const outcomeKey = `${hotelId}:missing_dates`;
+      if (ratesOutcomeKey.current !== outcomeKey) {
+        ratesOutcomeKey.current = outcomeKey;
+        trackVercelFunnelEvent("rates_unavailable", { reason: "missing_dates" });
+      }
       return;
     }
     if (!hotel) return;
@@ -276,13 +282,45 @@ function HotelContent() {
         }
 
         setQuotedCurrency(requestedCurrency);
-        setRoomGroups(buildRoomGroups(hotel, allRates));
+        const groups = buildRoomGroups(hotel, allRates);
+        setRoomGroups(groups);
         setHasFreeCancellation(freeCancellation);
+        const cheapest = groups
+          .flatMap((group) => group.rates)
+          .reduce<number | undefined>((lowest, rate) => {
+            const amount = rate.retailRate?.total?.[0]?.amount;
+            if (typeof amount !== "number") return lowest;
+            return lowest == null || amount < lowest ? amount : lowest;
+          }, undefined);
+        const outcomeKey = `${hotelId}:${checkin}:${checkout}:${groups.length}`;
+        if (ratesOutcomeKey.current !== outcomeKey) {
+          ratesOutcomeKey.current = outcomeKey;
+          if (groups.length === 0) {
+            trackVercelFunnelEvent("rates_unavailable", {
+              city: hotel.city?.trim()?.slice(0, 80),
+              reason: "no_rooms",
+            });
+          } else {
+            trackVercelFunnelEvent("rates_shown", {
+              city: hotel.city?.trim()?.slice(0, 80),
+              currency: requestedCurrency,
+              price_bucket: priceBucket(cheapest),
+            });
+          }
+        }
       })
       .catch((e) => {
         if (abort.signal.aborted) return;
         if (generation !== ratesFetchGen.current) return;
         setError((e as Error).message);
+        const outcomeKey = `${hotelId}:${checkin}:${checkout}:error`;
+        if (ratesOutcomeKey.current !== outcomeKey) {
+          ratesOutcomeKey.current = outcomeKey;
+          trackVercelFunnelEvent("rates_unavailable", {
+            city: hotel.city?.trim()?.slice(0, 80),
+            reason: "error",
+          });
+        }
       })
       .finally(() => {
         if (generation === ratesFetchGen.current) {

@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { destinationToEventRedirects } from "./src/lib/legacyRedirects";
+import { PLAUSIBLE_EVENT_PATH } from "./src/lib/plausiblePrivacy";
 
 const nextConfig: NextConfig = {
   async redirects() {
@@ -18,7 +19,13 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     // Some AI crawlers look for the briefing under /.well-known/
-    return [{ source: "/.well-known/llms.txt", destination: "/llms.txt" }];
+    // Plausible events are proxied as a first-party POST so the visitor IP
+    // stays on the CDN (Vercel sets X-Forwarded-For). The path avoids the
+    // words blockers filter on.
+    return [
+      { source: "/.well-known/llms.txt", destination: "/llms.txt" },
+      { source: PLAUSIBLE_EVENT_PATH, destination: "https://plausible.io/api/event" },
+    ];
   },
 };
 

@@ -3,9 +3,11 @@
  * the prices rendered on /results can never drift apart.
  */
 
+import type { LiteApiCancellationPolicies } from "@/lib/cancellationPolicy";
+
 export type RateLine = {
   retailRate?: { total?: Array<{ amount: number; currency?: string }> };
-  cancellationPolicies?: { refundableTag?: string };
+  cancellationPolicies?: LiteApiCancellationPolicies;
 };
 
 export type RateOffer = {
@@ -21,6 +23,8 @@ export type HotelRateSummary = {
   lowest: Money | null;
   lowestRefundable: Money | null;
   hasFreeCancellation: boolean;
+  /** Cancellation terms for the cheapest rate (when LiteAPI includes them). */
+  lowestCancellation?: LiteApiCancellationPolicies | null;
 };
 
 /**
@@ -51,10 +55,14 @@ export function summarizeRatesByHotel(
   for (const offer of offers) {
     let lowest: Money | null = null;
     let lowestRefundable: Money | null = null;
+    let lowestCancellation: LiteApiCancellationPolicies | null | undefined;
     for (const rate of ratesForOffer(offer)) {
       const money = moneyFromRate(rate, fallbackCurrency);
       if (!money) continue;
-      if (!lowest || money.amount < lowest.amount) lowest = money;
+      if (!lowest || money.amount < lowest.amount) {
+        lowest = money;
+        lowestCancellation = rate.cancellationPolicies ?? null;
+      }
       if (rate.cancellationPolicies?.refundableTag === "RFN") {
         if (!lowestRefundable || money.amount < lowestRefundable.amount) {
           lowestRefundable = money;
@@ -65,6 +73,7 @@ export function summarizeRatesByHotel(
       lowest,
       lowestRefundable,
       hasFreeCancellation: lowestRefundable != null,
+      lowestCancellation,
     };
   }
   return byHotel;

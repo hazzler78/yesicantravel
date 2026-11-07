@@ -3,6 +3,12 @@ import { Clock, ImageOff, MapPin, TrainFront, Venus } from "lucide-react";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { repairLiteApiText } from "@/lib/repairLiteApiText";
 import { formatDistance, type StaySignals } from "@/lib/staySignals";
+import {
+  describeRateCancellation,
+  isRefundableRate,
+  type LiteApiCancellationPolicies,
+} from "@/lib/cancellationPolicy";
+import { checkInBadgeLabel, pickTrustUiLanguage } from "@/lib/trustUiCopy";
 import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 
@@ -18,6 +24,7 @@ export type HotelCardData = {
   hasFreeCancellation?: boolean;
   /** Cheapest refundable total when it differs from `price`. */
   refundableFromPrice?: number;
+  lowestCancellation?: LiteApiCancellationPolicies | null;
   safetyBadges?: string[];
 };
 
@@ -31,7 +38,9 @@ type HotelCardProps = {
 };
 
 export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap }: HotelCardProps) {
+  const uiLang = pickTrustUiLanguage({ currency: hotel.currency });
   const hasPrice = hotel.price != null;
+  const cancellationLabel = describeRateCancellation(hotel.lowestCancellation, uiLang);
   const showRefundableLine =
     hasPrice &&
     hotel.hasFreeCancellation &&
@@ -122,8 +131,20 @@ export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap 
               {signals?.matches.includes("womenOnlyRoom") && (
                 <SafetyBadge label="Women-only room" tone="positive" icon={Venus} />
               )}
-              {signals?.latestCheckIn && (
-                <SafetyBadge label={`Check-in until ${signals.latestCheckIn}`} icon={Clock} />
+              {signals?.checkInEnd && (
+                <SafetyBadge
+                  label={checkInBadgeLabel(
+                    signals.checkInEnd,
+                    Boolean(signals.checkInEarlyCutoff),
+                    uiLang,
+                  )}
+                  tone={
+                    signals.checkInEarlyCutoff
+                      ? "caution"
+                      : "positive"
+                  }
+                  icon={Clock}
+                />
               )}
               <SafetyBadgeList
                 badges={hotel.safetyBadges ?? []}
@@ -139,6 +160,15 @@ export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap 
                 <p className="tnum font-display text-xl font-semibold text-ink">
                   {formatStayTotal(hotel.price!, hotel.currency ?? "EUR")}
                 </p>
+                {cancellationLabel && (
+                  <p
+                    className={`mt-0.5 text-xs font-medium ${
+                      isRefundableRate(hotel.lowestCancellation) ? "text-positive" : "text-ink-muted"
+                    }`}
+                  >
+                    {cancellationLabel}
+                  </p>
+                )}
                 {showRefundableLine && (
                   <p className="mt-0.5 text-xs font-medium text-positive">
                     Free cancellation from{" "}

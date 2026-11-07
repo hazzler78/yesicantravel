@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, Suspense } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams, usePathname, useRouter } from "next/navigation";
 import { track } from "@vercel/analytics";
 import { Check, ImageOff, Lock, MapPin, TriangleAlert } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
@@ -30,6 +30,9 @@ import { RatingBadge } from "@/components/ui/RatingBadge";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency, type CurrencyCode } from "@/lib/currency";
+import { useCurrencyQuerySync } from "@/lib/currencyUrl";
+import { describeRateCancellation } from "@/lib/cancellationPolicy";
+import { pickTrustUiLanguage } from "@/lib/trustUiCopy";
 import { buildRoomGroups, type HotelRoomRate } from "@/lib/hotelRoomRates";
 import { repairLiteApiText } from "@/lib/repairLiteApiText";
 import {
@@ -121,7 +124,10 @@ function formatStayDate(iso: string | null) {
 function HotelContent() {
   const params = useParams();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const router = useRouter();
   const currency = useCurrency();
+  useCurrencyQuerySync(searchParams, pathname, router);
   const hotelId = params.hotelId as string;
   const [hotel, setHotel] = useState<HotelDetail | null>(null);
   const [roomGroups, setRoomGroups] = useState<ReturnType<typeof buildRoomGroups>>([]);
@@ -361,14 +367,18 @@ function HotelContent() {
 
   const backHref =
     searchParams.get("placeId") || searchParams.get("aiSearch")
-      ? `/results?${buildStaySearchParams({
-          checkin,
-          checkout,
-          party,
-          rooms: requestedRooms,
-          placeId: searchParams.get("placeId"),
-          aiSearch: searchParams.get("aiSearch"),
-        })}`
+      ? `/results?${(() => {
+          const qs = buildStaySearchParams({
+            checkin,
+            checkout,
+            party,
+            rooms: requestedRooms,
+            placeId: searchParams.get("placeId"),
+            aiSearch: searchParams.get("aiSearch"),
+          });
+          qs.set("currency", currency);
+          return qs.toString();
+        })()}`
       : "/";
 
   const pricesReady = quotedCurrency === currency && !ratesLoading;
@@ -544,6 +554,10 @@ function HotelContent() {
                           const total = rate.retailRate?.total?.[0];
                           const amount = pricesReady ? (total?.amount ?? 0) : 0;
                           const rateCurrency = total?.currency ?? quotedCurrency ?? currency;
+                          const cancellationCopy = describeRateCancellation(
+                            rate.cancellationPolicies,
+                            pickTrustUiLanguage({ currency }),
+                          );
                           const refundable =
                             rate.cancellationPolicies?.refundableTag === "RFN";
                           return (
@@ -555,13 +569,13 @@ function HotelContent() {
                                 <p className="text-[0.9375rem] font-medium text-ink">
                                   {rate.boardName}
                                 </p>
-                                {rate.cancellationPolicies?.refundableTag && (
+                                {cancellationCopy && (
                                   <p
                                     className={`mt-0.5 text-[0.8125rem] font-medium ${
                                       refundable ? "text-positive" : "text-ink-muted"
                                     }`}
                                   >
-                                    {refundable ? "Free cancellation" : "Non-refundable"}
+                                    {cancellationCopy}
                                   </p>
                                 )}
                               </div>

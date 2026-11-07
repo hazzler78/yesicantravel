@@ -24,7 +24,7 @@ const BADGE_ICONS: Record<string, LucideIcon> = {
   "Free WiFi": Wifi,
 };
 
-type Tone = "neutral" | "positive";
+type Tone = "neutral" | "positive" | "caution";
 
 type SafetyBadgeProps = {
   label: string;
@@ -37,7 +37,9 @@ export function SafetyBadge({ label, tone = "neutral", icon }: SafetyBadgeProps)
   const toneClass =
     tone === "positive"
       ? "bg-positive-soft text-positive"
-      : "bg-surface-muted text-ink ring-1 ring-border";
+      : tone === "caution"
+        ? "bg-coral-soft text-coral ring-1 ring-coral/25"
+        : "bg-surface-muted text-ink ring-1 ring-border";
 
   return (
     <span

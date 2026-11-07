@@ -53,6 +53,14 @@ import {
   logCheckoutEventClient,
   persistCheckoutGuestToServer,
 } from "@/lib/checkoutClient";
+import { getCheckoutCorrelationId } from "@/lib/checkoutCorrelation";
+import {
+  classifyPrebookFailure,
+  prebookFailureRecoveryLabel,
+  prebookFailureUserMessage,
+  type PrebookFailureKind,
+} from "@/lib/checkoutPrebookErrors";
+import { resolveLiteApiPaymentPublicKey } from "@/lib/checkoutPaymentEnv";
 
 const CHECKOUT_COMPLETED_KEY = "liteapi_checkout_completed";
 
@@ -66,7 +74,11 @@ function PaymentFormInit({
   checkin,
   checkout,
   occupancyQuery,
+  correlationId,
+  sdkScriptReady,
   onPaymentSubmit,
+  onSdkInitFailed,
+  onSdkInitSuccess,
 }: {
   secretKey: string;
   publicKey: "sandbox" | "live";
@@ -77,28 +89,72 @@ function PaymentFormInit({
   checkin: string;
   checkout: string;
   occupancyQuery: string;
+  correlationId: string;
+  sdkScriptReady: boolean;
   onPaymentSubmit?: () => void;
+  onSdkInitFailed?: (reason: string) => void;
+  onSdkInitSuccess?: () => void;
 }) {
   const initialized = useRef(false);
   useEffect(() => {
-    if (initialized.current) return;
-    const w = window as unknown as { LiteAPIPayment?: new (c: object) => { handlePayment: () => void } };
-    if (!w.LiteAPIPayment) return;
-    initialized.current = true;
-    const returnUrl =
-      typeof window !== "undefined"
-        ? `${window.location.origin}${window.location.pathname}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&${occupancyQuery}&prebookId=${prebookId}&transactionId=${transactionId}`
-        : "";
-    const payment = new w.LiteAPIPayment({
-      publicKey,
-      secretKey,
-      returnUrl,
-      targetElement: "#payment-form",
-      appearance: { theme: "flat" },
-      options: { business: { name: "Safer Stays" } },
-    });
-    payment.handlePayment();
-  }, [secretKey, publicKey, prebookId, transactionId, offerId, hotelId, checkin, checkout, occupancyQuery]);
+    if (initialized.current || !sdkScriptReady) return;
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 40;
+
+    const tryInit = () => {
+      if (cancelled || initialized.current) return;
+      const w = window as unknown as { LiteAPIPayment?: new (c: object) => { handlePayment: () => void } };
+      if (!w.LiteAPIPayment) {
+        attempts += 1;
+        if (attempts >= maxAttempts) {
+          onSdkInitFailed?.("payment_sdk_global_missing");
+        }
+        return;
+      }
+      initialized.current = true;
+      const returnUrl =
+        typeof window !== "undefined"
+          ? `${window.location.origin}${window.location.pathname}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&${occupancyQuery}&prebookId=${prebookId}&transactionId=${transactionId}&cid=${encodeURIComponent(correlationId)}`
+          : "";
+      try {
+        const payment = new w.LiteAPIPayment({
+          publicKey,
+          secretKey,
+          returnUrl,
+          targetElement: "#payment-form",
+          appearance: { theme: "flat" },
+          options: { business: { name: "Safer Stays" } },
+        });
+        payment.handlePayment();
+        onSdkInitSuccess?.();
+      } catch {
+        initialized.current = false;
+        onSdkInitFailed?.("payment_sdk_handle_failed");
+      }
+    };
+
+    tryInit();
+    const interval = window.setInterval(tryInit, 250);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [
+    secretKey,
+    publicKey,
+    prebookId,
+    transactionId,
+    offerId,
+    hotelId,
+    checkin,
+    checkout,
+    occupancyQuery,
+    correlationId,
+    sdkScriptReady,
+    onSdkInitFailed,
+    onSdkInitSuccess,
+  ]);
 
   useEffect(() => {
     const root = document.getElementById("payment-form");
@@ -198,7 +254,22 @@ function CheckoutContent() {
   } | null>(null);
   const [booking, setBooking] = useState<Record<string, unknown> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [errorRecoveryLabel, setErrorRecoveryLabel] = useState<string>("Back to the stay");
   const [paymentLoadFailed, setPaymentLoadFailed] = useState(false);
+  const [paymentSdkScriptReady, setPaymentSdkScriptReady] = useState(false);
+
+  const correlationId = useMemo(() => {
+    const fromUrl = searchParams.get("cid")?.trim();
+    if (fromUrl) {
+      try {
+        sessionStorage.setItem("yict_checkout_correlation", fromUrl);
+      } catch {
+        /* ignore */
+      }
+      return fromUrl;
+    }
+    return getCheckoutCorrelationId();
+  }, [searchParams]);
 
   const progressPhase =
     step === "form" ? "details" : step === "payment" ? "payment" : step === "booking" ? "confirm" : "details";
@@ -267,6 +338,27 @@ function CheckoutContent() {
     },
     [hotelId, checkin, checkout]
   );
+
+  useEffect(() => {
+    if (!offerId || !hotelId) return;
+    logCheckoutEventClient({
+      kind: "checkout_view",
+      correlationId,
+      offerId,
+      hotelId,
+      metadata: { has_return_params: Boolean(prebookId && transactionId) },
+    });
+    trackVercelFunnelEvent("checkout_view", {
+      hotelId,
+      offerId,
+      correlation_id: correlationId,
+    });
+  }, [correlationId, offerId, hotelId, prebookId, transactionId]);
+
+  useEffect(() => {
+    const w = window as unknown as { LiteAPIPayment?: unknown };
+    if (w.LiteAPIPayment) setPaymentSdkScriptReady(true);
+  }, []);
 
   useEffect(() => {
     fetch("/api/config")
@@ -358,15 +450,24 @@ function CheckoutContent() {
   }, [offerId, hotelId, checkin, checkout, adults, travellerCount, step, totalCurrencyParam]);
 
   useEffect(() => {
-    if (step !== "payment" || !hotelId || !offerId) return;
+    if (step !== "payment" || !hotelId || !offerId || !prebookData) return;
+    logCheckoutEventClient({
+      kind: "checkout_payment_view",
+      correlationId,
+      prebookId: prebookData.prebookId,
+      transactionId: prebookData.transactionId,
+      offerId,
+      hotelId,
+    });
     trackVercelFunnelEvent("payment_form_shown", {
       hotelId,
       offerId,
+      correlation_id: correlationId,
       checkin: checkin ?? undefined,
       checkout: checkout ?? undefined,
       adults,
     });
-  }, [step, hotelId, offerId, checkin, checkout, adults]);
+  }, [step, hotelId, offerId, checkin, checkout, adults, correlationId, prebookData]);
 
   useEffect(() => {
     const onLeave = () => {
@@ -415,12 +516,14 @@ function CheckoutContent() {
         ) {
           logCheckoutEventClient({
             kind: "payment_return_failed",
+            correlationId,
             prebookId,
             transactionId,
             offerId: offerId ?? undefined,
             hotelId: hotelId ?? undefined,
             errorMessage: bookingDecision.reason,
           });
+          setErrorRecoveryLabel("Back to the stay");
           setError(paymentFailureUserMessage(redirectStatus));
           setStep("error");
         }
@@ -447,15 +550,27 @@ function CheckoutContent() {
       if (!resolved) {
         logCheckoutEventClient({
           kind: "payment_return_guest_missing",
+          correlationId,
           prebookId,
           transactionId,
           offerId: offerId ?? undefined,
           hotelId: hotelId ?? undefined,
         });
+        setErrorRecoveryLabel("Back to the stay");
         setError(guestMissingAfterPaymentMessage(prebookId));
         setStep("error");
         return;
       }
+
+      logCheckoutEventClient({
+        kind: "checkout_payment_return",
+        correlationId,
+        prebookId,
+        transactionId,
+        offerId: offerId ?? undefined,
+        hotelId: hotelId ?? undefined,
+        metadata: { redirect_status: redirectStatus },
+      });
 
       const guest = resolved.guest;
       setFirstName(guest.firstName ?? "");
@@ -479,6 +594,7 @@ function CheckoutContent() {
     offerId,
     hotelId,
     trackPaymentSubmitted,
+    correlationId,
   ]);
 
   // Execute book when we have everything (return from User Payment redirect)
@@ -500,15 +616,26 @@ function CheckoutContent() {
       if (!resolved) {
         logCheckoutEventClient({
           kind: "payment_return_orphan",
+          correlationId,
           prebookId,
           transactionId,
           offerId: offerId ?? undefined,
           hotelId: hotelId ?? undefined,
         });
+        setErrorRecoveryLabel("Back to the stay");
         setError(guestMissingAfterPaymentMessage(prebookId));
         setStep("error");
         return;
       }
+
+      logCheckoutEventClient({
+        kind: "checkout_book_attempt",
+        correlationId,
+        prebookId,
+        transactionId,
+        offerId: offerId ?? undefined,
+        hotelId: hotelId ?? undefined,
+      });
 
       bookInFlightRef.current = true;
       try {
@@ -525,6 +652,7 @@ function CheckoutContent() {
           body: JSON.stringify({
             prebookId,
             transactionId,
+            correlationId,
             clientReference: clientRef || undefined,
             holder: {
               firstName: guest.firstName,
@@ -619,6 +747,7 @@ function CheckoutContent() {
         });
       } catch (e) {
         bookInFlightRef.current = false;
+        setErrorRecoveryLabel("Back to the stay");
         setError((e as Error).message);
         setStep("error");
       }
@@ -639,6 +768,7 @@ function CheckoutContent() {
     occupancies,
     saveCustomerForSuggestions,
     ingestBookingRevenue,
+    correlationId,
   ]);
 
   // Suppress Stripe Element loaderrors (payment/expressCheckout fail on HTTP localhost; HTTPS required)
@@ -729,6 +859,14 @@ function CheckoutContent() {
       userData: { email: email.trim(), phone: phone.trim() },
     });
 
+    logCheckoutEventClient({
+      kind: "checkout_guest_submit",
+      correlationId,
+      offerId,
+      hotelId: hotelId ?? undefined,
+      metadata: { payment_method: paymentMethod },
+    });
+
     try {
       const usePaymentSdk = paymentMethod === "card";
       const prebookRes = await fetch("/api/prebook", {
@@ -741,10 +879,19 @@ function CheckoutContent() {
           checkin,
           checkout,
           adults: party.adults,
+          correlationId,
         }),
       });
       const prebookJson = await prebookRes.json();
-      if (!prebookRes.ok) throw new Error(prebookJson.error ?? "Prebook failed");
+      if (!prebookRes.ok) {
+        const failureKind = (prebookJson.failureKind as PrebookFailureKind | undefined) ??
+          classifyPrebookFailure(String(prebookJson.error ?? ""), prebookJson.code);
+        const message = prebookJson.error
+          ? String(prebookJson.error)
+          : prebookFailureUserMessage(failureKind);
+        setErrorRecoveryLabel(prebookFailureRecoveryLabel(failureKind));
+        throw new Error(message);
+      }
 
       const pid = prebookJson.data.prebookId;
 
@@ -757,6 +904,7 @@ function CheckoutContent() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             prebookId: pid,
+            correlationId,
             paymentMethod: "ACC_CREDIT_CARD",
             clientReference: clientRef,
             holder: guestPayload,
@@ -838,6 +986,12 @@ function CheckoutContent() {
       const tid = prebookJson.data.transactionId;
       const sk = prebookJson.data.secretKey;
       const prebookSandbox = prebookJson.data?.sandbox;
+      if (!tid || !sk) {
+        setErrorRecoveryLabel(prebookFailureRecoveryLabel("stale_offer"));
+        throw new Error(
+          "Card payment could not be started for this reservation. Go back, refresh rates, and try again."
+        );
+      }
       setPrebookData({ prebookId: pid, transactionId: tid, secretKey: sk, sandbox: prebookSandbox });
       const stayContext = {
         offerId,
@@ -846,14 +1000,21 @@ function CheckoutContent() {
         checkout: checkout ?? undefined,
         occupancyQuery,
         clientReference: clientRef,
+        correlationId,
       };
       writeGuestToLocalStorage(pid, guestPayload, stayContext);
       void persistCheckoutGuestToServer(pid, guestPayload, stayContext);
       setStep("payment");
+      setPaymentSdkScriptReady(
+        Boolean((window as unknown as { LiteAPIPayment?: unknown }).LiteAPIPayment)
+      );
 
       const base = typeof window !== "undefined" ? window.location.origin + window.location.pathname : "";
-      const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&${occupancyQuery}&prebookId=${pid}&transactionId=${tid}`;
-      const paymentEnv = typeof prebookSandbox === "boolean" ? (prebookSandbox ? "sandbox" : "live") : (paymentConfig?.paymentEnv ?? "sandbox");
+      const returnUrl = `${base}?offerId=${offerId}&hotelId=${hotelId}&checkin=${checkin}&checkout=${checkout}&${occupancyQuery}&prebookId=${pid}&transactionId=${tid}&cid=${encodeURIComponent(correlationId)}`;
+      const paymentEnv = resolveLiteApiPaymentPublicKey({
+        prebookSandbox,
+        configPaymentEnv: paymentConfig?.paymentEnv,
+      });
       (window as unknown as { liteAPIConfig?: unknown }).liteAPIConfig = {
         publicKey: paymentEnv,
         secretKey: sk,
@@ -890,7 +1051,7 @@ function CheckoutContent() {
           " You can retry the stay — or take the free checklist while you decide."
         }
         actionHref={hotelStayHref}
-        actionLabel="Back to the stay"
+        actionLabel={errorRecoveryLabel}
         secondaryHref="/lead-magnet?utm_source=checkout&utm_medium=error&utm_campaign=checklist"
         secondaryLabel="Get the free checklist"
       />
@@ -954,7 +1115,22 @@ function CheckoutContent() {
 
   return (
     <div className="bg-canvas">
-      <Script src="https://payment-wrapper.liteapi.travel/dist/liteAPIPayment.js?v=a1" strategy="afterInteractive" />
+      <Script
+        src="https://payment-wrapper.liteapi.travel/dist/liteAPIPayment.js?v=a1"
+        strategy="afterInteractive"
+        onLoad={() => setPaymentSdkScriptReady(true)}
+        onError={() => {
+          setPaymentLoadFailed(true);
+          logCheckoutEventClient({
+            kind: "checkout_payment_sdk_failed",
+            correlationId,
+            prebookId: prebookData?.prebookId,
+            offerId: offerId ?? undefined,
+            hotelId: hotelId ?? undefined,
+            errorMessage: "payment_sdk_script_load_failed",
+          });
+        }}
+      />
       <div className="mx-auto max-w-xl px-4 py-6 sm:px-6 sm:py-10">
         <Link
           href={backToHotelsHref}
@@ -1190,7 +1366,10 @@ function CheckoutContent() {
             {prebookData && (
               <PaymentFormInit
                 secretKey={prebookData.secretKey}
-                publicKey={typeof prebookData.sandbox === "boolean" ? (prebookData.sandbox ? "sandbox" : "live") : (paymentConfig?.paymentEnv ?? "sandbox")}
+                publicKey={resolveLiteApiPaymentPublicKey({
+                  prebookSandbox: prebookData.sandbox,
+                  configPaymentEnv: paymentConfig?.paymentEnv,
+                })}
                 prebookId={prebookData.prebookId}
                 transactionId={prebookData.transactionId}
                 offerId={offerId!}
@@ -1198,7 +1377,36 @@ function CheckoutContent() {
                 checkin={checkin!}
                 checkout={checkout!}
                 occupancyQuery={occupancyQuery}
+                correlationId={correlationId}
+                sdkScriptReady={paymentSdkScriptReady}
                 onPaymentSubmit={() => trackPaymentSubmitted("pay_button")}
+                onSdkInitSuccess={() => {
+                  logCheckoutEventClient({
+                    kind: "checkout_payment_sdk_init",
+                    correlationId,
+                    prebookId: prebookData.prebookId,
+                    transactionId: prebookData.transactionId,
+                    offerId: offerId ?? undefined,
+                    hotelId: hotelId ?? undefined,
+                    metadata: {
+                      public_key_env: resolveLiteApiPaymentPublicKey({
+                        prebookSandbox: prebookData.sandbox,
+                        configPaymentEnv: paymentConfig?.paymentEnv,
+                      }),
+                    },
+                  });
+                }}
+                onSdkInitFailed={(reason) => {
+                  setPaymentLoadFailed(true);
+                  logCheckoutEventClient({
+                    kind: "checkout_payment_sdk_failed",
+                    correlationId,
+                    prebookId: prebookData.prebookId,
+                    offerId: offerId ?? undefined,
+                    hotelId: hotelId ?? undefined,
+                    errorMessage: reason,
+                  });
+                }}
               />
             )}
           </div>

@@ -7,6 +7,7 @@ import { Check, ImageOff, Lock, MapPin, TriangleAlert } from "lucide-react";
 import { fbqTrack, generateMetaEventId } from "@/lib/metaPixel";
 import { sendMetaCapiEvent } from "@/lib/metaCapi";
 import { trackFunnelEvent } from "@/lib/funnelEvents";
+import { resetCheckoutCorrelationId } from "@/lib/checkoutCorrelation";
 import { priceBucket, trackVercelFunnelEvent } from "@/lib/vercelFunnelEvents";
 import { normalizeFacilityNames, deriveSafetyBadges } from "@/lib/safetyBadges";
 import {
@@ -296,6 +297,7 @@ function HotelContent() {
   }, [hotelId, checkin, checkout, occupancyKey, currency, hotel]);
 
   const handleBook = (offerId: string) => {
+    const correlationId = resetCheckoutCorrelationId();
     const selectedRate = roomGroups
       .flatMap((g) => g.rates)
       .find((r) => r.offerId === offerId);
@@ -356,6 +358,12 @@ function HotelContent() {
       q.set("totalAmount", String(total.amount));
     }
     if (total?.currency) q.set("totalCurrency", total.currency);
+    q.set("cid", correlationId);
+    trackVercelFunnelEvent("checkout_entered", {
+      hotelId,
+      offerId,
+      correlation_id: correlationId,
+    });
     window.location.href = `/checkout?${q}`;
   };
 

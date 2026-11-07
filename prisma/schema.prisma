@@ -344,6 +344,7 @@ model CheckoutGuestSession {
 model CheckoutEvent {
   id            String   @id @default(cuid())
   kind          String
+  correlationId String?
   prebookId     String?
   transactionId String?
   offerId       String?
@@ -355,6 +356,7 @@ model CheckoutEvent {
 
   @@index([kind, createdAt])
   @@index([prebookId, createdAt])
+  @@index([correlationId, createdAt])
 }
 
 /// Anonymous results-page feedback (no email; search context only).

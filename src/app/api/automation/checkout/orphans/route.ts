@@ -59,6 +59,7 @@ export async function GET(request: NextRequest) {
     events: rows.map((e) => ({
       id: e.id,
       kind: e.kind,
+      correlationId: e.correlationId,
       prebookId: e.prebookId,
       transactionId: e.transactionId,
       offerId: e.offerId,

@@ -6,7 +6,10 @@ import { deleteCheckoutGuestSession, recordCheckoutEvent } from "@/lib/checkoutT
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { prebookId, transactionId, paymentMethod, holder, guests, clientReference } = body;
+    const { prebookId, transactionId, paymentMethod, holder, guests, clientReference, correlationId } =
+      body;
+    const correlation =
+      typeof correlationId === "string" ? correlationId.slice(0, 80) : undefined;
     if (!prebookId || !holder || !guests?.length) {
       return NextResponse.json(
         { error: "prebookId, holder and guests are required" },
@@ -80,6 +83,7 @@ export async function POST(request: NextRequest) {
     const bookingId = (bookingPayload as { bookingId?: string })?.bookingId;
     void recordCheckoutEvent({
       kind: "book_ok",
+      correlationId: correlation,
       prebookId,
       transactionId: typeof transactionId === "string" ? transactionId : undefined,
       errorMessage: bookingId ? undefined : "book_ok_without_booking_id",
@@ -106,8 +110,17 @@ export async function POST(request: NextRequest) {
     } catch {
       /* ignore */
     }
+    let failCorrelation: string | undefined;
+    try {
+      const parsed = await request.clone().json();
+      failCorrelation =
+        typeof parsed.correlationId === "string" ? parsed.correlationId.slice(0, 80) : undefined;
+    } catch {
+      /* ignore */
+    }
     void recordCheckoutEvent({
       kind: "book_failed",
+      correlationId: failCorrelation,
       prebookId: failPrebookId,
       transactionId: failTransactionId,
       errorCode: payload.code,

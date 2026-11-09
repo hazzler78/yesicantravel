@@ -7,15 +7,6 @@
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "${workspaceFolder}/.cursor/secrets/gsc-service-account.json"
       }
-    },
-    "mailerlite-yict": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote@latest",
-        "https://mcp.mailerlite.com/mcp?account=yict",
-        "8791"
-      ]
     }
   }
 }

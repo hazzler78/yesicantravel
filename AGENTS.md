@@ -24,8 +24,10 @@ These are NOT set by default; the app boots and builds without them, but the ext
 
 ### MailerLite MCP (two brands)
 - Official Cursor plugin **MailerLite** can stay on Elbespararen (`info@vkng.ltd`).
-- This repo adds a second server `mailerlite-yict` in `.cursor/mcp.json` (`https://mcp.mailerlite.com/mcp?account=yict`) so Yes I Can Travel can OAuth separately. The `?account=yict` query is required so Cursor does not collapse both into one connection.
-- After pull: enable **mailerlite-yict**, click Connect/Needs login, authorize the **YICT** MailerLite account. Ask the agent to run `get_auth_status` and confirm it is not `info@vkng.ltd`.
+- This repo adds a second server `mailerlite-yict` via `mcp-remote` → `https://mcp.mailerlite.com/mcp?account=yict` (port `8791`). Using `mcp-remote` avoids Cursor’s flaky “no sign-in link” OAuth UI for custom HTTP MCPs; the proxy opens the browser itself.
+- After pull/reload MCP: enable **mailerlite-yict**. A browser window should open — sign in as **`hello@yesicantravel.com`**. If nothing opens: **Output → MCP Logs**, copy the authorize URL, open it manually.
+- Ask the agent to run `get_auth_status` on `mailerlite-yict` and confirm email is `hello@yesicantravel.com` (not `info@vkng.ltd`).
+- Note: **Cloud — yict** / **Cloud — elbespararen** in the account switcher are Cursor cloud *environments*, not MailerLite accounts.
 
 ### Non-obvious gotchas
 - `npm run lint` currently reports **pre-existing** errors/warnings (e.g. `react-hooks/set-state-in-effect`, `@next/next/no-img-element`) that live in the repo source, not caused by the environment. Don't treat them as setup failures.

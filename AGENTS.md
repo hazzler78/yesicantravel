@@ -22,12 +22,23 @@ These are NOT set by default; the app boots and builds without them, but the ext
   - **Purchase tracking:** Pixel fires client-side; CAPI needs `META_ACCESS_TOKEN` in Vercel. `/api/health` reports `metaCapiToken`, `clarity`, `gtm`, and `ga4`.
   - **Social traffic:** `/bio` is the UTM-tracked link hub for Instagram/TikTok. Internal playbook at `/admin/social-playbook`. Seed first SEO blog post with `node scripts/seed-first-seo-blog.js` (requires `DATABASE_URL`).
 
-### MailerLite MCP (two brands)
-- Official Cursor plugin **MailerLite** can stay on Elbespararen (`info@vkng.ltd`).
-- This repo adds a second server `mailerlite-yict` via `mcp-remote` → `https://mcp.mailerlite.com/mcp?account=yict` (port `8791`). Using `mcp-remote` avoids Cursor’s flaky “no sign-in link” OAuth UI for custom HTTP MCPs; the proxy opens the browser itself.
-- After pull/reload MCP: enable **mailerlite-yict**. A browser window should open — sign in as **`hello@yesicantravel.com`**. If nothing opens: **Output → MCP Logs**, copy the authorize URL, open it manually.
-- Ask the agent to run `get_auth_status` on `mailerlite-yict` and confirm email is `hello@yesicantravel.com` (not `info@vkng.ltd`).
-- Note: **Cloud — yict** / **Cloud — elbespararen** in the account switcher are Cursor cloud *environments*, not MailerLite accounts.
+### MailerLite MCP (two brands — keep it simple)
+| Account | Email | How to reach it |
+|---|---|---|
+| Elbespararen | `info@vkng.ltd` | Official Cursor plugin **MailerLite** |
+| Yes I Can Travel | `hello@yesicantravel.com` | Custom MCP **`mailerlite-yict`** → `https://mcp.mailerlite.com/mcp?account=yict` |
+
+**Local (IDE):** `.cursor/mcp.json` already defines `mailerlite-yict` as HTTP. Enable it → Connect → authorize YICT.
+
+**Cloud Agents:** do **not** load project `mcp.json`. Add the same server once under [Dashboard → Plugins & MCPs](https://cursor.com/dashboard) (or the MCP dropdown on cursor.com/agents):
+- Name: `mailerlite-yict`
+- Type: HTTP
+- URL: `https://mcp.mailerlite.com/mcp?account=yict`
+- Authenticate as `hello@yesicantravel.com`
+
+Leave plugin MailerLite on Elbespararen. The `?account=yict` query keeps the two OAuth sessions from collapsing into one.
+
+Verify: `get_auth_status` / `get_subscriber_count` on each server — emails must differ.
 
 ### Non-obvious gotchas
 - `npm run lint` currently reports **pre-existing** errors/warnings (e.g. `react-hooks/set-state-in-effect`, `@next/next/no-img-element`) that live in the repo source, not caused by the environment. Don't treat them as setup failures.

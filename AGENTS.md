@@ -22,23 +22,21 @@ These are NOT set by default; the app boots and builds without them, but the ext
   - **Purchase tracking:** Pixel fires client-side; CAPI needs `META_ACCESS_TOKEN` in Vercel. `/api/health` reports `metaCapiToken`, `clarity`, `gtm`, and `ga4`.
   - **Social traffic:** `/bio` is the UTM-tracked link hub for Instagram/TikTok. Internal playbook at `/admin/social-playbook`. Seed first SEO blog post with `node scripts/seed-first-seo-blog.js` (requires `DATABASE_URL`).
 
-### MailerLite MCP (two brands — keep it simple)
-| Account | Email | How to reach it |
+### MailerLite (two brands — simple split)
+Cursor cannot OAuth a second custom MailerLite MCP (`No sign-in link is available for this MCP server`). Do **not** add `mailerlite-yict` HTTP/mcp-remote entries.
+
+| Account | Email | How agents reach it |
 |---|---|---|
-| Elbespararen | `info@vkng.ltd` | Official Cursor plugin **MailerLite** |
-| Yes I Can Travel | `hello@yesicantravel.com` | Custom MCP **`mailerlite-yict`** → `https://mcp.mailerlite.com/mcp?account=yict` |
+| Elbespararen | `info@vkng.ltd` | Official Cursor plugin **MailerLite** (`get_auth_status`, etc.) |
+| Yes I Can Travel | `hello@yesicantravel.com` | REST via secret **`MAILERLITE_YICT_API_KEY`** + `node scripts/mailerlite-yict.mjs` |
 
-**Local (IDE):** `.cursor/mcp.json` already defines `mailerlite-yict` as HTTP. Enable it → Connect → authorize YICT.
+Create the YICT token in MailerLite → Integrations → API. Store it as Cursor / Cloud Agent secret `MAILERLITE_YICT_API_KEY` (app deploy may still use `MAILERLITE_API_KEY` on Vercel).
 
-**Cloud Agents:** do **not** load project `mcp.json`. Add the same server once under [Dashboard → Plugins & MCPs](https://cursor.com/dashboard) (or the MCP dropdown on cursor.com/agents):
-- Name: `mailerlite-yict`
-- Type: HTTP
-- URL: `https://mcp.mailerlite.com/mcp?account=yict`
-- Authenticate as `hello@yesicantravel.com`
-
-Leave plugin MailerLite on Elbespararen. The `?account=yict` query keeps the two OAuth sessions from collapsing into one.
-
-Verify: `get_auth_status` / `get_subscriber_count` on each server — emails must differ.
+```bash
+node scripts/mailerlite-yict.mjs auth
+node scripts/mailerlite-yict.mjs subscribers
+node scripts/mailerlite-yict.mjs groups
+```
 
 ### Non-obvious gotchas
 - `npm run lint` currently reports **pre-existing** errors/warnings (e.g. `react-hooks/set-state-in-effect`, `@next/next/no-img-element`) that live in the repo source, not caused by the environment. Don't treat them as setup failures.

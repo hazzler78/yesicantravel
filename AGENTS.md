@@ -22,6 +22,11 @@ These are NOT set by default; the app boots and builds without them, but the ext
   - **Purchase tracking:** Pixel fires client-side; CAPI needs `META_ACCESS_TOKEN` in Vercel. `/api/health` reports `metaCapiToken`, `clarity`, `gtm`, and `ga4`.
   - **Social traffic:** `/bio` is the UTM-tracked link hub for Instagram/TikTok. Internal playbook at `/admin/social-playbook`. Seed first SEO blog post with `node scripts/seed-first-seo-blog.js` (requires `DATABASE_URL`).
 
+### MailerLite MCP (two brands)
+- Official Cursor plugin **MailerLite** can stay on Elbespararen (`info@vkng.ltd`).
+- This repo adds a second server `mailerlite-yict` in `.cursor/mcp.json` (`https://mcp.mailerlite.com/mcp?account=yict`) so Yes I Can Travel can OAuth separately. The `?account=yict` query is required so Cursor does not collapse both into one connection.
+- After pull: enable **mailerlite-yict**, click Connect/Needs login, authorize the **YICT** MailerLite account. Ask the agent to run `get_auth_status` and confirm it is not `info@vkng.ltd`.
+
 ### Non-obvious gotchas
 - `npm run lint` currently reports **pre-existing** errors/warnings (e.g. `react-hooks/set-state-in-effect`, `@next/next/no-img-element`) that live in the repo source, not caused by the environment. Don't treat them as setup failures.
 - Card payment (Stripe via LiteAPI) requires **HTTPS** and will not load over `http://localhost` — see the "Before you drive traffic – booking readiness" section in `README.md` for the full sandbox test-booking checklist.

@@ -9,8 +9,13 @@
       }
     },
     "mailerlite-yict": {
-      "type": "http",
-      "url": "https://mcp.mailerlite.com/mcp?account=yict"
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.mailerlite.com/mcp?account=yict",
+        "8791"
+      ]
     }
   }
 }

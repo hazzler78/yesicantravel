@@ -1115,6 +1115,267 @@ export const events: Event[] = [
     contentVerified: true,
   },
   {
+    id: "prague-christmas-markets-2026",
+    slug: "prague-christmas-markets-2026",
+    city: "Prague",
+    country: "Czech Republic",
+    eventName: "Prague Christmas Markets",
+    eventShortName: "Prague Christmas",
+    startDate: "2026-11-28",
+    endDate: "2027-01-06",
+    displayDateRange: "November 28, 2026 – January 6, 2027",
+    category: "season",
+    aiSearchTemplate: "safe central hotels Prague Old Town well-lit near metro",
+    placeQuery: "Prague, Czech Republic",
+    venueNotes: "Old Town Square, Wenceslas Square, náměstí Míru",
+    whyNow:
+      "The flagship markets on Old Town and Wenceslas Square run from 28 November through 6 January — among the longest central-market seasons in Europe. Mid-December weekends are the busiest; a midweek base in Malá Strana or Nové Město is easier to walk home from.",
+    knownFor: [
+      "The tree-lit Old Town Square market, run by Trhy Praha",
+      "Wenceslas Square stalls within walking distance of the first",
+      "Náměstí Míru in Vinohrady, opening earlier on 20 November",
+      "Trdelník, svíčková aromas, and evening lights on Charles Bridge",
+    ],
+    neighbourhoods: [
+      {
+        name: "Malá Strana and the Lesser Town",
+        description:
+          "Below the Castle, quiet cobbles and lit lanes that slope toward the river. A 10-minute walk to Old Town Square, calmer to sleep in than staying on the square itself, and well served by tram 22.",
+        verdict: "recommended",
+      },
+      {
+        name: "Nové Město (around Wenceslas Square)",
+        description:
+          "Wide avenues, hotels with proper desks, and the bottom of Wenceslas Square on the doorstep. Busy and bright in the evening; pickpockets work the crowds, so treat your bag accordingly.",
+        verdict: "recommended",
+      },
+      {
+        name: "Josefov and the Old Town core",
+        description:
+          "You are inside the market footprint — unbeatable for atmosphere, louder and more expensive. Fine if you accept noise until stalls close; less restful if you want an early night.",
+        verdict: "caution",
+      },
+      {
+        name: "Around the main station (Praha hl.n.)",
+        description:
+          "Convenient for trains and cheaper beds, with the usual station-adjacent bustle late at night. If you book here, favour a hotel on the main street with a staffed lobby.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Pickpocketing is the main risk — concentrated on Old Town Square, Wenceslas Square, metro line A toward the centre, and Charles Bridge when it is crowded.",
+      "Validate your Lítačka or paper ticket before boarding; inspectors check the metro and trams.",
+      "Use official taxis (booked or from a rank) or Bolt/Uber. Avoid unofficial drivers offering fixed prices outside tourist sights.",
+      "Currency exchange booths on the street often advertise zero commission with a brutal spread — use ATMs inside banks or pay by card where stalls allow it.",
+      "Markets run 10:00–22:00 on the two main squares; plan your walk home before the last tram if you are staying outside the centre.",
+      "Czech emergency number is 112; English operators are available.",
+    ],
+    gettingAround:
+      "Vaclav Havel Airport is west of the city. The Airport Express bus and public bus 119 (then metro A) reach the centre in about 40 minutes. In town, metro A links Wenceslas Square, Old Town and Malostranská; trams fill the gaps along the river. Tickets cover both.",
+    faqs: [
+      {
+        question: "When do Prague's main Christmas markets run in 2026?",
+        answer:
+          "Old Town Square and Wenceslas Square open on 28 November 2026 and run through 6 January 2027, daily 10:00–22:00, per organiser Trhy Praha. Náměstí Míru opens earlier, on 20 November.",
+      },
+      {
+        question: "Is Prague safe for a solo woman in December?",
+        answer:
+          "Prague is generally comfortable for solo travellers — the centre stays busy while markets are open and streets are lit. The honest caveat is pickpocketing in the densest crowds, not violent crime.",
+      },
+      {
+        question: "Where should I stay for the markets?",
+        answer:
+          "Malá Strana or Nové Město puts either square within a walk or one metro stop, which matters when you are carrying mugs of mulled wine and tired feet. Sleeping directly on Old Town Square trades quiet for convenience.",
+      },
+      {
+        question: "Do I need Czech koruna cash?",
+        answer:
+          "Cards are increasingly accepted, but some stalls still prefer cash and mug deposits are often paid in coins. Withdraw koruna from a bank ATM rather than street exchange booths.",
+      },
+      {
+        question: "How late does the metro run?",
+        answer:
+          "The Prague metro typically runs until about midnight on weeknights and a little later on weekends, with night trams on key routes after that. Check DPP for the exact last train from your station.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "strasbourg-christmas-markets-2026",
+    slug: "strasbourg-christmas-markets-2026",
+    city: "Strasbourg",
+    country: "France",
+    eventName: "Strasbourg Capitale de Noël",
+    eventShortName: "Strasbourg Christmas",
+    startDate: "2026-11-27",
+    endDate: "2026-12-24",
+    displayDateRange: "November 27 – December 24, 2026",
+    category: "season",
+    aiSearchTemplate: "safe central hotels Strasbourg Grande Île well-lit",
+    placeQuery: "Strasbourg, France",
+    venueNotes: "Grande Île — Broglie, Gutenberg, Petite France",
+    whyNow:
+      "Eight markets fill the Grande Île from 27 November. Chalets close for good on Christmas Eve evening — book inside the island if you want a short walk back after the late nocturnes on 11–12 and 18–19 December.",
+    knownFor: [
+      "Christkindelsmärik on place Broglie — the historic heart of the festival",
+      "The giant tree on place Kléber",
+      "Petite France lanes along the Ill",
+      "Alsatian bredele biscuits and vin chaud on every corner",
+    ],
+    neighbourhoods: [
+      {
+        name: "Grande Île and Krutenau",
+        description:
+          "Inside the UNESCO island core: every market within a walk, cobbles lit and busy until chalets close at 21:00 (22:00 on nocturne nights). The premium base for a short winter trip.",
+        verdict: "recommended",
+      },
+      {
+        name: "Esplanade and Orangerie",
+        description:
+          "East of the centre around the European institutions — modern, well lit, on the tram network, and quieter than the island. A short ride to Broglie when you want the crowds.",
+        verdict: "recommended",
+      },
+      {
+        name: "Petite France (sleeping)",
+        description:
+          "Postcard pretty and on the walking route, but narrow lanes and bridges get slick in rain. Wonderful to wander; choose your hotel knowing you may take the last stretch slowly after 21:00.",
+        verdict: "recommended",
+      },
+      {
+        name: "Around Gare de Strasbourg",
+        description:
+          "Fast trains and cheaper hotels, with the usual station perimeter bustle. Favour a street-facing hotel with a staffed desk if you are returning after the markets close.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Chalets are open 11:30–21:00 daily, with nocturnes until 22:00 on 11–12 and 18–19 December and earlier closure on 24 December — plan the walk home before the island empties.",
+      "December afternoons are dark by 17:00; the festival is built around evening light, so most of your trip happens after sunset — normal here, and the island stays populated until closing.",
+      "Pickpocketing shows up in viewing crowds around Kléber and Broglie; keep phones and wallets in front pockets or a zipped bag.",
+      "The Strasbourg tram covers the island until late; after closing, taxis from an official rank are simpler than hunting for parking.",
+      "France's 3919 line (Violences Femmes Info) is free and anonymous 24/7. Emergency: 112, police: 17.",
+      "Driving and parking on the Grande Île are heavily restricted during the market — transit or walking is the practical choice.",
+    ],
+    gettingAround:
+      "Strasbourg-Entzheim airport is 20 minutes by train to the central station. From Gare de Strasbourg, trams A, B, C and D cross the city — the island is one stop away on several lines. Most visitors never need a car; the markets are designed as a walking circuit.",
+    faqs: [
+      {
+        question: "When is Strasbourg Capitale de Noël 2026?",
+        answer:
+          "The eight markets run from Friday 27 November to Thursday 24 December 2026. Chalets open from 11:30 to 21:00 most days, with later hours on selected nocturne weekends, per the official noel.strasbourg.eu schedule.",
+      },
+      {
+        question: "Is Strasbourg safe for solo female travellers?",
+        answer:
+          "Strasbourg is a manageable solo city — the festival crowds the island but violent crime against visitors is uncommon. The practical risks are pickpocketing in dense market rows and slippery cobbles in rain.",
+      },
+      {
+        question: "Where should I stay?",
+        answer:
+          "On or immediately around the Grande Île if you want the walk-home advantage after evening lights. Esplanade is a calmer tram-linked alternative a few minutes away.",
+      },
+      {
+        question: "Are markets open on Christmas Eve?",
+        answer:
+          "Yes, but with shorter hours — chalets close on 24 December in the early evening and do not reopen until the following year.",
+      },
+      {
+        question: "Do I need French cash?",
+        answer:
+          "Cards are standard in restaurants; market stalls are more mixed. A few euros in coins smooths small purchases without hunting for change.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "edinburgh-hogmanay-2026",
+    slug: "edinburgh-hogmanay-2026",
+    city: "Edinburgh",
+    country: "UK",
+    eventName: "Edinburgh's Hogmanay",
+    eventShortName: "Hogmanay",
+    startDate: "2026-12-29",
+    endDate: "2027-01-01",
+    displayDateRange: "December 29, 2026 – January 1, 2027",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Edinburgh Old Town Princes Street well-lit",
+    placeQuery: "Edinburgh, United Kingdom",
+    venueNotes: "Street Party on Princes Street, 31 December; Torchlight Procession 29 Dec",
+    whyNow:
+      "Four days of ticketed events lead into the Street Party on 31 December — gates open at 20:00, last entry 23:00, and the arena clears around 00:50. A hotel with 24/7 reception inside the Old Town or on Princes Street is worth more than the room rate that night.",
+    knownFor: [
+      "The Torchlight Procession on 29 December",
+      "The ticketed Street Party on Princes Street, 31 December",
+      "Midnight fireworks above Edinburgh Castle",
+      "Ceilidh culture and pub sessions across the Old Town",
+    ],
+    neighbourhoods: [
+      {
+        name: "Old Town (Royal Mile and Grassmarket)",
+        description:
+          "Steep, historic, and walkable to Princes Street for the Street Party. Expect noise until the small hours on 31 December; book 24/7 reception if you are returning after midnight.",
+        verdict: "recommended",
+      },
+      {
+        name: "New Town (around Princes Street)",
+        description:
+          "Wide Georgian streets, brighter lighting, and short walks to the Street Party entrances. Many hotels here have round-the-clock desks — filter for that before you book Hogmanay week.",
+        verdict: "recommended",
+      },
+      {
+        name: "Leith and waterfront",
+        description:
+          "Quieter than the festival core, connected by bus and a longer walk. Fine if you want sleep outside the arena; less ideal if your ticket ends at 00:50 and you want a ten-minute walk.",
+        verdict: "caution",
+      },
+      {
+        name: "Around Waverley station late on 31 December",
+        description:
+          "The station sits between Old and New Town and gets extremely busy when the Street Party empties. The area is policed and lit, but crowded — know your hotel address before you leave the arena.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Street Party tickets are only valid through official channels (edinburghshogmanay.com / Ticketmaster) — secondary sites sell invalid passes.",
+      "Re-entry to the Street Party is not permitted; use toilets and layer up before you go through the gate after 20:00.",
+      "Last entry is 23:00; plan to arrive earlier — queues swell after the torchlight events on 29 December.",
+      "It is an outdoor winter event in Scotland. No umbrellas in the arena; waterproof layers beat fashion.",
+      "Lothian Buses and trams run expanded Hogmanay services after midnight on 31 December — worth screenshotting routes before you lose signal in the crowd.",
+      "Scotland's Domestic Abuse and Forced Marriage Helpline is 0800 027 1234, 24/7. Emergency: 999.",
+    ],
+    gettingAround:
+      "Edinburgh Airport has a tram to the city centre in about 35 minutes. Waverley station anchors the festival core between Old and New Town. On 31 December, walking is often faster than driving — many central roads close for the Street Party arena.",
+    faqs: [
+      {
+        question: "When is Edinburgh's Hogmanay 2026/27?",
+        answer:
+          "Celebrations run from 29 December 2026 to 1 January 2027. The Torchlight Procession is on 29 December; the Street Party is on 31 December, gates 20:00–23:00 entry, with the countdown at midnight.",
+      },
+      {
+        question: "Is Hogmanay safe for solo women?",
+        answer:
+          "Tens of thousands attend every year and the event is heavily stewarded, but it is a dense, all-standing outdoor crowd in winter. The practical plan is a nearby hotel with 24/7 reception, charged phone, and a route home that does not depend on a late taxi in surge pricing.",
+      },
+      {
+        question: "Where should I stay?",
+        answer:
+          "Old Town or New Town inside the festival footprint. Prioritise 24/7 staffed reception — you may return between 01:00 and 02:00 after the Street Party clears.",
+      },
+      {
+        question: "Do I need a Street Party ticket?",
+        answer:
+          "Yes for the fenced Princes Street arena. Other Hogmanay events (Concert in the Gardens, Candlelit Concert, etc.) are separate tickets on the official site.",
+      },
+      {
+        question: "How cold is it?",
+        answer:
+          "Expect near-freezing temperatures and wind off the castle. Layers, waterproof footwear, and hand warmers matter more than they look in photos.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
     id: "amsterdam-light-festival-2026",
     slug: "amsterdam-light-festival-2026",
     city: "Amsterdam",

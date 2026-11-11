@@ -10,7 +10,11 @@ import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { prisma } from "@/lib/prisma";
-import { BLOG_TO_DESTINATION_SLUG } from "@/lib/relatedGuides";
+import {
+  BLOG_SEARCH_CTA,
+  BLOG_TO_DESTINATION_SLUG,
+} from "@/lib/relatedGuides";
+import { SafestCitiesSearchCta } from "@/components/content/SafestCitiesSearchCta";
 import { getDestinationBySlug } from "@/data/destinations";
 import { ogImageForPath } from "@/lib/readyPins";
 import { ContentSearchCta } from "@/components/content/ContentSearchCta";
@@ -129,6 +133,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const destination = destinationSlug
     ? getDestinationBySlug(destinationSlug)
     : undefined;
+  const blogSearchCta = BLOG_SEARCH_CTA[post.slug];
+  const isSafestCitiesList =
+    post.slug === "safest-cities-europe-solo-female-travellers";
   const destinationFaqs = destination?.faqs;
   const destinationPlaceId = destinationSlug
     ? getPlaceIdForDestinationSlug(destinationSlug)
@@ -251,12 +258,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </ReactMarkdown>
           </div>
 
-          {destination ? (
+          {isSafestCitiesList ? (
+            <SafestCitiesSearchCta className="mt-10" />
+          ) : destination ? (
             <ContentSearchCta
               className="mt-10"
               city={destination.city}
               placeId={destinationPlaceId}
               aiSearch={destinationPlaceId ? undefined : destination.aiSearch}
+              trackingSource={`blog_${post.slug}`}
+            />
+          ) : blogSearchCta ? (
+            <ContentSearchCta
+              className="mt-10"
+              city={blogSearchCta.city}
+              aiSearch={blogSearchCta.aiSearch}
               trackingSource={`blog_${post.slug}`}
             />
           ) : null}

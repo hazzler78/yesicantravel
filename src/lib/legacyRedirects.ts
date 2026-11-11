@@ -31,4 +31,5 @@ export const redirectedDestinationSlugs = new Set([
 /** Published blog slugs that 301 elsewhere — omit from sitemap.xml. */
 export const redirectedBlogSlugs = new Set([
   "safe-solo-hotels-barcelona-women-1776070666045",
+  "is-amsterdam-safe-for-solo-female-travellers",
 ]);

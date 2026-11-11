@@ -48,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "rock-en-seine-paris-2026": `Rock en Seine 2026 hotels for solo women`,
     "munich-oktoberfest-2026": `Oktoberfest 2026 ends 4 Oct — Safe Space + solo hotels`,
     "amsterdam-dance-event-2026": `Amsterdam Dance Event 2026 dates (21–25 Oct) + solo hotels`,
+    "amsterdam-dance-event-2027": `ADE 2027 (20–24 Oct): solo women hotels`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival 2026–27: safe solo stays`,
     "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: safe solo hotels`,
     "prague-christmas-markets-2026": `Prague Christmas Markets 2026: safe solo hotels`,
@@ -60,6 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "rock-en-seine-paris-2026": `Rock en Seine Paris: metro line 10 hotels, Boulogne, and late-night returns for solo women.`,
     "munich-oktoberfest-2026": `Oktoberfest 2026 solo stays: Theresienwiese vs Glockenbach, Safe Space hours, U-Bahn exits, and 24/7 reception filters.`,
     "amsterdam-dance-event-2026": `ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception. Free checklist.`,
+    "amsterdam-dance-event-2027": `ADE 2027 (20–24 Oct): safer solo hotels in Amsterdam — centre bases, night buses after 00:30, 24/7 reception.`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival canal route stays for solo women — Jordaan & canal ring, night buses, 24/7 reception.`,
     "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: Innere Stadt bases, evening walks, and hotels with 24/7 reception for solo women.`,
     "prague-christmas-markets-2026": `Prague Christmas Markets 2026 (28 Nov–6 Jan): Old Town bases, pickpocket plan, and hotels with 24/7 reception for solo women.`,
@@ -67,30 +69,43 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "edinburgh-hogmanay-2026": `Edinburgh Hogmanay 2026/27: Old Town & Princes Street, Street Party 31 Dec, 24/7 reception for solo women.`,
   };
 
-  const title =
+  const bookableTitle =
     titleOverrides[event.slug] ??
     `${eventNameWithYear} – Safe Solo Stays for Women`;
-  const description =
+  const bookableDescription =
     descriptionOverrides[event.slug] ??
     `Safe, women-reviewed hotels near ${eventNameWithYear}. 24/7 reception, safety filters & expert tips for solo female travelers. Book confidently and feel prepared.`;
   const eventUrl = `${BASE_URL}/events/${event.slug}`;
   const past = isEventPast(event);
+  const nextEdition = event.supersededBy ? getEventBySlug(event.supersededBy) : undefined;
+  const nextYear = nextEdition?.startDate.slice(0, 4);
+  const nextRange =
+    nextEdition && nextYear
+      ? `${nextEdition.eventName} ${nextYear} (${nextEdition.startDate}–${nextEdition.endDate})`
+      : null;
+
+  const description = past
+    ? nextRange
+      ? `${eventNameWithYear} has ended. Plan ${nextRange} or browse year-round safer solo stays in ${event.city}.`
+      : `${eventNameWithYear} has ended. Browse year-round safer solo stays in ${event.city} — not live booking for this edition.`
+    : bookableDescription;
+  const socialTitle = past ? `${eventNameWithYear} has ended` : bookableTitle;
 
   return {
     title: past
       ? { absolute: `${eventNameWithYear} has ended | Yes I Can Travel` }
-      : { absolute: `${title} | Yes I Can Travel` },
+      : { absolute: `${bookableTitle} | Yes I Can Travel` },
     description,
     // Keep the URL alive for anyone who has it, but stop offering a finished
     // edition to search as if it were bookable.
     robots: past ? { index: false, follow: true } : undefined,
     openGraph: {
-      title,
+      title: socialTitle,
       description,
       url: eventUrl,
     },
     twitter: {
-      title,
+      title: socialTitle,
       description,
     },
     alternates: { canonical: eventUrl },

@@ -24,8 +24,13 @@ export const EVENT_RELATED_GUIDES: Record<
   },
   "amsterdam-dance-event-2026": {
     href: "/blog/amsterdam-dance-event-2026-solo-women-hotels",
-    label: "ADE 2026 solo hotels",
-    blurb: "21–25 Oct dates, centre bases, and late-night returns for women going alone.",
+    label: "ADE solo hotels guide",
+    blurb: "Centre bases, late returns, and what to filter before festival week.",
+  },
+  "amsterdam-dance-event-2027": {
+    href: "/blog/amsterdam-dance-event-2026-solo-women-hotels",
+    label: "ADE solo hotels guide",
+    blurb: "Official ADE 2027 is 20–24 Oct — centre bases and night-bus plans for women alone.",
   },
   "vienna-christmas-markets-2026": {
     href: "/blog/is-vienna-safe-for-solo-female-travellers",
@@ -55,8 +60,8 @@ export const DESTINATION_RELATED_GUIDES: Record<
   },
   amsterdam: {
     href: "/blog/amsterdam-safe-solo-women-night",
-    label: "Amsterdam safe at night for solo women",
-    blurb: "Neighbourhood tips, late trams, and hotel filters that reduce unknowns.",
+    label: "Is Amsterdam safe for solo female travellers?",
+    blurb: "Day and night, Jordaan and De Pijp, night buses after 00:30, and hotel filters.",
   },
   london: {
     href: "/blog/is-london-safe-for-solo-female-travellers",

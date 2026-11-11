@@ -868,6 +868,7 @@ export const events: Event[] = [
     aiSearchTemplate: "safe central hotels Amsterdam near canal ring well-lit 24 hour reception",
     placeQuery: "Amsterdam, Netherlands",
     venueNotes: "300+ venues across the city",
+    supersededBy: "amsterdam-dance-event-2027",
     whyNow:
       "ADE's 30th anniversary turns the whole city into the venue for five days and nights. Because events run until the early hours, a central stay with a staffed reception matters more here than the usual city break.",
     knownFor: [
@@ -937,6 +938,80 @@ export const events: Event[] = [
         question: "How do I get back to my hotel after 1am?",
         answer:
           "Night buses cover the whole city from 00:30 to 07:30, all of them running from Centraal, and they are CCTV-equipped and busy with people doing exactly what you are doing. Leidseplein and Rembrandtplein are the two main pick-up points besides Centraal, both with taxi ranks. Uber and Bolt work well and are cheap for central journeys.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
+    id: "amsterdam-dance-event-2027",
+    slug: "amsterdam-dance-event-2027",
+    city: "Amsterdam",
+    country: "Netherlands",
+    eventName: "Amsterdam Dance Event",
+    eventShortName: "ADE",
+    startDate: "2027-10-20",
+    endDate: "2027-10-24",
+    category: "festival",
+    aiSearchTemplate: "safe central hotels Amsterdam near canal ring well-lit 24 hour reception",
+    placeQuery: "Amsterdam, Netherlands",
+    venueNotes: "300+ venues across the city",
+    whyNow:
+      "ADE turns Amsterdam into a city-wide festival for five days and nights. Official dates are 20–24 October 2027 (source: amsterdam-dance-event.nl). Club nights run until the early hours, so a central stay with staffed reception matters more here than on a typical break.",
+    knownFor: [
+      "Five days of club nights across 300-plus venues",
+      "Paradiso and Melkweg, both a short walk from Leidseplein",
+      "Warehouse programmes at Westergasfabriek and NDSM Wharf",
+      "The canal ring, walkable end to end in under an hour",
+    ],
+    neighbourhoods: [
+      {
+        name: "De Pijp",
+        description:
+          "Dense with restaurants and small bars, dominated by locals rather than stag parties, and on the Noord-Zuidlijn metro. The walk back through residential streets is lit and populated at any hour. Night buses from Centraal cover the area after the metro stops.",
+        verdict: "recommended",
+      },
+      {
+        name: "Jordaan and the canal ring",
+        description:
+          "Central enough to walk home from most ADE venues in the centre, calm enough to sleep when you get there. Night buses from Centraal run through the canal belt after trams stop around 00:30.",
+        verdict: "recommended",
+      },
+      {
+        name: "Oud-West",
+        description:
+          "Residential, well connected by tram, and cheaper than the canal ring for the same short distances. Night buses from Centraal run out this way after midnight.",
+        verdict: "recommended",
+      },
+      {
+        name: "De Wallen (Red Light District) and around Centraal",
+        description:
+          "Well policed and not dangerous, but between roughly 23:00 and 02:00 the combination of stag groups, narrow bottlenecked streets and heavy drinking makes it the part of central Amsterdam solo travellers most often say they would rather not walk through.",
+        verdict: "caution",
+      },
+    ],
+    safetyTips: [
+      "Trams and the metro stop around 00:30 — which is roughly when ADE nights peak. GVB night buses run from 00:30 to 07:30, all starting and ending at Centraal, roughly hourly.",
+      "Night buses are pay-as-you-board by contactless card or phone at the front of the bus — not with a standard one-hour GVB ticket bought earlier in the day.",
+      "Pickpocketing is the realistic risk — crowded trams, Centraal Station and busy venue entrances. A zipped bag worn in front covers most of it.",
+      "Uber, Bolt and licensed TCA taxis operate; a central late-night ride is usually €15–25. Book in the app rather than accepting an offer on the street.",
+    ],
+    gettingAround:
+      "Schiphol is fifteen to twenty minutes from Centraal by train, running through the night. ADE venues spread across the centre, West, Noord (ferry from behind Centraal) and Zuidoost. Staying central keeps you within walking or night-bus distance of most programmes.",
+    faqs: [
+      {
+        question: "When is Amsterdam Dance Event 2027?",
+        answer:
+          "ADE 2027 runs from Wednesday 20 to Sunday 24 October 2027, according to the official Amsterdam Dance Event website. The conference and festival programmes run across those five days and nights.",
+      },
+      {
+        question: "Where should a solo woman stay for ADE 2027?",
+        answer:
+          "De Pijp, Oud-West and the canal ring are the practical picks: central, residential, well lit, and served by night buses from Centraal after the trams stop.",
+      },
+      {
+        question: "Is Amsterdam safe for a solo woman during ADE?",
+        answer:
+          "Violent crime is low and central neighbourhoods stay populated late. The catches are transport timing — trams stop at 00:30 when the night is just starting — and pickpockets in crowds. Plan the route home before you go out.",
       },
     ],
     contentVerified: true,

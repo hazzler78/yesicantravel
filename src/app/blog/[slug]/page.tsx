@@ -20,6 +20,7 @@ import { ogImageForPath } from "@/lib/readyPins";
 import { ContentSearchCta } from "@/components/content/ContentSearchCta";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { preferredEmailCaptureKind } from "@/lib/emailCapture";
+import { absoluteSeoTitle, socialTitle } from "@/lib/contentSeoTitle";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -43,20 +44,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   if (!post) return {};
 
-  const title = post.seoTitle ?? post.title;
+  const documentTitle = post.seoTitle ?? post.title;
   const description = post.seoDescription ?? post.excerpt ?? "";
   const canonical = `https://yesicantravel.com/blog/${post.slug}`;
   const ogImage = ogImageForPath(`/blog/${post.slug}`);
-  const absoluteTitle = title.includes("Yes I Can Travel")
-    ? title
-    : `${title} | Yes I Can Travel`;
+  const ogTitle = socialTitle(post.seoTitle, post.title);
 
   return {
-    title: { absolute: absoluteTitle },
+    title: absoluteSeoTitle(documentTitle),
     description,
     alternates: { canonical },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       url: canonical,
       type: "article",
@@ -75,7 +74,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
       ...(ogImage ? { images: [ogImage] } : {}),
     },

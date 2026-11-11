@@ -464,6 +464,101 @@ export const destinations: Destination[] = [
     contentVerified: true,
   },
   {
+    slug: "vienna",
+    city: "Vienna",
+    country: "Austria",
+    headline: "Vienna for solo female travellers",
+    subheadline:
+      "Formal on the surface and genuinely calm once you know the districts — with weekend U-Bahn nights, proof-of-payment tickets, and a centre that stays lit after four o'clock in winter.",
+    metaTitle: "Is Vienna Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaDescription:
+      "Is Vienna safe for women travelling alone? Innere Stadt & Neubau, weekend 24h U-Bahn, pickpocket plan, 24/7 reception — practical, not fear-based.",
+    aiSearch: "safe central hotels Vienna Austria well-lit near U-Bahn Ring",
+    knownFor: [
+      "The Ringstraße and the first district's coffee-house culture",
+      "Schönbrunn Palace and the Prater beyond the centre",
+      "Seasonal Christmas markets from November through January",
+      "The Staatsoper and Vienna's long ball season",
+      "A transit network that runs all night on Fridays and Saturdays",
+    ],
+    neighbourhoods: [
+      {
+        name: "Innere Stadt (1st district)",
+        verdict: "recommended",
+        description:
+          "Inside the Ringstraße, walking distance to Stephansplatz, the museums and the main markets. Expensive, but the payoff is a lit, busy walk home after dinner or a market rather than working out a tram. Comfortable at any hour.",
+      },
+      {
+        name: "Neubau (7th district)",
+        verdict: "recommended",
+        description:
+          "Around Mariahilfer Straße and the Spittelberg lanes — central without first-district prices, on the U3, and residential enough to be quiet by midnight. A strong base for Christmas market weeks.",
+      },
+      {
+        name: "Wieden and Margareten (4th and 5th)",
+        verdict: "recommended",
+        description:
+          "South of the centre around Karlsplatz and the Naschmarkt, on the U1, U2 and U4. Cheaper beds, populated evening streets, and a short ride to every major sight.",
+      },
+      {
+        name: "Leopoldstadt (2nd)",
+        verdict: "recommended",
+        description:
+          "Across the Danube Canal from the centre, with the Prater park and a growing restaurant scene. Well connected by U1 and U2; calmer than the first district but still a straightforward ride home.",
+      },
+      {
+        name: "Around Praterstern and Westbahnhof",
+        verdict: "caution",
+        description:
+          "Major interchanges with plenty of budget hotels, and visible street drinking at the station entrances that draws police attention. The trains are fine; it is the immediate surroundings late at night that many solo travellers prefer to avoid.",
+      },
+    ],
+    safetyTips: [
+      "The U-Bahn and trams run all night on Fridays, Saturdays and the eves of public holidays; on other nights the last trains leave around 00:30 and night buses take over — worth knowing before a late opera or ball.",
+      "Vienna uses proof-of-payment with no barriers. Validate a paper ticket before you board; the on-the-spot fine for travelling without a valid ticket is steep.",
+      "Pickpocketing concentrates in crowds: Stephansplatz, Karlsplatz, Christmas market stalls and the U1 and U3 through the tourist stations. Bag zipped and worn in front covers most of it.",
+      "Ignore costumed ticket sellers outside the Staatsoper and Stephansdom offering concert tickets — book directly with the venue if you want to go.",
+      "Cards are accepted widely, but market mug deposits and some smaller stalls still expect cash. A few euros in small notes saves queuing at an ATM in the cold.",
+      "The Frauen.Notruf gegen Gewalt hotline is 0800 222 555 — free, anonymous, 24 hours. For immediate danger call 112 (also 133 for police).",
+    ],
+    gettingAround:
+      "Vienna International (VIE) is east of the city. The S7 city train reaches Wien Mitte in about 25 minutes for a few euros; the City Airport Train is faster for several times the price — check ÖBB before you travel. A regulated taxi to the centre is typically €40–50. In the city the U-Bahn and trams reach every district tourists book; the network is frequent, clean and visibly staffed.",
+    supportLine: {
+      name: "Frauen.Notruf gegen Gewalt",
+      number: "0800 222 555",
+      description:
+        "Austria's free, anonymous 24-hour helpline for women affected by violence. Available nationwide in German; interpreters can be arranged. Emergency: 112.",
+    },
+    faqs: [
+      {
+        question: "Is Vienna safe for solo female travellers?",
+        answer:
+          "Vienna is among the safer large European capitals for women travelling alone. Violent crime against visitors is uncommon and street harassment is relatively rare. The realistic risks are pickpocketing in tourist crowds and misjudging the last U-Bahn on a weeknight.",
+      },
+      {
+        question: "Which district should I stay in?",
+        answer:
+          "Innere Stadt if you want to walk everywhere inside the Ring. Neubau is the best-value central alternative. Wieden and Margareten suit travellers who prefer a residential feel with fast U-Bahn links.",
+      },
+      {
+        question: "Does Vienna public transport run all night?",
+        answer:
+          "On Friday and Saturday nights and on the eves of public holidays, the U-Bahn runs through the night. On other nights the system shuts around 00:30 and night buses cover the main corridors until morning.",
+      },
+      {
+        question: "Do I need to validate my ticket?",
+        answer:
+          "Yes. There are no gates; inspectors check frequently and fines are not waived for visitors. Stamp or validate before you board.",
+      },
+      {
+        question: "Is it safe to walk back after the Christmas markets?",
+        answer:
+          "In the centre, yes — markets close well before the U-Bahn stops, streets stay lit and busy, and many women walk home from Stephansplatz or Rathausplatz without concern. Staying inside the Ring or one stop away on a main line keeps the last stretch simple.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
     slug: "milan",
     city: "Milan",
     country: "Italy",

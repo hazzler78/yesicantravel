@@ -50,6 +50,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "amsterdam-dance-event-2026": `Amsterdam Dance Event 2026 dates (21–25 Oct) + solo hotels`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival 2026–27: safe solo stays`,
     "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: safe solo hotels`,
+    "prague-christmas-markets-2026": `Prague Christmas Markets 2026: safe solo hotels`,
+    "strasbourg-christmas-markets-2026": `Strasbourg Christmas 2026: safe solo hotels`,
+    "edinburgh-hogmanay-2026": `Edinburgh Hogmanay 2026/27: safe solo stays`,
   };
   const descriptionOverrides: Record<string, string> = {
     "berlin-marathon-2026": `BMW Berlin Marathon 2026 is Sunday 27 September. Where to stay as a solo woman near Brandenburg Gate — 24/7 reception, early start, free cancellation.`,
@@ -59,6 +62,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     "amsterdam-dance-event-2026": `ADE 2026 (21–25 Oct): safer solo hotels in Amsterdam — centre bases, late nights, 24/7 reception. Free checklist.`,
     "amsterdam-light-festival-2026": `Amsterdam Light Festival canal route stays for solo women — Jordaan & canal ring, night buses, 24/7 reception.`,
     "vienna-christmas-markets-2026": `Vienna Christmas Markets 2026: Innere Stadt bases, evening walks, and hotels with 24/7 reception for solo women.`,
+    "prague-christmas-markets-2026": `Prague Christmas Markets 2026 (28 Nov–6 Jan): Old Town bases, pickpocket plan, and hotels with 24/7 reception for solo women.`,
+    "strasbourg-christmas-markets-2026": `Strasbourg Capitale de Noël 2026 (27 Nov–24 Dec): Grande Île bases and late market walks for solo women.`,
+    "edinburgh-hogmanay-2026": `Edinburgh Hogmanay 2026/27: Old Town & Princes Street, Street Party 31 Dec, 24/7 reception for solo women.`,
   };
 
   const title =

@@ -1,23 +1,34 @@
 /**
- * Single source of truth for permanent destination→event redirects.
+ * Single source of truth for permanent destination redirects.
  *
  * Consumed by:
  *   - next.config.ts  (to emit 301 redirects at the edge)
  *   - src/app/sitemap.ts  (to exclude these slugs so we don't ask Google
  *     to crawl URLs that immediately 301)
  *
- * If you add a new destination→event redirect, add it here only.
+ * If you add a new destination redirect, add it here only.
  */
-export const destinationToEventRedirects: Record<string, string> = {
-  // Milan is no longer here: /destinations/milan is a year-round city guide now,
-  // which serves the standing "safe hotels in Milan" demand that a redirect to a
-  // single 2027 event could not.
-  cancun: "cancun-spring-break-2026",
-  austin: "austin-sxsw-2026",
-  miami: "miami-spring-break-2026",
-  "key-west": "key-west-spring-break-2026",
-};
 
-export const redirectedDestinationSlugs = new Set(
-  Object.keys(destinationToEventRedirects),
-);
+/**
+ * Thin, event-led US stubs (no year-round guide copy). Send visitors to the
+ * destinations hub instead of ended spring-2026 event pages that are noindex.
+ */
+export const destinationHubRedirects = new Set([
+  "cancun",
+  "austin",
+  "miami",
+  "key-west",
+]);
+
+/** @deprecated Empty — US stubs now use destinationHubRedirects. */
+export const destinationToEventRedirects: Record<string, string> = {};
+
+export const redirectedDestinationSlugs = new Set([
+  ...destinationHubRedirects,
+  ...Object.keys(destinationToEventRedirects),
+]);
+
+/** Published blog slugs that 301 elsewhere — omit from sitemap.xml. */
+export const redirectedBlogSlugs = new Set([
+  "safe-solo-hotels-barcelona-women-1776070666045",
+]);

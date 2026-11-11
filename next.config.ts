@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
         destination: "/blog/is-barcelona-safe-for-solo-female-travellers",
         permanent: true,
       },
+      {
+        source: "/blog/is-amsterdam-safe-for-solo-female-travellers",
+        destination: "/blog/amsterdam-safe-solo-women-night",
+        permanent: true,
+      },
     ];
 
     // Note: apex-vs-www canonicalization is handled at the Vercel domain

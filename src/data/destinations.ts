@@ -88,12 +88,12 @@ export const destinations: Destination[] = [
     slug: "barcelona",
     city: "Barcelona",
     country: "Spain",
-    headline: "Barcelona for solo female travellers",
+    headline: "Barcelona for solo women: where to stay",
     subheadline:
       "A walkable, late-running city where the main risk to plan around is theft, not violence. Here's which neighbourhoods put you near a staffed reception and a metro entrance, and how to get back after midnight.",
-    metaTitle: "Is Barcelona Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Barcelona for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Barcelona safe for solo female travellers? Where to stay: Eixample & Gràcia, metro hours, pickpocketing plan, 24/7 reception — plus free checklist.",
+      "Eixample and Gràcia, metro hours, pickpocket plan, hotels with 24/7 reception. Where to base yourself as a woman travelling Barcelona alone.",
     aiSearch: "central safe hotel Barcelona Spain well-lit 24-hour reception",
     knownFor: [
       "Gaudí's Sagrada Família, Casa Batlló and Park Güell",
@@ -182,13 +182,13 @@ export const destinations: Destination[] = [
     slug: "amsterdam",
     city: "Amsterdam",
     country: "Netherlands",
-    headline: "Amsterdam for solo female travellers",
+    headline: "Amsterdam for solo women: where to stay",
     subheadline:
       "Small, flat and easy to cross on foot — with two things that catch visitors out: the trams stop just after midnight, and the red asphalt is a bike road, not a pavement. Here's how to stay somewhere calm and get home after the last tram.",
     // Broad query for destination; night query lives on /blog/amsterdam-safe-solo-women-night
-    metaTitle: "Is Amsterdam Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Amsterdam for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Amsterdam safe for solo female travellers? Jordaan & De Pijp bases, night buses after midnight, 24/7 reception — free checklist.",
+      "Jordaan and De Pijp, night buses after midnight, hotels with 24/7 reception. Where to base yourself as a woman travelling Amsterdam alone.",
     aiSearch: "central safe hotel Amsterdam Netherlands well-lit near station",
     knownFor: [
       "The UNESCO-listed canal ring, walkable end to end in under an hour",
@@ -278,12 +278,12 @@ export const destinations: Destination[] = [
     slug: "paris",
     city: "Paris",
     country: "France",
-    headline: "Paris for solo female travellers",
+    headline: "Paris for solo women: where to stay",
     subheadline:
       "A city built for walking alone, with an excellent late metro and a well-rehearsed set of street scams. Here's where to base yourself, how the last train really works, and which approaches to ignore.",
-    metaTitle: "Is Paris Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Paris for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Paris safe for solo female travellers? Where to stay: Marais & Saint-Germain, metro nights, scams to ignore, 24/7 reception — plus free checklist.",
+      "Marais and Saint-Germain, last metro and Noctilien nights, hotels with 24/7 reception. Where to base yourself as a woman travelling Paris alone.",
     aiSearch: "central safe hotel Paris France well-lit 24-hour reception",
     knownFor: [
       "The Louvre, Musée d'Orsay and a museum pass that pays for itself in two days",
@@ -372,12 +372,12 @@ export const destinations: Destination[] = [
     slug: "berlin",
     city: "Berlin",
     country: "Germany",
-    headline: "Berlin for solo female travellers",
+    headline: "Berlin for solo women: where to stay",
     subheadline:
       "Spread out, relaxed and unusually good for anyone out late — the U-Bahn and S-Bahn simply don't stop at weekends. Here's how the night network works and which districts suit a solo trip.",
-    metaTitle: "Is Berlin Safe for Women at Night? Solo Female Guide | Yes I Can Travel",
+    metaTitle: "Berlin for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Berlin safe for women at night? Weekend 24h U-Bahn, Prenzlauer Berg & Mitte, hotels with 24/7 reception — practical, not fear-based. Free checklist included.",
+      "Prenzlauer Berg and Mitte, weekend 24-hour U-Bahn, hotels with 24/7 reception. Where to base yourself as a woman travelling Berlin alone.",
     aiSearch: "central safe hotel Berlin Germany well-lit near U-Bahn",
     knownFor: [
       "The Brandenburg Gate, Reichstag dome and Museum Island",
@@ -467,12 +467,12 @@ export const destinations: Destination[] = [
     slug: "vienna",
     city: "Vienna",
     country: "Austria",
-    headline: "Vienna for solo female travellers",
+    headline: "Vienna for solo women: where to stay",
     subheadline:
       "Formal on the surface and genuinely calm once you know the districts — with weekend U-Bahn nights, proof-of-payment tickets, and a centre that stays lit after four o'clock in winter.",
-    metaTitle: "Is Vienna Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Vienna for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Vienna safe for women travelling alone? Innere Stadt & Neubau, weekend 24h U-Bahn, pickpocket plan, 24/7 reception — practical, not fear-based.",
+      "Innere Stadt and Neubau, weekend 24-hour U-Bahn, pickpocket plan, hotels with 24/7 reception. Where to base yourself as a woman travelling Vienna alone.",
     aiSearch: "safe central hotels Vienna Austria well-lit near U-Bahn Ring",
     knownFor: [
       "The Ringstraße and the first district's coffee-house culture",
@@ -562,12 +562,12 @@ export const destinations: Destination[] = [
     slug: "milan",
     city: "Milan",
     country: "Italy",
-    headline: "Milan for solo female travellers",
+    headline: "Milan for solo women: where to stay",
     subheadline:
       "A working city rather than a museum, compact in the centre and easy to cross by metro — as long as you know it shuts around 00:30. Here's where to stay and how the night network fills the gap.",
-    metaTitle: "Is Milan Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Milan for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Yes — for most solo women who stay in Brera or Porta Nuova. Metro until ~00:30, 24/7 reception hotels, free checklist.",
+      "Brera or Porta Nuova, metro until about 00:30, hotels with 24/7 reception. Where to base yourself as a woman travelling Milan alone.",
     aiSearch: "central safe hotel Milan Italy well-lit near metro",
     knownFor: [
       "The Duomo and the Galleria Vittorio Emanuele II",
@@ -657,12 +657,12 @@ export const destinations: Destination[] = [
     slug: "london",
     city: "London",
     country: "UK",
-    headline: "London for solo female travellers",
+    headline: "London for solo women: where to stay",
     subheadline:
       "Enormous, well policed and staffed at every station — with one rule that genuinely matters: never get into a minicab you didn't book. Here's how the night network works and where to base yourself.",
-    metaTitle: "Is London Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "London for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is London safe for solo female travellers? Night Tube, licensed taxis vs minicabs, stay areas, and hotels with 24/7 reception — plus free checklist.",
+      "Night Tube, licensed taxis rather than unbooked minicabs, hotels with 24/7 reception. Where to base yourself as a woman travelling London alone.",
     aiSearch: "central safe hotel London UK well-lit near tube station",
     knownFor: [
       "World-class museums with free general admission",

@@ -119,6 +119,25 @@ export const BLOG_SEARCH_CTA: Record<string, { city: string; aiSearch: string }>
   },
 };
 
+/** Seasonal event pages tied to a safety blog (no DB body edits required). */
+export const BLOG_RELATED_EVENTS: Record<
+  string,
+  { href: string; label: string; blurb: string }
+> = {
+  "is-prague-safe-for-solo-female-travellers": {
+    href: "/events/prague-christmas-markets-2026",
+    label: "Prague Christmas Markets 2026",
+    blurb:
+      "Old Town dates pre-filled — neighbourhoods, pickpocket plan, and a search wired to market week.",
+  },
+  "is-vienna-safe-for-solo-female-travellers": {
+    href: "/events/vienna-christmas-markets-2026",
+    label: "Vienna Christmas Markets 2026",
+    blurb:
+      "Innere Stadt bases and evening U-Bahn notes — open the event page for dated stay search.",
+  },
+};
+
 /** Destinations featured on the safest-cities listicle (prefilled /results links). */
 export const SAFEST_CITIES_DESTINATION_SLUGS = [
   "amsterdam",

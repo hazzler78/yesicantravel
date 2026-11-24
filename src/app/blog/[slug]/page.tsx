@@ -11,9 +11,11 @@ import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { prisma } from "@/lib/prisma";
 import {
+  BLOG_RELATED_EVENTS,
   BLOG_SEARCH_CTA,
   BLOG_TO_DESTINATION_SLUG,
 } from "@/lib/relatedGuides";
+import { enrichResultsHref } from "@/lib/resultsSearchUrl";
 import { SafestCitiesSearchCta } from "@/components/content/SafestCitiesSearchCta";
 import { getDestinationBySlug } from "@/data/destinations";
 import { ogImageForPath } from "@/lib/readyPins";
@@ -133,6 +135,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     ? getDestinationBySlug(destinationSlug)
     : undefined;
   const blogSearchCta = BLOG_SEARCH_CTA[post.slug];
+  const blogRelatedEvent = BLOG_RELATED_EVENTS[post.slug];
   const isSafestCitiesList =
     post.slug === "safest-cities-europe-solo-female-travellers";
   const destinationFaqs = destination?.faqs;
@@ -247,7 +250,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 ),
                 li: ({ children }) => <li>{children}</li>,
                 a: ({ children, href }) => (
-                  <a href={href} className="text-teal underline underline-offset-4">
+                  <a
+                    href={enrichResultsHref(href) ?? href}
+                    className="text-teal underline underline-offset-4"
+                  >
                     {children}
                   </a>
                 ),
@@ -256,6 +262,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               {post.bodyMarkdown}
             </ReactMarkdown>
           </div>
+
+          {blogRelatedEvent && (
+            <Card className="mt-10 p-5 sm:p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+                Peak dates nearby
+              </p>
+              <Link
+                href={blogRelatedEvent.href}
+                className="mt-1 block font-display text-lg font-semibold text-ink hover:text-teal"
+              >
+                {blogRelatedEvent.label}
+              </Link>
+              <p className="mt-1.5 text-[0.9375rem] text-ink-muted">{blogRelatedEvent.blurb}</p>
+            </Card>
+          )}
 
           {isSafestCitiesList ? (
             <SafestCitiesSearchCta className="mt-10" />

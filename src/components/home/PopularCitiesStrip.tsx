@@ -11,7 +11,8 @@ import { SectionHeading } from "@/components/ui/Card";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { formatHeadlinePrice } from "@/lib/formatStayPrice";
-import { formatIsoDateShort } from "@/lib/stayDates";
+import { formatIsoDateShort, getDefaultStayWindow } from "@/lib/stayDates";
+import { buildResultsPath } from "@/lib/resultsSearchUrl";
 
 function formatDateRange(checkin: string, checkout: string) {
   return `${formatIsoDateShort(checkin)} – ${formatIsoDateShort(checkout)}`;
@@ -20,6 +21,7 @@ function formatDateRange(checkin: string, checkout: string) {
 export function PopularCitiesStrip() {
   const currency = useCurrency();
   const [prices, setPrices] = useState<MinPricesResponse | null>(null);
+  const fallbackStay = getDefaultStayWindow();
 
   useEffect(() => {
     let cancelled = false;
@@ -56,14 +58,14 @@ export function PopularCitiesStrip() {
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {popularCities.map((city) => {
             const price = prices?.cities?.[city.slug];
-            const href = prices
-              ? `/results?${new URLSearchParams({
-                  placeId: city.placeId,
+            const stay = prices
+              ? {
                   checkin: prices.checkin,
                   checkout: prices.checkout,
-                  adults: String(prices.adults),
-                })}`
-              : `/results?${new URLSearchParams({ placeId: city.placeId })}`;
+                  nights: prices.nights,
+                }
+              : fallbackStay;
+            const href = buildResultsPath({ placeId: city.placeId, stay });
 
             // The price card points into /results, which robots.txt disallows,
             // so it carries no crawl signal. The guide link below it is the

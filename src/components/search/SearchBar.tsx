@@ -17,6 +17,7 @@ import {
 import { DateRangePicker } from "@/components/search/DateRangePicker";
 import { TravellersPicker } from "@/components/search/TravellersPicker";
 import { parseStayType, STAY_TYPE_ORDER, STAY_TYPES, type StayType } from "@/lib/stayTypes";
+import { getDefaultStayWindow } from "@/lib/stayDates";
 import { localIsoDaysFromNow } from "@/lib/localIsoDate";
 
 type Place = { placeId: string; displayName: string; formattedAddress?: string };
@@ -92,8 +93,9 @@ export function SearchBar({
   const setDestination = setTypedDestination;
   const [placeId, setPlaceId] = useState(initialPlaceId);
   const [vibe, setVibe] = useState(initialVibe);
-  const [checkin, setCheckin] = useState(initialCheckin ?? localIsoDaysFromNow(14));
-  const [checkout, setCheckout] = useState(initialCheckout ?? localIsoDaysFromNow(16));
+  const defaultStay = getDefaultStayWindow();
+  const [checkin, setCheckin] = useState(initialCheckin ?? defaultStay.checkin);
+  const [checkout, setCheckout] = useState(initialCheckout ?? defaultStay.checkout);
   const stayDatesRef = useRef({ checkin, checkout });
   useEffect(() => {
     stayDatesRef.current = { checkin, checkout };

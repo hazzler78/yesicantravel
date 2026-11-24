@@ -3,7 +3,7 @@ import { getAllDestinationSlugs } from "@/data/destinations";
 import { getIndexableEventSlugs } from "@/data/events";
 import { ContentStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { redirectedDestinationSlugs } from "@/lib/legacyRedirects";
+import { redirectedBlogSlugs, redirectedDestinationSlugs } from "@/lib/legacyRedirects";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -42,12 +42,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // lastModified only on pages where we know a real edit date. Stamping every
   // URL with the build time teaches Google to ignore the field entirely.
-  const blogUrls = blogPosts.map((post) => ({
-    url: `${BASE_URL}/blog/${post.slug}`,
-    lastModified: post.updatedAt,
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
+  const blogUrls = blogPosts
+    .filter((post) => !redirectedBlogSlugs.has(post.slug))
+    .map((post) => ({
+      url: `${BASE_URL}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
 
   return [
     {

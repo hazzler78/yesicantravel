@@ -45,11 +45,16 @@ export type StaySignalInput = {
 
 export type NearestTransit = { name: string; distanceKm: number };
 
+/** Minutes from midnight; check-in before this is an early cutoff worth flagging. */
+export const LATE_CHECK_IN_CUTOFF_MINUTES = 21 * 60;
+
 export type StaySignals = {
   matches: StayFilterId[];
   nearestTransit?: NearestTransit;
-  /** Display string such as "23:30", only when the property publishes it. */
-  latestCheckIn?: string;
+  /** Display string such as "23:30" whenever the property publishes a check-in end time. */
+  checkInEnd?: string;
+  /** True when check-in ends before {@link LATE_CHECK_IN_CUTOFF_MINUTES} (early / risky for late arrivals). */
+  checkInEarlyCutoff?: boolean;
   roundTheClockReception: boolean;
 };
 
@@ -142,13 +147,16 @@ export function deriveStaySignals(input: StaySignalInput | null | undefined): St
   if (SECURITY_ON_SITE.test(facilities)) matches.push("securityOnSite");
   if (PRIVATE_CHECK_IN.test(facilities)) matches.push("privateCheckIn");
 
-  const checkInEnd = parseClockTime(input.checkinCheckoutTimes?.checkin_end);
+  const checkInEndMinutes = parseClockTime(input.checkinCheckoutTimes?.checkin_end);
+  const checkInEnd =
+    checkInEndMinutes != null ? formatClockTime(checkInEndMinutes) : undefined;
 
   return {
     matches,
     nearestTransit,
-    // Only worth saying when it's late enough to answer "can I still get in?".
-    latestCheckIn: checkInEnd != null && checkInEnd >= 21 * 60 ? formatClockTime(checkInEnd) : undefined,
+    checkInEnd,
+    checkInEarlyCutoff:
+      checkInEndMinutes != null && checkInEndMinutes < LATE_CHECK_IN_CUTOFF_MINUTES,
     roundTheClockReception,
   };
 }

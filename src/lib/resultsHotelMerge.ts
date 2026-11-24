@@ -8,6 +8,7 @@ import {
 } from "@/lib/resultsPricing";
 import { safetyBadgesFromHotel } from "@/lib/safetyBadges";
 import { deriveStaySignals, type StaySignals } from "@/lib/staySignals";
+import type { LiteApiCancellationPolicies } from "@/lib/cancellationPolicy";
 import type { CurrencyCode } from "@/lib/currency";
 
 export type ResultsHotelBasic = {
@@ -29,6 +30,7 @@ export type ResultsHotelRow = ResultsHotelBasic & {
   currency?: string;
   refundableFromPrice?: number;
   hasFreeCancellation?: boolean;
+  lowestCancellation?: LiteApiCancellationPolicies | null;
   lat?: number;
   lng?: number;
   safetyBadges?: string[];
@@ -89,6 +91,7 @@ export function buildResultsHotelRow(params: {
     currency: summary?.lowest?.currency ?? currency,
     refundableFromPrice: summary?.lowestRefundable?.amount,
     hasFreeCancellation: summary?.hasFreeCancellation ?? false,
+    lowestCancellation: summary?.lowestCancellation,
     lat: coords?.lat,
     lng: coords?.lng,
     safetyBadges: hotelForSignals

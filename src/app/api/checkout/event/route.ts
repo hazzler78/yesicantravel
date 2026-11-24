@@ -5,6 +5,13 @@ const CLIENT_KINDS: CheckoutEventKind[] = [
   "payment_return_failed",
   "payment_return_orphan",
   "payment_return_guest_missing",
+  "checkout_view",
+  "checkout_guest_submit",
+  "checkout_payment_view",
+  "checkout_payment_sdk_init",
+  "checkout_payment_sdk_failed",
+  "checkout_payment_return",
+  "checkout_book_attempt",
 ];
 
 export async function POST(request: NextRequest) {
@@ -16,10 +23,13 @@ export async function POST(request: NextRequest) {
     }
     await recordCheckoutEvent({
       kind,
+      correlationId:
+        typeof body.correlationId === "string" ? body.correlationId.slice(0, 80) : undefined,
       prebookId: typeof body.prebookId === "string" ? body.prebookId : undefined,
       transactionId: typeof body.transactionId === "string" ? body.transactionId : undefined,
       offerId: typeof body.offerId === "string" ? body.offerId : undefined,
       hotelId: typeof body.hotelId === "string" ? body.hotelId : undefined,
+      errorCode: typeof body.errorCode === "number" ? body.errorCode : undefined,
       errorMessage: typeof body.errorMessage === "string" ? body.errorMessage : undefined,
       metadata:
         body.metadata && typeof body.metadata === "object"

@@ -14,6 +14,7 @@ import {
 import { Card } from "@/components/ui/Card";
 import { SafetyBadge, SafetyBadgeList } from "@/components/ui/SafetyBadge";
 import { formatDistance, type StaySignals } from "@/lib/staySignals";
+import { checkInPeaceOfMindText, pickTrustUiLanguage } from "@/lib/trustUiCopy";
 
 type PeaceOfMindCardProps = {
   stay: StaySignals;
@@ -28,10 +29,20 @@ export function PeaceOfMindCard({
   hasFreeCancellation,
 }: PeaceOfMindCardProps) {
   const titleId = useId();
+  const uiLang = pickTrustUiLanguage();
+  const checkInCopy =
+    stay.checkInEnd != null
+      ? checkInPeaceOfMindText(
+          stay.checkInEnd,
+          Boolean(stay.checkInEarlyCutoff),
+          stay.roundTheClockReception,
+          uiLang,
+        )
+      : null;
   const hasSignals =
     safetyBadges.length > 0 ||
     Boolean(stay.nearestTransit) ||
-    Boolean(stay.latestCheckIn) ||
+    Boolean(stay.checkInEnd) ||
     stay.matches.includes("womenOnlyRoom") ||
     hasFreeCancellation;
 
@@ -53,7 +64,7 @@ export function PeaceOfMindCard({
         </div>
       </div>
 
-      {(stay.nearestTransit || stay.latestCheckIn || stay.roundTheClockReception) && (
+      {(stay.nearestTransit || checkInCopy || stay.roundTheClockReception) && (
         <ul className="mt-4 space-y-2 text-[0.9375rem] text-ink">
           {stay.nearestTransit && (
             <li className="flex items-start gap-2">
@@ -66,17 +77,20 @@ export function PeaceOfMindCard({
               </span>
             </li>
           )}
-          {stay.latestCheckIn && (
+          {checkInCopy && (
             <li className="flex items-start gap-2">
-              <Clock className="mt-1 h-4 w-4 shrink-0 text-teal" aria-hidden />
-              <span>
-                Check-in until{" "}
-                <span className="tnum font-semibold">{stay.latestCheckIn}</span>
-                {stay.roundTheClockReception && " — reception staffed around the clock"}
+              <Clock
+                className={`mt-1 h-4 w-4 shrink-0 ${
+                  checkInCopy.earlyCutoff ? "text-coral" : "text-teal"
+                }`}
+                aria-hidden
+              />
+              <span className={checkInCopy.earlyCutoff ? "text-coral" : undefined}>
+                {checkInCopy.text}
               </span>
             </li>
           )}
-          {!stay.latestCheckIn && stay.roundTheClockReception && (
+          {!stay.checkInEnd && stay.roundTheClockReception && (
             <li className="flex items-start gap-2">
               <Clock className="mt-1 h-4 w-4 shrink-0 text-teal" aria-hidden />
               <span>24/7 front desk published by the property</span>

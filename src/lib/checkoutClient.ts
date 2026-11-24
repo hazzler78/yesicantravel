@@ -42,16 +42,30 @@ export async function fetchCheckoutGuestFromServer(
   }
 }
 
+type ClientCheckoutLogKind = Extract<
+  CheckoutEventKind,
+  | "payment_return_failed"
+  | "payment_return_orphan"
+  | "payment_return_guest_missing"
+  | "checkout_view"
+  | "checkout_guest_submit"
+  | "checkout_payment_view"
+  | "checkout_payment_sdk_init"
+  | "checkout_payment_sdk_failed"
+  | "checkout_payment_return"
+  | "checkout_book_attempt"
+>;
+
 export function logCheckoutEventClient(input: {
-  kind: Extract<
-    CheckoutEventKind,
-    "payment_return_failed" | "payment_return_orphan" | "payment_return_guest_missing"
-  >;
+  kind: ClientCheckoutLogKind;
+  correlationId?: string;
   prebookId?: string;
   transactionId?: string;
   offerId?: string;
   hotelId?: string;
+  errorCode?: number;
   errorMessage?: string;
+  metadata?: Record<string, unknown>;
 }): void {
   fetch("/api/checkout/event", {
     method: "POST",

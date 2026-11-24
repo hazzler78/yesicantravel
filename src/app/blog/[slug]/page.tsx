@@ -10,12 +10,17 @@ import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { prisma } from "@/lib/prisma";
-import { BLOG_TO_DESTINATION_SLUG } from "@/lib/relatedGuides";
+import {
+  BLOG_SEARCH_CTA,
+  BLOG_TO_DESTINATION_SLUG,
+} from "@/lib/relatedGuides";
+import { SafestCitiesSearchCta } from "@/components/content/SafestCitiesSearchCta";
 import { getDestinationBySlug } from "@/data/destinations";
 import { ogImageForPath } from "@/lib/readyPins";
 import { ContentSearchCta } from "@/components/content/ContentSearchCta";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { preferredEmailCaptureKind } from "@/lib/emailCapture";
+import { absoluteSeoTitle, socialTitle } from "@/lib/contentSeoTitle";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -39,20 +44,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   if (!post) return {};
 
-  const title = post.seoTitle ?? post.title;
+  const documentTitle = post.seoTitle ?? post.title;
   const description = post.seoDescription ?? post.excerpt ?? "";
   const canonical = `https://yesicantravel.com/blog/${post.slug}`;
   const ogImage = ogImageForPath(`/blog/${post.slug}`);
-  const absoluteTitle = title.includes("Yes I Can Travel")
-    ? title
-    : `${title} | Yes I Can Travel`;
+  const ogTitle = socialTitle(post.seoTitle, post.title);
 
   return {
-    title: { absolute: absoluteTitle },
+    title: absoluteSeoTitle(documentTitle),
     description,
     alternates: { canonical },
     openGraph: {
-      title,
+      title: ogTitle,
       description,
       url: canonical,
       type: "article",
@@ -71,7 +74,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: ogTitle,
       description,
       ...(ogImage ? { images: [ogImage] } : {}),
     },
@@ -129,6 +132,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const destination = destinationSlug
     ? getDestinationBySlug(destinationSlug)
     : undefined;
+  const blogSearchCta = BLOG_SEARCH_CTA[post.slug];
+  const isSafestCitiesList =
+    post.slug === "safest-cities-europe-solo-female-travellers";
   const destinationFaqs = destination?.faqs;
   const destinationPlaceId = destinationSlug
     ? getPlaceIdForDestinationSlug(destinationSlug)
@@ -251,12 +257,21 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </ReactMarkdown>
           </div>
 
-          {destination ? (
+          {isSafestCitiesList ? (
+            <SafestCitiesSearchCta className="mt-10" />
+          ) : destination ? (
             <ContentSearchCta
               className="mt-10"
               city={destination.city}
               placeId={destinationPlaceId}
               aiSearch={destinationPlaceId ? undefined : destination.aiSearch}
+              trackingSource={`blog_${post.slug}`}
+            />
+          ) : blogSearchCta ? (
+            <ContentSearchCta
+              className="mt-10"
+              city={blogSearchCta.city}
+              aiSearch={blogSearchCta.aiSearch}
               trackingSource={`blog_${post.slug}`}
             />
           ) : null}

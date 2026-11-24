@@ -8,10 +8,18 @@ export type CheckoutEventKind =
   | "payment_return_orphan"
   | "payment_return_guest_missing"
   | "prebook_ok"
-  | "book_ok";
+  | "book_ok"
+  | "checkout_view"
+  | "checkout_guest_submit"
+  | "checkout_payment_view"
+  | "checkout_payment_sdk_init"
+  | "checkout_payment_sdk_failed"
+  | "checkout_payment_return"
+  | "checkout_book_attempt";
 
 export type CheckoutEventInput = {
   kind: CheckoutEventKind;
+  correlationId?: string;
   prebookId?: string;
   transactionId?: string;
   offerId?: string;
@@ -38,6 +46,7 @@ export async function recordCheckoutEvent(input: CheckoutEventInput): Promise<vo
     await prisma.checkoutEvent.create({
       data: {
         kind: input.kind,
+        correlationId: input.correlationId ?? null,
         prebookId: input.prebookId ?? null,
         transactionId: input.transactionId ?? null,
         offerId: input.offerId ?? null,

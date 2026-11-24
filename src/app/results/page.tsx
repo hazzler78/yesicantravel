@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useCallback, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { Map as MapIcon, SearchX, SlidersHorizontal, TriangleAlert } from "lucide-react";
@@ -22,6 +22,7 @@ import { ResultsFeedbackWidget } from "@/components/results/ResultsFeedbackWidge
 import { SecondaryLink } from "@/components/ui/SecondaryButton";
 import { useCurrency } from "@/components/currency/CurrencyControl";
 import { guestNationalityForCurrency } from "@/lib/currency";
+import { useCurrencyQuerySync } from "@/lib/currencyUrl";
 import {
   appendOccupancyParams,
   buildSplitOccupancies,
@@ -74,6 +75,7 @@ interface HotelListItem extends HotelBasic, HotelCardData {
   currency?: string;
   hasFreeCancellation?: boolean;
   refundableFromPrice?: number;
+  lowestCancellation?: import("@/lib/cancellationPolicy").LiteApiCancellationPolicies | null;
   lat?: number;
   lng?: number;
   safetyBadges?: string[];
@@ -162,8 +164,10 @@ function formatDate(iso: string | null) {
 function ResultsContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const pathname = usePathname();
   const stay = parseStayType(searchParams.get("stay"));
   const currency = useCurrency();
+  useCurrencyQuerySync(searchParams, pathname, router);
   const [hotels, setHotels] = useState<HotelListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [enriching, setEnriching] = useState(false);
@@ -778,6 +782,7 @@ function ResultsContent() {
     if (placeId) qs.set("placeId", placeId);
     if (aiSearch) qs.set("aiSearch", aiSearch);
     if (stay !== "all") qs.set("stay", stay);
+    qs.set("currency", currency);
     return `/hotel/${id}?${qs.toString()}`;
   };
 
@@ -794,7 +799,7 @@ function ResultsContent() {
         currency: h.currency,
         href: hotelHref(h.id),
       })),
-    [aiSearch, checkin, checkout, hotelsWithCoords, party, placeId, roomsInSearch],
+    [aiSearch, checkin, checkout, currency, hotelsWithCoords, party, placeId, roomsInSearch, stay],
   );
 
   const showHotelOnMap = (hotelId: string) => {

@@ -88,12 +88,12 @@ export const destinations: Destination[] = [
     slug: "barcelona",
     city: "Barcelona",
     country: "Spain",
-    headline: "Barcelona for solo female travellers",
+    headline: "Barcelona for solo women: where to stay",
     subheadline:
       "A walkable, late-running city where the main risk to plan around is theft, not violence. Here's which neighbourhoods put you near a staffed reception and a metro entrance, and how to get back after midnight.",
-    metaTitle: "Is Barcelona Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Barcelona for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Barcelona safe for solo female travellers? Where to stay: Eixample & Gràcia, metro hours, pickpocketing plan, 24/7 reception — plus free checklist.",
+      "Eixample and Gràcia, metro hours, pickpocket plan, hotels with 24/7 reception. Where to base yourself as a woman travelling Barcelona alone.",
     aiSearch: "central safe hotel Barcelona Spain well-lit 24-hour reception",
     knownFor: [
       "Gaudí's Sagrada Família, Casa Batlló and Park Güell",
@@ -182,13 +182,13 @@ export const destinations: Destination[] = [
     slug: "amsterdam",
     city: "Amsterdam",
     country: "Netherlands",
-    headline: "Amsterdam for solo female travellers",
+    headline: "Amsterdam for solo women: where to stay",
     subheadline:
       "Small, flat and easy to cross on foot — with two things that catch visitors out: the trams stop just after midnight, and the red asphalt is a bike road, not a pavement. Here's how to stay somewhere calm and get home after the last tram.",
     // Broad query for destination; night query lives on /blog/amsterdam-safe-solo-women-night
-    metaTitle: "Is Amsterdam Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Amsterdam for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Amsterdam safe for solo female travellers? Jordaan & De Pijp bases, night buses after midnight, 24/7 reception — free checklist.",
+      "Jordaan and De Pijp, night buses after midnight, hotels with 24/7 reception. Where to base yourself as a woman travelling Amsterdam alone.",
     aiSearch: "central safe hotel Amsterdam Netherlands well-lit near station",
     knownFor: [
       "The UNESCO-listed canal ring, walkable end to end in under an hour",
@@ -278,12 +278,12 @@ export const destinations: Destination[] = [
     slug: "paris",
     city: "Paris",
     country: "France",
-    headline: "Paris for solo female travellers",
+    headline: "Paris for solo women: where to stay",
     subheadline:
       "A city built for walking alone, with an excellent late metro and a well-rehearsed set of street scams. Here's where to base yourself, how the last train really works, and which approaches to ignore.",
-    metaTitle: "Is Paris Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Paris for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Paris safe for solo female travellers? Where to stay: Marais & Saint-Germain, metro nights, scams to ignore, 24/7 reception — plus free checklist.",
+      "Marais and Saint-Germain, last metro and Noctilien nights, hotels with 24/7 reception. Where to base yourself as a woman travelling Paris alone.",
     aiSearch: "central safe hotel Paris France well-lit 24-hour reception",
     knownFor: [
       "The Louvre, Musée d'Orsay and a museum pass that pays for itself in two days",
@@ -372,12 +372,12 @@ export const destinations: Destination[] = [
     slug: "berlin",
     city: "Berlin",
     country: "Germany",
-    headline: "Berlin for solo female travellers",
+    headline: "Berlin for solo women: where to stay",
     subheadline:
       "Spread out, relaxed and unusually good for anyone out late — the U-Bahn and S-Bahn simply don't stop at weekends. Here's how the night network works and which districts suit a solo trip.",
-    metaTitle: "Is Berlin Safe for Women at Night? Solo Female Guide | Yes I Can Travel",
+    metaTitle: "Berlin for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is Berlin safe for women at night? Weekend 24h U-Bahn, Prenzlauer Berg & Mitte, hotels with 24/7 reception — practical, not fear-based. Free checklist included.",
+      "Prenzlauer Berg and Mitte, weekend 24-hour U-Bahn, hotels with 24/7 reception. Where to base yourself as a woman travelling Berlin alone.",
     aiSearch: "central safe hotel Berlin Germany well-lit near U-Bahn",
     knownFor: [
       "The Brandenburg Gate, Reichstag dome and Museum Island",
@@ -464,15 +464,110 @@ export const destinations: Destination[] = [
     contentVerified: true,
   },
   {
+    slug: "vienna",
+    city: "Vienna",
+    country: "Austria",
+    headline: "Vienna for solo women: where to stay",
+    subheadline:
+      "Formal on the surface and genuinely calm once you know the districts — with weekend U-Bahn nights, proof-of-payment tickets, and a centre that stays lit after four o'clock in winter.",
+    metaTitle: "Vienna for solo women: where to stay | Yes I Can Travel",
+    metaDescription:
+      "Innere Stadt and Neubau, weekend 24-hour U-Bahn, pickpocket plan, hotels with 24/7 reception. Where to base yourself as a woman travelling Vienna alone.",
+    aiSearch: "safe central hotels Vienna Austria well-lit near U-Bahn Ring",
+    knownFor: [
+      "The Ringstraße and the first district's coffee-house culture",
+      "Schönbrunn Palace and the Prater beyond the centre",
+      "Seasonal Christmas markets from November through January",
+      "The Staatsoper and Vienna's long ball season",
+      "A transit network that runs all night on Fridays and Saturdays",
+    ],
+    neighbourhoods: [
+      {
+        name: "Innere Stadt (1st district)",
+        verdict: "recommended",
+        description:
+          "Inside the Ringstraße, walking distance to Stephansplatz, the museums and the main markets. Expensive, but the payoff is a lit, busy walk home after dinner or a market rather than working out a tram. Comfortable at any hour.",
+      },
+      {
+        name: "Neubau (7th district)",
+        verdict: "recommended",
+        description:
+          "Around Mariahilfer Straße and the Spittelberg lanes — central without first-district prices, on the U3, and residential enough to be quiet by midnight. A strong base for Christmas market weeks.",
+      },
+      {
+        name: "Wieden and Margareten (4th and 5th)",
+        verdict: "recommended",
+        description:
+          "South of the centre around Karlsplatz and the Naschmarkt, on the U1, U2 and U4. Cheaper beds, populated evening streets, and a short ride to every major sight.",
+      },
+      {
+        name: "Leopoldstadt (2nd)",
+        verdict: "recommended",
+        description:
+          "Across the Danube Canal from the centre, with the Prater park and a growing restaurant scene. Well connected by U1 and U2; calmer than the first district but still a straightforward ride home.",
+      },
+      {
+        name: "Around Praterstern and Westbahnhof",
+        verdict: "caution",
+        description:
+          "Major interchanges with plenty of budget hotels, and visible street drinking at the station entrances that draws police attention. The trains are fine; it is the immediate surroundings late at night that many solo travellers prefer to avoid.",
+      },
+    ],
+    safetyTips: [
+      "The U-Bahn and trams run all night on Fridays, Saturdays and the eves of public holidays; on other nights the last trains leave around 00:30 and night buses take over — worth knowing before a late opera or ball.",
+      "Vienna uses proof-of-payment with no barriers. Validate a paper ticket before you board; the on-the-spot fine for travelling without a valid ticket is steep.",
+      "Pickpocketing concentrates in crowds: Stephansplatz, Karlsplatz, Christmas market stalls and the U1 and U3 through the tourist stations. Bag zipped and worn in front covers most of it.",
+      "Ignore costumed ticket sellers outside the Staatsoper and Stephansdom offering concert tickets — book directly with the venue if you want to go.",
+      "Cards are accepted widely, but market mug deposits and some smaller stalls still expect cash. A few euros in small notes saves queuing at an ATM in the cold.",
+      "The Frauen.Notruf gegen Gewalt hotline is 0800 222 555 — free, anonymous, 24 hours. For immediate danger call 112 (also 133 for police).",
+    ],
+    gettingAround:
+      "Vienna International (VIE) is east of the city. The S7 city train reaches Wien Mitte in about 25 minutes for a few euros; the City Airport Train is faster for several times the price — check ÖBB before you travel. A regulated taxi to the centre is typically €40–50. In the city the U-Bahn and trams reach every district tourists book; the network is frequent, clean and visibly staffed.",
+    supportLine: {
+      name: "Frauen.Notruf gegen Gewalt",
+      number: "0800 222 555",
+      description:
+        "Austria's free, anonymous 24-hour helpline for women affected by violence. Available nationwide in German; interpreters can be arranged. Emergency: 112.",
+    },
+    faqs: [
+      {
+        question: "Is Vienna safe for solo female travellers?",
+        answer:
+          "Vienna is among the safer large European capitals for women travelling alone. Violent crime against visitors is uncommon and street harassment is relatively rare. The realistic risks are pickpocketing in tourist crowds and misjudging the last U-Bahn on a weeknight.",
+      },
+      {
+        question: "Which district should I stay in?",
+        answer:
+          "Innere Stadt if you want to walk everywhere inside the Ring. Neubau is the best-value central alternative. Wieden and Margareten suit travellers who prefer a residential feel with fast U-Bahn links.",
+      },
+      {
+        question: "Does Vienna public transport run all night?",
+        answer:
+          "On Friday and Saturday nights and on the eves of public holidays, the U-Bahn runs through the night. On other nights the system shuts around 00:30 and night buses cover the main corridors until morning.",
+      },
+      {
+        question: "Do I need to validate my ticket?",
+        answer:
+          "Yes. There are no gates; inspectors check frequently and fines are not waived for visitors. Stamp or validate before you board.",
+      },
+      {
+        question: "Is it safe to walk back after the Christmas markets?",
+        answer:
+          "In the centre, yes — markets close well before the U-Bahn stops, streets stay lit and busy, and many women walk home from Stephansplatz or Rathausplatz without concern. Staying inside the Ring or one stop away on a main line keeps the last stretch simple.",
+      },
+    ],
+    contentVerified: true,
+  },
+  {
     slug: "milan",
     city: "Milan",
     country: "Italy",
-    headline: "Milan for solo female travellers",
+    headline: "Milan for solo women: where to stay",
     subheadline:
       "A working city rather than a museum, compact in the centre and easy to cross by metro — as long as you know it shuts around 00:30. Here's where to stay and how the night network fills the gap.",
-    metaTitle: "Is Milan Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "Milan for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Yes — for most solo women who stay in Brera or Porta Nuova. Metro until ~00:30, 24/7 reception hotels, free checklist.",
+      "Brera or Porta Nuova, metro until about 00:30, hotels with 24/7 reception. Where to base yourself as a woman travelling Milan alone.",
     aiSearch: "central safe hotel Milan Italy well-lit near metro",
     knownFor: [
       "The Duomo and the Galleria Vittorio Emanuele II",
@@ -562,12 +657,12 @@ export const destinations: Destination[] = [
     slug: "london",
     city: "London",
     country: "UK",
-    headline: "London for solo female travellers",
+    headline: "London for solo women: where to stay",
     subheadline:
       "Enormous, well policed and staffed at every station — with one rule that genuinely matters: never get into a minicab you didn't book. Here's how the night network works and where to base yourself.",
-    metaTitle: "Is London Safe for Solo Female Travellers? | Yes I Can Travel",
+    metaTitle: "London for solo women: where to stay | Yes I Can Travel",
     metaDescription:
-      "Is London safe for solo female travellers? Night Tube, licensed taxis vs minicabs, stay areas, and hotels with 24/7 reception — plus free checklist.",
+      "Night Tube, licensed taxis rather than unbooked minicabs, hotels with 24/7 reception. Where to base yourself as a woman travelling London alone.",
     aiSearch: "central safe hotel London UK well-lit near tube station",
     knownFor: [
       "World-class museums with free general admission",

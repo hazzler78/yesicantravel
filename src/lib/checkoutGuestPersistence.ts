@@ -14,6 +14,7 @@ export type CheckoutStayContext = {
   checkout?: string;
   occupancyQuery?: string;
   clientReference?: string;
+  correlationId?: string;
 };
 
 export type StoredCheckoutGuest = CheckoutGuestPayload & {

@@ -5,9 +5,9 @@ import { ArrowRight } from "lucide-react";
 import { popularCities } from "@/data/popularCities";
 import { getDestinationBySlug } from "@/data/destinations";
 import { Card } from "@/components/ui/Card";
-import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
-import { getCityPhotoBySlug } from "@/lib/cityPhotos";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
 import { getDefaultStayWindow } from "@/lib/stayDates";
 import { buildResultsPath } from "@/lib/resultsSearchUrl";
 
@@ -40,18 +40,15 @@ export default function PopularCitiesPage() {
             // Without a guide link the card is a dead end for crawlers, and the
             // city page is what ranks for "safe hotels in <city>" anyway.
             const guide = getDestinationBySlug(city.slug);
-            const photo = getCityPhotoBySlug(city.slug);
+            const photo = resolveDiscoveryCardPhoto({ destinationSlug: city.slug });
             return (
               <li key={city.slug}>
                 <Card as="article" className="flex h-full flex-col overflow-hidden p-0">
-                  {photo && (
-                    <CityCardPhoto
-                      src={photo.src}
-                      alt={photo.alt}
-                      priority={index < 3}
-                      className="rounded-t-[inherit]"
-                    />
-                  )}
+                  <DiscoveryCardPhoto
+                    photo={photo}
+                    priority={index < 3}
+                    className="rounded-t-[inherit]"
+                  />
                   <div className="flex flex-1 flex-col p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
                       {city.country}

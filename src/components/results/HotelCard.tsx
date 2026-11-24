@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Clock, ImageOff, MapPin, TrainFront, Venus } from "lucide-react";
+import { Clock, MapPin, TrainFront, Venus } from "lucide-react";
+import { HotelCardPhoto } from "@/components/results/HotelCardPhoto";
 import { formatStayTotal } from "@/lib/formatStayPrice";
 import { repairLiteApiText } from "@/lib/repairLiteApiText";
 import { formatDistance, type StaySignals } from "@/lib/staySignals";
@@ -62,24 +63,7 @@ export function HotelCard({ hotel, signals, href, nights, onSelect, onShowOnMap 
           aria-hidden
           className="relative block aspect-[4/3] w-full shrink-0 overflow-hidden bg-surface-muted sm:aspect-auto sm:h-[188px] sm:w-[248px]"
         >
-          {hotel.main_photo ? (
-            /* Hotel photos come from partner CDNs that aren't in next.config image hosts. */
-            /* eslint-disable-next-line @next/next/no-img-element */
-            <img
-              src={hotel.main_photo}
-              alt=""
-              width={496}
-              height={376}
-              loading="lazy"
-              decoding="async"
-              sizes="(max-width: 640px) 100vw, 248px"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <span className="flex h-full w-full items-center justify-center text-ink-muted">
-              <ImageOff className="h-6 w-6" aria-hidden />
-            </span>
-          )}
+          <HotelCardPhoto src={hotel.main_photo} name={hotel.name} />
         </Link>
 
         <div className="flex min-w-0 flex-1 flex-col gap-3 p-4 sm:flex-row sm:gap-5">

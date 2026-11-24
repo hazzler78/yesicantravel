@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CalendarDays } from "lucide-react";
 import { getUpcomingEvents } from "@/data/events";
-import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { Card } from "@/components/ui/Card";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
-import { getCityPhotoByCityName } from "@/lib/cityPhotos";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -127,17 +127,14 @@ export default function EventsPage() {
                 </h2>
                 <ul className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {monthEvents.map((event) => {
-                    const photo = getCityPhotoByCityName(event.city);
+                    const photo = resolveDiscoveryCardPhoto({
+                      city: event.city,
+                      eventSlug: event.slug,
+                    });
                     return (
                       <li key={event.slug}>
                         <Card as="article" className="flex h-full flex-col overflow-hidden p-0">
-                          {photo && (
-                            <CityCardPhoto
-                              src={photo.src}
-                              alt={photo.alt}
-                              className="rounded-t-[inherit]"
-                            />
-                          )}
+                          <DiscoveryCardPhoto photo={photo} className="rounded-t-[inherit]" />
                           <div className="flex flex-1 flex-col p-5">
                             <p className="tnum text-xs font-semibold uppercase tracking-[0.08em] text-teal">
                               {event.dateRange}

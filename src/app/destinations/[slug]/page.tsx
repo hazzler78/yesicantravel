@@ -11,11 +11,10 @@ import { getUpcomingEventsInCity } from "@/data/events";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
 import { buildResultsPath } from "@/lib/resultsSearchUrl";
-import Image from "next/image";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
-import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { EmailSignupBox } from "@/components/EmailSignupBox";
-import { getCityPhotoBySlug } from "@/lib/cityPhotos";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 import { DESTINATION_RELATED_GUIDES } from "@/lib/relatedGuides";
 import { ContentSearchCta } from "@/components/content/ContentSearchCta";
 
@@ -74,7 +73,7 @@ export default async function DestinationPage({ params }: Props) {
   const canonicalUrl = `${BASE_URL}/destinations/${slug}`;
   const related = getRelatedDestinations(slug, 3);
   const cityEvents = getUpcomingEventsInCity(dest.city, 4);
-  const photo = getCityPhotoBySlug(slug);
+  const photo = resolveDiscoveryCardPhoto({ destinationSlug: slug, city: dest.city });
 
   // JSON-LD: BreadcrumbList + TouristDestination. Helps Google understand
   // topical relevance of thin templated pages while we build out richer copy.
@@ -164,11 +163,9 @@ export default async function DestinationPage({ params }: Props) {
           </p>
         </header>
 
-        {photo && (
-          <div className="mb-8 overflow-hidden rounded-card border border-border">
-            <CityCardPhoto src={photo.src} alt={photo.alt} priority className="rounded-card" />
-          </div>
-        )}
+        <div className="mb-8 overflow-hidden rounded-card border border-border">
+          <DiscoveryCardPhoto photo={photo} priority className="rounded-card" />
+        </div>
 
         <ContentSearchCta
           className="mb-8 mt-6"
@@ -398,24 +395,17 @@ export default async function DestinationPage({ params }: Props) {
             </h2>
             <ul className="grid gap-3 sm:grid-cols-2">
               {related.map((r) => {
-                const relatedPhoto = getCityPhotoBySlug(r.slug);
+                const relatedPhoto = resolveDiscoveryCardPhoto({
+                  destinationSlug: r.slug,
+                  city: r.city,
+                });
                 return (
                   <li key={r.slug}>
                     <Link
                       href={`/destinations/${r.slug}`}
                       className="block overflow-hidden rounded-card border border-border bg-surface transition-colors hover:border-border-strong"
                     >
-                      {relatedPhoto && (
-                        <span className="relative block aspect-[16/10] bg-surface-muted">
-                          <Image
-                            src={relatedPhoto.src}
-                            alt=""
-                            fill
-                            sizes="(max-width: 640px) 100vw, 33vw"
-                            className="object-cover"
-                          />
-                        </span>
-                      )}
+                      <DiscoveryCardPhoto photo={relatedPhoto} className="rounded-t-[inherit]" />
                       <span className="block p-4">
                         <p className="text-xs font-medium uppercase tracking-wider text-teal">
                           {r.country}

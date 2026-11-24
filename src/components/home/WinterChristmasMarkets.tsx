@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { getHomepageWinterEvents } from "@/data/events";
-import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 import { SectionHeading } from "@/components/ui/Card";
-import { getCityPhotoByCityName } from "@/lib/cityPhotos";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
 
 /**
  * Seasonal block for Christmas markets and Hogmanay while each event is still upcoming.
@@ -28,16 +28,17 @@ export function WinterChristmasMarkets() {
 
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {events.map((event) => {
-            const photo = getCityPhotoByCityName(event.city);
+            const photo = resolveDiscoveryCardPhoto({
+              city: event.city,
+              eventSlug: event.slug,
+            });
             return (
               <li key={event.slug}>
                 <Link
                   href={`/events/${event.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface transition-colors hover:border-teal/40 hover:bg-surface"
                 >
-                  {photo && (
-                    <CityCardPhoto src={photo.src} alt="" className="rounded-t-[inherit]" />
-                  )}
+                  <DiscoveryCardPhoto photo={photo} className="rounded-t-[inherit]" />
                   <span className="flex flex-1 flex-col p-4">
                     <span className="inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-teal tnum">
                       <Sparkles className="h-3.5 w-3.5 shrink-0" aria-hidden />

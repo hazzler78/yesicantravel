@@ -16,6 +16,8 @@ import {
   BLOG_TO_DESTINATION_SLUG,
 } from "@/lib/relatedGuides";
 import { enrichResultsHref } from "@/lib/resultsSearchUrl";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 import { SafestCitiesSearchCta } from "@/components/content/SafestCitiesSearchCta";
 import { getDestinationBySlug } from "@/data/destinations";
 import { ogImageForPath } from "@/lib/readyPins";
@@ -263,20 +265,30 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </ReactMarkdown>
           </div>
 
-          {blogRelatedEvent && (
-            <Card className="mt-10 p-5 sm:p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">
-                Peak dates nearby
-              </p>
-              <Link
-                href={blogRelatedEvent.href}
-                className="mt-1 block font-display text-lg font-semibold text-ink hover:text-teal"
-              >
-                {blogRelatedEvent.label}
-              </Link>
-              <p className="mt-1.5 text-[0.9375rem] text-ink-muted">{blogRelatedEvent.blurb}</p>
-            </Card>
-          )}
+          {blogRelatedEvent && (() => {
+            const eventSlug = blogRelatedEvent.href.replace(/^\/events\//, "");
+            const eventPhoto = resolveDiscoveryCardPhoto({
+              eventSlug,
+              city: destination?.city,
+            });
+            return (
+              <Card className="mt-10 overflow-hidden p-0 sm:p-0">
+                <DiscoveryCardPhoto photo={eventPhoto} className="rounded-t-[inherit]" />
+                <div className="p-5 sm:p-6">
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-teal">
+                    Peak dates nearby
+                  </p>
+                  <Link
+                    href={blogRelatedEvent.href}
+                    className="mt-1 block font-display text-lg font-semibold text-ink hover:text-teal"
+                  >
+                    {blogRelatedEvent.label}
+                  </Link>
+                  <p className="mt-1.5 text-[0.9375rem] text-ink-muted">{blogRelatedEvent.blurb}</p>
+                </div>
+              </Card>
+            );
+          })()}
 
           {isSafestCitiesList ? (
             <SafestCitiesSearchCta className="mt-10" />

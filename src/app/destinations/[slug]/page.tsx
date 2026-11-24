@@ -10,6 +10,7 @@ import {
 import { getUpcomingEventsInCity } from "@/data/events";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { formatStayWindow, getDefaultStayWindow } from "@/lib/stayDates";
+import { buildResultsPath } from "@/lib/resultsSearchUrl";
 import Image from "next/image";
 import { FromPriceBadge } from "@/components/FromPriceBadge";
 import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
@@ -64,12 +65,11 @@ export default async function DestinationPage({ params }: Props) {
   // Same placeId (when we have one) as the from-price quote, so the figure
   // on this page is actually on the results list the CTA opens.
   const placeId = getPlaceIdForDestinationSlug(slug);
-  const searchUrl = `/results?${new URLSearchParams({
-    ...(placeId ? { placeId } : { aiSearch: dest.aiSearch }),
-    checkin: stay.checkin,
-    checkout: stay.checkout,
-    adults: "1",
-  })}`;
+  const searchUrl = buildResultsPath({
+    placeId,
+    aiSearch: placeId ? undefined : dest.aiSearch,
+    stay,
+  });
 
   const canonicalUrl = `${BASE_URL}/destinations/${slug}`;
   const related = getRelatedDestinations(slug, 3);

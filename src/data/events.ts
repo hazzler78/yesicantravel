@@ -4,7 +4,7 @@
  * Sitemap and /events/[slug] are generated from this array.
  */
 
-import { getSeasonStayWindow, todayIso, type StayWindow } from "@/lib/stayDates";
+import { getWeekendStayWindowInRange, todayIso, type StayWindow } from "@/lib/stayDates";
 
 export { getDefaultStayWindow, type StayWindow } from "@/lib/stayDates";
 
@@ -2072,7 +2072,24 @@ export function getEventStayWindow(
   event: Pick<Event, "startDate" | "endDate">,
   today = todayIso(),
 ): StayWindow | null {
-  return getSeasonStayWindow(event.startDate, event.endDate, today);
+  return getWeekendStayWindowInRange(event.startDate, event.endDate, today);
+}
+
+/** Winter peak dates promoted on the homepage while still bookable. */
+export const HOMEPAGE_WINTER_EVENT_SLUGS = [
+  "strasbourg-christmas-markets-2026",
+  "prague-christmas-markets-2026",
+  "vienna-christmas-markets-2026",
+  "edinburgh-hogmanay-2026",
+] as const;
+
+export function getHomepageWinterEvents(today = todayIso()) {
+  return HOMEPAGE_WINTER_EVENT_SLUGS.map((slug) => getEventBySlug(slug)).filter(
+    (e): e is Event & { dateRange: string } => {
+      if (!e) return false;
+      return !isEventPast(e, today);
+    },
+  );
 }
 
 export function getEventBySlug(slug: string): (Event & { dateRange: string }) | undefined {

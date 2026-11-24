@@ -18,6 +18,7 @@ import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { Card } from "@/components/ui/Card";
 import { PrimaryLink } from "@/components/ui/PrimaryButton";
 import { EVENT_RELATED_GUIDES } from "@/lib/relatedGuides";
+import { buildResultsPathForEvent } from "@/lib/resultsSearchUrl";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -143,12 +144,10 @@ export default async function EventPage({ params }: Props) {
       // fall back to aiSearch below
     }
   }
-  const searchUrl = `/results?${new URLSearchParams({
-    ...(placeId ? { placeId } : { aiSearch: event.aiSearchTemplate }),
-    checkin: stay.checkin,
-    checkout: stay.checkout,
-    adults: "1",
-  })}`;
+  const searchUrl = buildResultsPathForEvent(event, {
+    placeId,
+    aiSearch: event.aiSearchTemplate,
+  });
 
   const whyNowBody =
     event.whyNow ??

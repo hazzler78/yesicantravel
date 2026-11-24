@@ -4,6 +4,7 @@ import { getDestinationBySlug } from "@/data/destinations";
 import { getPlaceIdForDestinationSlug } from "@/data/popularCities";
 import { SAFEST_CITIES_DESTINATION_SLUGS } from "@/lib/relatedGuides";
 import { getDefaultStayWindow } from "@/lib/stayDates";
+import { buildResultsPath } from "@/lib/resultsSearchUrl";
 
 type SafestCitiesSearchCtaProps = {
   className?: string;
@@ -31,20 +32,15 @@ export function SafestCitiesSearchCta({ className = "" }: SafestCitiesSearchCtaP
           const dest = getDestinationBySlug(slug);
           if (!dest) return null;
           const placeId = getPlaceIdForDestinationSlug(slug);
-          const params = new URLSearchParams({
-            checkin: stay.checkin,
-            checkout: stay.checkout,
-            adults: "1",
+          const href = buildResultsPath({
+            placeId,
+            aiSearch: placeId ? undefined : dest.aiSearch,
+            stay,
           });
-          if (placeId) {
-            params.set("placeId", placeId);
-          } else if (dest.aiSearch) {
-            params.set("aiSearch", dest.aiSearch);
-          }
           return (
             <li key={slug}>
               <Link
-                href={`/results?${params.toString()}`}
+                href={href}
                 className="text-teal underline underline-offset-4 hover:text-teal/90"
               >
                 Search safer stays in {dest.city}

@@ -8,11 +8,14 @@
 
 export type StayWindow = { checkin: string; checkout: string; nights: number };
 
-/** Far enough out that inventory and prices look normal, close enough to feel real. */
-export const DEFAULT_LEAD_DAYS = 14;
+/** Fri → Sun is the usual short-break shape we pre-fill everywhere. */
 export const DEFAULT_NIGHTS = 2;
+/** LiteAPI inventory thins out beyond ~90 days for many cities. */
+export const MAX_RATES_HORIZON_DAYS = 90;
 /** Nobody books a 53-night stay because a tulip season runs that long. */
 export const MAX_PREFILLED_NIGHTS = 3;
+/** @deprecated Legacy lead; evergreen CTAs use {@link getFridaySundayStayWindow}. */
+export const DEFAULT_LEAD_DAYS = 14;
 
 export function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
@@ -29,10 +32,64 @@ export function nightsBetween(from: string, to: string): number {
   return Math.max(0, Math.round(diff / 86_400_000));
 }
 
-/** A plain upcoming stay, for pages that aren't tied to a specific date. */
-export function getDefaultStayWindow(today = todayIso()): StayWindow {
+function utcDayOfWeek(iso: string): number {
+  return new Date(iso + "T12:00:00Z").getUTCDay();
+}
+
+/**
+ * Next Friday–Sunday (two nights) from at least tomorrow, with check-in
+ * within {@link MAX_RATES_HORIZON_DAYS} of today.
+ */
+export function getFridaySundayStayWindow(today = todayIso()): StayWindow {
+  const earliestCheckin = addDays(today, 1);
+  const latestCheckin = addDays(today, MAX_RATES_HORIZON_DAYS - DEFAULT_NIGHTS);
+
+  let cursor = earliestCheckin;
+  for (let i = 0; i < MAX_RATES_HORIZON_DAYS + 7; i += 1) {
+    if (cursor > latestCheckin) break;
+    if (utcDayOfWeek(cursor) === 5) {
+      const checkout = addDays(cursor, DEFAULT_NIGHTS);
+      return { checkin: cursor, checkout, nights: DEFAULT_NIGHTS };
+    }
+    cursor = addDays(cursor, 1);
+  }
+
   const checkin = addDays(today, DEFAULT_LEAD_DAYS);
   return { checkin, checkout: addDays(checkin, DEFAULT_NIGHTS), nights: DEFAULT_NIGHTS };
+}
+
+/** A plain upcoming stay, for pages that aren't tied to a specific date. */
+export function getDefaultStayWindow(today = todayIso()): StayWindow {
+  return getFridaySundayStayWindow(today);
+}
+
+/**
+ * First Fri–Sun stay that fits inside a dated window (events / seasons).
+ * Falls back to {@link getSeasonStayWindow} when no full weekend fits.
+ */
+export function getWeekendStayWindowInRange(
+  startDate: string,
+  endDate: string,
+  today = todayIso(),
+): StayWindow | null {
+  if (endDate < today) return null;
+
+  const earliestCheckin = startDate > addDays(today, 1) ? startDate : addDays(today, 1);
+  const horizonCheckin = addDays(today, MAX_RATES_HORIZON_DAYS - DEFAULT_NIGHTS);
+  const searchUntil = endDate < horizonCheckin ? endDate : horizonCheckin;
+
+  let cursor = earliestCheckin;
+  while (cursor <= searchUntil) {
+    if (utcDayOfWeek(cursor) === 5) {
+      const checkout = addDays(cursor, DEFAULT_NIGHTS);
+      if (checkout <= endDate) {
+        return { checkin: cursor, checkout, nights: DEFAULT_NIGHTS };
+      }
+    }
+    cursor = addDays(cursor, 1);
+  }
+
+  return getSeasonStayWindow(startDate, endDate, today);
 }
 
 /**

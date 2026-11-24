@@ -10,6 +10,7 @@ import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import { STAY_TYPE_ORDER, STAY_TYPES, type StayType } from "@/lib/stayTypes";
+import { getDefaultStayWindow } from "@/lib/stayDates";
 
 type ExploreHotel = {
   id: string;
@@ -22,16 +23,9 @@ type ExploreHotel = {
   address?: string;
 };
 
-/** Default check-in 14 days out, 2 nights — same as the homepage search. */
 function defaultDates() {
-  const checkin = new Date();
-  checkin.setDate(checkin.getDate() + 14);
-  const checkout = new Date(checkin);
-  checkout.setDate(checkout.getDate() + 2);
-  return {
-    checkin: checkin.toISOString().slice(0, 10),
-    checkout: checkout.toISOString().slice(0, 10),
-  };
+  const { checkin, checkout } = getDefaultStayWindow();
+  return { checkin, checkout };
 }
 
 /** Rough meters per degree of latitude/longitude at a given latitude. */

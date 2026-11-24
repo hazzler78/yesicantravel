@@ -5,6 +5,7 @@ import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { PopularCitiesStrip } from "@/components/home/PopularCitiesStrip";
 import { SafetySignals } from "@/components/home/SafetySignals";
 import { TrendingEvents } from "@/components/home/TrendingEvents";
+import { WinterChristmasMarkets } from "@/components/home/WinterChristmasMarkets";
 
 export const metadata: Metadata = {
   title: {
@@ -33,6 +34,7 @@ export default function HomePage() {
       <HomeHero />
       <LeadMagnetHomeCta />
       <PopularCitiesStrip />
+      <WinterChristmasMarkets />
       <SafetySignals />
       <TrendingEvents />
       <CommunityQuote />

@@ -9,6 +9,7 @@ import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { getCityPhotoBySlug } from "@/lib/cityPhotos";
 import { getDefaultStayWindow } from "@/lib/stayDates";
+import { buildResultsPath } from "@/lib/resultsSearchUrl";
 
 export default function PopularCitiesPage() {
   const { checkin, checkout } = getDefaultStayWindow();
@@ -31,12 +32,10 @@ export default function PopularCitiesPage() {
 
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {popularCities.map((city, index) => {
-            const href = `/results?${new URLSearchParams({
+            const href = buildResultsPath({
               placeId: city.placeId,
-              checkin,
-              checkout,
-              adults: "1",
-            })}`;
+              stay: { checkin, checkout, nights: 2 },
+            });
             // The search link lives under /results, which robots.txt disallows.
             // Without a guide link the card is a dead end for crawlers, and the
             // city page is what ranks for "safe hotels in <city>" anyway.

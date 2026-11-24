@@ -3,22 +3,9 @@ import { searchRates } from "@/lib/liteapi";
 import { popularCities } from "@/data/popularCities";
 import { cheapestVisibleTotal, perNight, type RateOffer } from "@/lib/resultsPricing";
 import { DEFAULT_CURRENCY, resolveRequestCurrency } from "@/lib/currency";
+import { getDefaultStayWindow } from "@/lib/stayDates";
 
-const NIGHTS = 2;
 const ADULTS = 1;
-const DAYS_AHEAD = 14;
-
-/** Default check-in 14 days from now – identical to the links on the city cards. */
-function getDefaultDates() {
-  const checkin = new Date();
-  checkin.setDate(checkin.getDate() + DAYS_AHEAD);
-  const checkout = new Date(checkin);
-  checkout.setDate(checkout.getDate() + NIGHTS);
-  return {
-    checkin: checkin.toISOString().slice(0, 10),
-    checkout: checkout.toISOString().slice(0, 10),
-  };
-}
 
 export type CityPrice = { perNight: number | null; currency: string };
 
@@ -46,7 +33,7 @@ export async function GET(request: NextRequest) {
       cookieHeader: request.headers.get("cookie"),
       fallback: DEFAULT_CURRENCY,
     });
-    const { checkin, checkout } = getDefaultDates();
+    const { checkin, checkout, nights } = getDefaultStayWindow();
 
     const results = await Promise.all(
       popularCities.map(async (city): Promise<{ slug: string } & CityPrice> => {
@@ -60,7 +47,7 @@ export async function GET(request: NextRequest) {
           });
           const cheapest = cheapestVisibleTotal((data?.data ?? []) as RateOffer[]);
           if (!cheapest) return { slug: city.slug, perNight: null, currency };
-          const nightly = perNight(cheapest, NIGHTS);
+          const nightly = perNight(cheapest, nights);
           return { slug: city.slug, perNight: nightly.amount, currency: nightly.currency };
         } catch {
           return { slug: city.slug, perNight: null, currency };
@@ -76,7 +63,7 @@ export async function GET(request: NextRequest) {
     const body: MinPricesResponse = {
       checkin,
       checkout,
-      nights: NIGHTS,
+      nights,
       adults: ADULTS,
       currency,
       cities,

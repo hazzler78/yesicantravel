@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getLinkableDestinations } from "@/data/destinations";
-import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 import { LeadMagnetHomeCta } from "@/components/home/LeadMagnetHomeCta";
 import { Card } from "@/components/ui/Card";
-import { getCityPhotoBySlug } from "@/lib/cityPhotos";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
 
 const BASE_URL = "https://yesicantravel.com";
 
@@ -89,18 +89,18 @@ export default function DestinationsPage() {
 
         <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {destinations.map((destination, index) => {
-            const photo = getCityPhotoBySlug(destination.slug);
+            const photo = resolveDiscoveryCardPhoto({
+              destinationSlug: destination.slug,
+              city: destination.city,
+            });
             return (
               <li key={destination.slug}>
                 <Card as="article" className="flex h-full flex-col overflow-hidden p-0">
-                  {photo && (
-                    <CityCardPhoto
-                      src={photo.src}
-                      alt={photo.alt}
-                      priority={index < 3}
-                      className="rounded-t-[inherit]"
-                    />
-                  )}
+                  <DiscoveryCardPhoto
+                    photo={photo}
+                    priority={index < 3}
+                    className="rounded-t-[inherit]"
+                  />
                   <div className="flex flex-1 flex-col p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.08em] text-ink-muted">
                       {destination.country}

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getEventsForHomepage } from "@/data/events";
-import { CityCardPhoto } from "@/components/cities/CityCardPhoto";
+import { DiscoveryCardPhoto } from "@/components/cities/DiscoveryCardPhoto";
 import { SectionHeading } from "@/components/ui/Card";
-import { getCityPhotoByCityName } from "@/lib/cityPhotos";
+import { resolveDiscoveryCardPhoto } from "@/lib/cityPhotos";
 
 export function TrendingEvents() {
   const events = getEventsForHomepage(8);
@@ -21,16 +21,17 @@ export function TrendingEvents() {
 
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {events.map((event) => {
-            const photo = getCityPhotoByCityName(event.city);
+            const photo = resolveDiscoveryCardPhoto({
+              city: event.city,
+              eventSlug: event.slug,
+            });
             return (
               <li key={event.slug}>
                 <Link
                   href={`/events/${event.slug}`}
                   className="group flex h-full flex-col overflow-hidden rounded-card border border-border bg-surface transition-colors hover:border-border-strong hover:bg-surface-muted"
                 >
-                  {photo && (
-                    <CityCardPhoto src={photo.src} alt="" className="rounded-t-[inherit]" />
-                  )}
+                  <DiscoveryCardPhoto photo={photo} className="rounded-t-[inherit]" />
                   <span className="flex flex-1 flex-col p-4">
                     <span className="text-[0.8125rem] font-semibold uppercase tracking-[0.08em] text-teal tnum">
                       {event.dateRange}

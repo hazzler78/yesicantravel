@@ -7,7 +7,10 @@ type CityCardPhotoProps = {
   size?: "card" | "strip";
   priority?: boolean;
   className?: string;
+  onError?: () => void;
 };
+
+export type { CityCardPhotoProps };
 
 /**
  * Place-first city photography for discovery cards.
@@ -19,6 +22,7 @@ export function CityCardPhoto({
   size = "card",
   priority = false,
   className = "",
+  onError,
 }: CityCardPhotoProps) {
   const heightClass = size === "strip" ? "h-16 w-20 sm:h-[4.5rem] sm:w-[5.5rem]" : "aspect-[3/2] w-full";
 
@@ -37,6 +41,7 @@ export function CityCardPhoto({
         }
         className="object-cover"
         priority={priority}
+        onError={onError}
       />
     </span>
   );

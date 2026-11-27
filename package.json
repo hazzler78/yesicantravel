@@ -26,6 +26,7 @@
     "mailerlite:backfill-nurture": "node scripts/backfill-mailerlite-nurture.js"
   },
   "dependencies": {
+    "@plausible-analytics/tracker": "0.4.7",
     "@prisma/client": "^6.19.3",
     "@types/leaflet": "^1.9.21",
     "@types/leaflet.markercluster": "^1.5.6",

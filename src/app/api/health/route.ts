@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getNurtureAutomationStatus } from "@/lib/mailerlite";
+import { isPlausibleDisabled, plausibleSiteDomain } from "@/lib/plausiblePrivacy";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 10;
@@ -59,6 +60,8 @@ export async function GET() {
   checks.ga4 = Boolean(
     process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID?.startsWith("G-")
   );
+  checks.plausible = !isPlausibleDisabled();
+  checks.plausibleDomain = plausibleSiteDomain();
   checks.mailerliteApiKey = Boolean(process.env.MAILERLITE_API_KEY);
   checks.mailerliteNurtureGroup = Boolean(process.env.MAILERLITE_NURTURE_GROUP_ID?.trim());
 

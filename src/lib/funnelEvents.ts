@@ -1,4 +1,5 @@
 import { track } from "@vercel/analytics";
+import { trackPlausibleEvent } from "@/lib/plausible";
 
 /**
  * Canonical funnel event names. These are the 5 events we watch in Clarity + Vercel Analytics
@@ -32,12 +33,18 @@ export function trackFunnelEvent(
         Object.entries(data).filter(([, v]) => v !== undefined),
       )
     : undefined;
+  const forVercel = sanitized ? { ...sanitized } : undefined;
+  if (forVercel && "revenueAmount" in forVercel) {
+    delete forVercel.revenueAmount;
+  }
 
   try {
-    track(name, sanitized as Record<string, string | number | boolean | null>);
+    track(name, forVercel as Record<string, string | number | boolean | null>);
   } catch {
     // Analytics never throws visibly; ignore.
   }
+
+  trackPlausibleEvent(name, sanitized);
 
   const clarity = getClarity();
   if (clarity) {

@@ -106,8 +106,27 @@ export function getCityPhotoBySlug(slug: string | null | undefined): CityPhoto |
   return BY_SLUG[slug];
 }
 
+/** Lowercases and strips accents so "Cancún" matches "cancun". */
+function normalizeCityName(value: string): string {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").trim().toLowerCase();
+}
+
 export function getCityPhotoByCityName(city: string | null | undefined): CityPhoto | undefined {
   if (!city) return undefined;
-  const slug = CITY_NAME_TO_SLUG[city.trim().toLowerCase()];
-  return slug ? BY_SLUG[slug] : undefined;
+  const normalized = normalizeCityName(city);
+
+  const exactSlug = CITY_NAME_TO_SLUG[normalized];
+  if (exactSlug) return BY_SLUG[exactSlug];
+
+  // Event locations often add context, e.g. "Ferropolis (near Berlin)".
+  const containedName = Object.keys(CITY_NAME_TO_SLUG).find((name) => normalized.includes(name));
+  return containedName ? BY_SLUG[CITY_NAME_TO_SLUG[containedName]] : undefined;
+}
+
+/**
+ * Event cards always need an image. Cities without a local photo fall back to
+ * a neutral atmosphere shot so the grid never shows empty tiles.
+ */
+export function getEventCardPhoto(city: string | null | undefined): CityPhoto {
+  return getCityPhotoByCityName(city) ?? ATMOSPHERE_PHOTOS.evening;
 }
